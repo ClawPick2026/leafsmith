@@ -16,7 +16,7 @@ MAX_EXTRACTED = 2 * 1024 * 1024 * 1024
 MAX_FILES = 20000
 SNAPSHOT = "https://snapshot.ubuntu.com/ubuntu/20261001T000000Z/"
 FFMPEG_SOURCES = [
-    {"name": "ffmpeg-7.1.3.tar.xz", "url": "https://ffmpeg.org/releases/ffmpeg-7.1.3.tar.xz", "sha256": "f0bf043299db9e3caacb435a712fc541fbb07df613c4b893e8b77e67baf3adbe"},
+    {"name": "ffmpeg-7.1.5.tar.xz", "url": "https://ffmpeg.org/releases/ffmpeg-7.1.5.tar.xz", "sha256": "de668509caf9e35e3cd162473441fdb29538c6d96ed080292b3cf9e6fc5d558f"},
     {"name": "libvpx-1.15.2.tar.gz", "url": "https://github.com/webmproject/libvpx/archive/refs/tags/v1.15.2.tar.gz", "sha256": "26fcd3db88045dee380e581862a6ef106f49b74b6396ee95c2993a260b4636aa"},
     {"name": "opus-1.5.2.tar.gz", "url": "https://downloads.xiph.org/releases/opus/opus-1.5.2.tar.gz", "sha256": "65c1d2f78b9f2fb20082c38cbe47c951ad5839345876e46941612ee87f9a7ce1"},
 ]
@@ -24,10 +24,10 @@ FFMPEG_SOURCES = [
 
 # Downloaded and independently hashed during recipe preparation; no unofficial binaries.
 WINDOWS_OCR_SOURCES = [
-    {"name": "tesseract-5.5.1.tar.gz", "url": "https://codeload.github.com/tesseract-ocr/tesseract/tar.gz/refs/tags/5.5.1", "sha256": "a7a3f2a7420cb6a6a94d80c24163e183cf1d2f1bed2df3bbc397c81808a57237"},
-    {"name": "leptonica-1.85.0.tar.gz", "url": "https://codeload.github.com/DanBloomberg/leptonica/tar.gz/refs/tags/1.85.0", "sha256": "c01376bce0379d4ea4bc2ec5d5cbddaa49e2f06f88242619ab8c059e21adf233"},
-    {"name": "zlib-1.3.1.tar.gz", "url": "https://zlib.net/fossils/zlib-1.3.1.tar.gz", "sha256": "9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23"},
-    {"name": "libpng-1.6.50.tar.gz", "url": "https://codeload.github.com/pnggroup/libpng/tar.gz/refs/tags/v1.6.50", "sha256": "71158e53cfdf2877bc99bcab33641d78df3f48e6e0daad030afe9cb8c031aa46"},
+    {"name": "tesseract-5.5.3.tar.gz", "url": "https://codeload.github.com/tesseract-ocr/tesseract/tar.gz/refs/tags/5.5.3", "sha256": "9218e62793116d42a9f6d14cd9348518b27f382096eea3d0f2d1a24616bb5884"},
+    {"name": "leptonica-1.87.0.tar.gz", "url": "https://codeload.github.com/DanBloomberg/leptonica/tar.gz/refs/tags/1.87.0", "sha256": "fa2b40c5caea96d1bb93a97486262aed8731b69ce25a84a6bf5d25323e33f631"},
+    {"name": "zlib-1.3.2.tar.xz", "url": "https://zlib.net/zlib-1.3.2.tar.xz", "sha256": "d7a0654783a4da529d1bb793b7ad9c3318020af77667bcae35f95d0e42a792f3"},
+    {"name": "libpng-1.6.59.tar.gz", "url": "https://codeload.github.com/pnggroup/libpng/tar.gz/refs/tags/v1.6.59", "sha256": "2540302a1844ad2b2b501977abecfa850f265f97b78f065a712ab4074a89f5b5"},
 ]
 TESSDATA_BASE = "https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/65727574dfcd264acbb0c3e07860e4e9e9b22185/"
 WINDOWS_OCR_DATA = [
@@ -37,35 +37,66 @@ WINDOWS_OCR_DATA = [
 ]
 
 
-OFFICE_BASE = "https://downloadarchive.documentfoundation.org/libreoffice/old/25.2.7.2/"
-WINDOWS_OFFICE_INSTALLER = {"name": "LibreOffice_25.2.7.2_Win_x86-64.msi", "url": OFFICE_BASE + "win/x86_64/LibreOffice_25.2.7.2_Win_x86-64.msi", "sha256": "9fdd22f8ea7a92a67de5beaa08588ef6da58c1930ac86fd57c46b0c6d7ca9d34"}
+OFFICE_VERSION = "26.2.7.1"
+OFFICE_CANDIDATE = {
+    "releaseChannel": "prerelease",
+    "displayName": "LibreOffice conversion (26.2.7.1 pre-release candidate)",
+    "dependencyBaseline": {"libpng": "1.6.59", "libpngUpgradeCommit": "fd76bd2515f0d4e69ed227834ee355bf6a6d7f88"},
+    "upstreamReleasePolicy": "https://www.libreoffice.org/download/pre-releases/",
+}
+OFFICE_BASE = "https://downloadarchive.documentfoundation.org/libreoffice/old/26.2.7.1/"
+WINDOWS_OFFICE_INSTALLER = {"name": "LibreOffice_26.2.7.1_Win_x86-64.msi", "url": OFFICE_BASE + "win/x86_64/LibreOffice_26.2.7.1_Win_x86-64.msi", "sha256": "82edb4c85605bf38420f461596c5e4eb625afbe6557bd6c7bfa2c470b430a8c7"}
+LINUX_OFFICE_INSTALLER = {"name": "LibreOffice_26.2.7.1_Linux_x86-64_deb.tar.gz", "url": OFFICE_BASE + "deb/x86_64/LibreOffice_26.2.7.1_Linux_x86-64_deb.tar.gz", "sha256": "7cc840bd089f4779636cb2340f33786e71ce66669fdfbe36fe5c7322edc186ee"}
 WINDOWS_OFFICE_SOURCES = [
-    {"name": "libreoffice-25.2.7.2.tar.xz", "url": OFFICE_BASE + "src/libreoffice-25.2.7.2.tar.xz", "sha256": "21b38b7f429d305b229fb70f3294dd6ccd803f52dad0463d0923cdf143e9c8bd"},
-    {"name": "libreoffice-dictionaries-25.2.7.2.tar.xz", "url": OFFICE_BASE + "src/libreoffice-dictionaries-25.2.7.2.tar.xz", "sha256": "1ce174419f0bb899d8ac32d4f699bcfacdbf2f0d6bbc595039b0123d47a38745"},
-    {"name": "libreoffice-help-25.2.7.2.tar.xz", "url": OFFICE_BASE + "src/libreoffice-help-25.2.7.2.tar.xz", "sha256": "5a0b7e3f5c7d087491c9c9307c78fdb87f4ceb5c899fd7a98c0008c3a4c325ed"},
-    {"name": "libreoffice-translations-25.2.7.2.tar.xz", "url": OFFICE_BASE + "src/libreoffice-translations-25.2.7.2.tar.xz", "sha256": "b15da015cd7c4b5297ad5afd63008ec25b02c6549e5436dd0fa3b05fa96d2c09"},
+    {"name": "libreoffice-26.2.7.1.tar.xz", "url": OFFICE_BASE + "src/libreoffice-26.2.7.1.tar.xz", "sha256": "3ce4475c3e8c27450d667d83bf2dd9e99a8070d190363286022cf392d4eaec17"},
+    {"name": "libreoffice-dictionaries-26.2.7.1.tar.xz", "url": OFFICE_BASE + "src/libreoffice-dictionaries-26.2.7.1.tar.xz", "sha256": "b8c73d520b1b6f65e1eed838d903334dbc68aa57c729049af74cac47db14cafd"},
+    {"name": "libreoffice-help-26.2.7.1.tar.xz", "url": OFFICE_BASE + "src/libreoffice-help-26.2.7.1.tar.xz", "sha256": "cbe017cfb3ebd15bcffec2d3b646b0414a4b62c2a8eedb9c0d2dc7568dfc6843"},
+    {"name": "libreoffice-translations-26.2.7.1.tar.xz", "url": OFFICE_BASE + "src/libreoffice-translations-26.2.7.1.tar.xz", "sha256": "781fc87e10424b510ee095480f152c4ed044e6b9a98e2a07020584bfe7691ac8"},
 ]
+
+
+WINDOWS_OFFICE_CRT = [
+    {"name": "concrt140.dll", "sha256": "34b64fba6f029a630e773a9cc323720e2250f36d049c2a2e3d8b202feece026d"},
+    {"name": "msvcp140.dll", "sha256": "157c2531a5bda76bef11d208c4aa704bf6ac6b5d3435b86b2b93dba8f0701600"},
+    {"name": "msvcp140_1.dll", "sha256": "13af1868c5c66d17526f3a74f3cbac76c279f36ca73259f896120ff72073e02b"},
+    {"name": "msvcp140_2.dll", "sha256": "44107c382321d49e80e3622794390e3ec89eb332a542a83a6d474c6e164c7460"},
+    {"name": "msvcp140_atomic_wait.dll", "sha256": "ece7c9fa921a40e7ecb35eb6f6858d03b6c2a0c77911f6e71ae9715cc25dbbdc"},
+    {"name": "msvcp140_codecvt_ids.dll", "sha256": "27ff490ee875ce357dcb40686905d7ca94cd5be1cf2fc3fd7b1d3f0840878d6e"},
+    {"name": "vcruntime140.dll", "sha256": "10153b02aa10a8ecb8c71b6d53185651b7a94c96e3a2ebec659d62f512fb97a6"},
+    {"name": "vcruntime140_1.dll", "sha256": "3784622569df61db345062f2563117038c52f3254325282fcac703ddf026e623"},
+]
+for _pin in WINDOWS_OFFICE_CRT:
+    _pin["member"] = _pin["name"] + "_amd64.DFEFC2FE_EEE6_424C_841B_D4E66F0C84A3"
 
 
 def build_plan(component, platform):
     if platform not in {"windows-x86_64", "linux-x86_64"}:
         raise ValueError("Only native Windows/Linux x86_64 builders are supported")
     if component == "ffmpeg":
-        return {"version": "7.1.3-vpx1.15.2-opus1.5.2", "sources": FFMPEG_SOURCES,
+        return {"version": "7.1.5-vpx1.15.2-opus1.5.2", "sources": FFMPEG_SOURCES,
                 "configure": ["--disable-gpl", "--disable-nonfree", "--disable-autodetect", "--disable-doc",
                               "--disable-debug", "--disable-shared", "--enable-static", "--enable-libvpx", "--enable-libopus"]}
     if platform == "windows-x86_64" and component == "tesseract":
-        return {"builder": "cmake-msvc-static", "version": "5.5.1-lept1.85.0-png1.6.50-zlib1.3.1-data4.1.0",
+        return {"builder": "cmake-msvc-static", "version": "5.5.3-lept1.87.0-png1.6.59-zlib1.3.2-data4.1.0",
                 "sources": WINDOWS_OCR_SOURCES, "data": WINDOWS_OCR_DATA, "imageCodecs": ["PNG", "PNM", "BMP"],
                 "runtimeNotices": [{"name": "MSVC-2022-license.docx", "url": "https://visualstudio.microsoft.com/wp-content/uploads/2021/11/Visual-Studio-2022-Enterprise-Professional-License-EN.docx", "sha256": "9c0cd52b20db9d081854c75bd1b50c75514b8f8cb09c8cad15e89d90b97b5bf3"}]}
     if platform == "windows-x86_64" and component == "libreoffice":
-        return {"builder": "official-msi-admin-extract-ci-only", "version": "25.2.7.2",
+        return {**OFFICE_CANDIDATE, "builder": "official-msi-admin-extract-ci-only", "version": OFFICE_VERSION,
                 "installer": WINDOWS_OFFICE_INSTALLER, "sources": WINDOWS_OFFICE_SOURCES,
-                "preserveEntireRuntime": True}
-    if platform == "linux-x86_64" and component in {"tesseract", "libreoffice"}:
-        packages = ["tesseract-ocr", "tesseract-ocr-eng", "tesseract-ocr-osd"] if component == "tesseract" else [
-            "libreoffice-core", "libreoffice-writer", "libreoffice-calc", "libreoffice-impress", "fonts-dejavu-core"]
-        return {"snapshot": SNAPSHOT, "distribution": "jammy", "packages": packages}
+                "crtMembers": WINDOWS_OFFICE_CRT, "preserveEntireRuntime": True}
+    if platform == "linux-x86_64" and component == "libreoffice":
+        # Jammy's tracker has NOT confirmed the Oct 2026 backports. Never fall
+        # back to its 7.3 engine; only use the distro for this audited ELF closure.
+        return {**OFFICE_CANDIDATE, "builder": "official-debs-app-local", "version": OFFICE_VERSION,
+                "installer": LINUX_OFFICE_INSTALLER, "sources": WINDOWS_OFFICE_SOURCES,
+                "snapshot": SNAPSHOT, "distribution": "jammy",
+                "packages": ["fonts-dejavu-core", "libx11-6", "libx11-xcb1", "libxext6", "libxinerama1",
+                             "libxrandr2", "libxrender1", "libice6", "libsm6", "libavahi-client3", "libavahi-common3",
+                             "libcairo2", "libcups2", "libdbus-1-3", "libfontconfig1", "libfreetype6", "libgcc-s1",
+                             "libglib2.0-0", "libgssapi-krb5-2", "libkrb5-3", "libcom-err2", "libnspr4", "libnss3",
+                             "libstdc++6", "zlib1g"]}
+    if platform == "linux-x86_64" and component == "tesseract":
+        return {"snapshot": SNAPSHOT, "distribution": "jammy", "packages": ["tesseract-ocr", "tesseract-ocr-eng", "tesseract-ocr-osd"]}
     raise ValueError(f"No verified builder for {component}/{platform}; use an existing system engine")
 
 
@@ -115,7 +146,7 @@ def office_external_sources(archive):
     """
     import tarfile
     with tarfile.open(archive) as source:
-        member = source.getmember("libreoffice-25.2.7.2/download.lst")
+        member = source.getmember(f"libreoffice-{OFFICE_VERSION}/download.lst")
         if not member.isfile() or member.size > 1024 * 1024:
             raise ValueError("Invalid LibreOffice download.lst")
         with source.extractfile(member) as stream:
@@ -148,18 +179,18 @@ def ocr_cmake_options(project, prefix):
               f"-DCMAKE_PREFIX_PATH={prefix}", "-DCMAKE_FIND_USE_PACKAGE_REGISTRY=OFF",
               "-DCMAKE_FIND_USE_SYSTEM_PACKAGE_REGISTRY=OFF"]
     options = {
-        "zlib": ["-DZLIB_BUILD_EXAMPLES=OFF"],
+        "zlib": ["-DZLIB_BUILD_SHARED=OFF", "-DZLIB_BUILD_STATIC=ON", "-DZLIB_BUILD_TESTING=OFF", "-DZLIB_INSTALL=ON"],
         "libpng": ["-DPNG_SHARED=OFF", "-DPNG_STATIC=ON", "-DPNG_TESTS=OFF", "-DPNG_TOOLS=OFF"],
         "leptonica": ["-DSW_BUILD=OFF", "-DBUILD_PROG=OFF", "-DSTRICT_CONF=ON", "-DENABLE_ZLIB=ON", "-DENABLE_PNG=ON",
                       *[f"-DENABLE_{codec}=OFF" for codec in ["GIF", "JPEG", "TIFF", "WEBP", "OPENJPEG"]]],
-        "tesseract": ["-DSW_BUILD=OFF", "-DWIN32_MT_BUILD=ON", "-DDISABLE_ARCHIVE=ON", "-DDISABLE_CURL=ON",
+        "tesseract": ["-DWIN32_MT_BUILD=ON", "-DDISABLE_ARCHIVE=ON", "-DDISABLE_CURL=ON",
                       "-DDISABLE_TIFF=ON", "-DOPENMP_BUILD=OFF", "-DENABLE_NATIVE=OFF", "-DGRAPHICS_DISABLED=ON",
                       "-DBUILD_TRAINING_TOOLS=OFF", "-DBUILD_TESTS=OFF", "-DINSTALL_CONFIGS=ON"],
     }
     if project not in options:
         raise ValueError(f"Unknown OCR source project: {project}")
     if project != "zlib":
-        common += [f"-DZLIB_LIBRARY={prefix / 'lib/zlibstatic.lib'}", f"-DZLIB_INCLUDE_DIR={prefix / 'include'}"]
+        common += [f"-DZLIB_LIBRARY={prefix / 'lib/zs.lib'}", f"-DZLIB_INCLUDE_DIR={prefix / 'include'}"]
     if project in {"leptonica", "tesseract"}:
         common += [f"-DPNG_LIBRARY={prefix / 'lib/libpng16_static.lib'}", f"-DPNG_PNG_INCLUDE_DIR={prefix / 'include'}"]
     return common + options[project]
@@ -172,13 +203,18 @@ crypt32 cryptbase cryptnet cryptsp d2d1 d3d9 d3d10 d3d10_1 d3d11 d3d12 d3dcompil
 msimg32 msvcrt mswsock ncrypt netapi32 normaliz ntdll ole32 oleacc oleaut32 opengl32 powrprof propsys
 psapi rasapi32 rpcrt4 secur32 setupapi shell32 shcore shlwapi sspicli ucrtbase urlmon user32 userenv
 usp10 uxtheme version winhttp wininet winmm winscard winspool wintrust wldap32 ws2_32 wtsapi32
-fontsub msi oledlg wer wsock32""".split())
+fontsub msi oledlg wer wsock32 httpapi mfplat mfplay mfreadwrite""".split())
 # Exact optional module names audited in this pinned official MSI. Preserve their
 # notices/bytes, but do not claim Java, .NET automation or scanner support.
 OFFICE_NONCONVERSION_MODULES = {
     "officebean.dll", "twain32shim.exe", "spsupp_x86.dll", "cli_uno.dll",
     *[prefix + name + ".dll" for prefix in ["", "policy.1.0."]
       for name in ["cli_basetypes", "cli_cppuhelper", "cli_oootypes", "cli_ure", "cli_uretypes"]],
+}
+OFFICE_PACKAGING_LAUNCHERS = {
+    "office/program/python-core-3.12.15/lib/" + suffix
+    for suffix in [*["setuptools/" + name + ".exe" for name in ["gui-arm64", "gui", "cli-arm64", "cli", "cli-32", "gui-32"]],
+                   *["pip/_vendor/distlib/" + name + ".exe" for name in ["t32", "w64-arm", "t64-arm", "w32"]]]
 }
 
 
@@ -244,12 +280,14 @@ def pe_dependencies(path):
 
 def audit_windows_runtime(payload, component=None):
     files = [p for p in sorted(payload.rglob("*")) if p.is_file() and p.suffix.lower() in {".exe", ".dll", ".com", ".bin", ".pyd"}]
-    excluded = {p for p in files if component == "libreoffice" and p.parent.relative_to(payload).as_posix() == "office/program" and p.name.lower() in OFFICE_NONCONVERSION_MODULES}
+    excluded = {p for p in files if component == "libreoffice" and (
+        (p.parent.relative_to(payload).as_posix() == "office/program" and p.name.lower() in OFFICE_NONCONVERSION_MODULES)
+        or p.relative_to(payload).as_posix() in OFFICE_PACKAGING_LAUNCHERS)}
     available = {p.name.lower() for p in files if p not in excluded}
     result = {}
     for path in files:
         if path in excluded:
-            result[path.relative_to(payload).as_posix()] = {"excludedFromHeadlessConversionAudit": "Optional Java/.NET/scanner integration is not supported by this pack"}
+            result[path.relative_to(payload).as_posix()] = {"excludedFromHeadlessConversionAudit": "Optional Java/.NET/scanner integration or cross-architecture Python packaging launcher; not supported headless functionality"}
             continue
         if path.suffix.lower() == ".bin":
             with path.open("rb") as stream:
@@ -262,6 +300,206 @@ def audit_windows_runtime(payload, component=None):
         result[path.relative_to(payload).as_posix()] = dependencies
     if not result:
         raise ValueError("No native Windows executables to audit")
+    return result
+
+
+def elf_dependencies(path):
+    """Read bounded loader-authoritative ELF64 metadata; never execute ldd.
+
+    Section headers are deliberately irrelevant (and may be absent/decoys).
+    Dynamic virtual addresses must map uniquely to file-backed PT_LOAD bytes.
+    """
+    import struct
+    try:
+        with Path(path).open("rb") as stream:
+            size = os.fstat(stream.fileno()).st_size
+
+            def read(offset, length, limit):
+                if offset < 0 or not 0 < length <= limit or offset + length > size:
+                    raise ValueError("Unbounded or truncated ELF metadata")
+                stream.seek(offset)
+                content = stream.read(length)
+                if len(content) != length:
+                    raise ValueError("Truncated ELF metadata")
+                return content
+
+            header = read(0, 64, 64)
+            kind, machine, version, _, offset = struct.unpack_from("<HHIQQ", header, 16)
+            if header[:7] != b"\x7fELF\x02\x01\x01" or machine != 62 or header[7] not in {0, 3}:
+                raise ValueError("Linux engine must be an x86_64 ELF64 little-endian binary")
+            ehsize, width, count = struct.unpack_from("<HHH", header, 52)
+            if kind not in {2, 3} or version != 1 or ehsize != 64 or width != 56 or not 0 < count <= 1024 or offset < 64:
+                raise ValueError("Invalid ELF program header table/type")
+            table = read(offset, width * count, 56 * 1024)
+            segments = [struct.unpack_from("<IIQQQQQQ", table, i * width) for i in range(count)]
+            loads = [s for s in segments if s[0] == 1]
+            if not loads:
+                raise ValueError("Missing ELF PT_LOAD mapping")
+            for segment in segments:
+                tag, flags, start, address, _, filesz, memsz, align = segment
+                if tag not in {1, 2, 3}:
+                    continue
+                if filesz > memsz or start + filesz > size or address + memsz > 2**64:
+                    raise ValueError("Invalid ELF segment bounds")
+                if align not in {0, 1} and (align & (align - 1) or (address - start) % align):
+                    raise ValueError("Invalid ELF segment alignment")
+            ordered = sorted(loads, key=lambda s: s[3])
+            if any(a[3] + a[6] > b[3] for a, b in zip(ordered, ordered[1:])):
+                raise ValueError("Overlapping ELF PT_LOAD mappings")
+
+            def mapped(address, length):
+                candidates = [s[2] + address - s[3] for s in loads
+                              if s[1] & 4 and s[3] <= address and address + length <= s[3] + s[5]]
+                if length <= 0 or len(candidates) != 1:
+                    raise ValueError("ELF metadata outside unique file-backed PT_LOAD mapping")
+                return candidates[0]
+
+            interpreters = [s for s in segments if s[0] == 3]
+            if len(interpreters) > 1:
+                raise ValueError("Duplicate ELF interpreter")
+            interpreter = None
+            if interpreters:
+                segment = interpreters[0]
+                if not 1 < segment[5] <= 256:
+                    raise ValueError("Unbounded ELF interpreter")
+                text = read(segment[2], segment[5], 256)
+                # Ubuntu/glibc x86_64 baseline only; no arbitrary host interpreter.
+                if text != b"/lib64/ld-linux-x86-64.so.2\0":
+                    raise ValueError("Unsupported or unterminated ELF interpreter")
+                interpreter = text[:-1].decode("ascii")
+
+            dynamic = [s for s in segments if s[0] == 2]
+            if len(dynamic) != 1:
+                raise ValueError("Expected one ELF PT_DYNAMIC segment")
+            segment = dynamic[0]
+            if segment[5] % 16 or mapped(segment[3], segment[5]) != segment[2]:
+                raise ValueError("Inconsistent ELF PT_DYNAMIC mapping")
+            content = read(segment[2], segment[5], 1024 * 1024)
+            entries = []
+            for cursor in range(0, len(content), 16):
+                tag, value = struct.unpack_from("<qQ", content, cursor)
+                if tag == 0:
+                    break
+                entries.append((tag, value))
+            else:
+                raise ValueError("Unterminated ELF dynamic table")
+
+            def single(tag):
+                values = [value for key, value in entries if key == tag]
+                if len(values) != 1:
+                    raise ValueError(f"Missing or duplicate ELF dynamic tag {tag}")
+                return values[0]
+
+            string_size = single(10)
+            strings = read(mapped(single(5), string_size), string_size, 16 * 1024 * 1024)
+            needed, paths = [], {}
+            for tag, value in entries:
+                if tag not in {1, 15, 29}:
+                    continue
+                if value >= len(strings):
+                    raise ValueError("Invalid ELF dynamic string offset")
+                end = strings.find(b"\0", value)
+                if end < 0:
+                    raise ValueError("Unterminated ELF dynamic string")
+                text = strings[value:end].decode("ascii")
+                if tag == 1:
+                    if not re.fullmatch(r"[A-Za-z0-9_.+\-]+", text) or text in {".", ".."}:
+                        raise ValueError("Unsafe ELF dependency name")
+                    needed.append(text)
+                else:
+                    if tag in paths:
+                        raise ValueError("Duplicate ELF search-path tag")
+                    paths[tag] = text.split(":")
+            # DT_RUNPATH suppresses DT_RPATH, including an otherwise unsafe
+            # decoy RPATH. Only loader-effective paths participate in resolution.
+            runpath = paths.get(29)
+            rpath = paths.get(15, []) if runpath is None else []
+            flags1 = [value for tag, value in entries if tag == 0x6ffffffb]
+            if len(flags1) > 1:
+                raise ValueError("Duplicate ELF DT_FLAGS_1")
+            return {"needed": sorted(set(needed)), "search": rpath if runpath is None else runpath,
+                    "rpath": rpath, "runpath": runpath, "type": kind, "interpreter": interpreter,
+                    "pie": bool(flags1 and flags1[0] & 0x08000000)}
+    except (struct.error, UnicodeDecodeError, ValueError) as error:
+        raise ValueError(f"Invalid Linux runtime {path}: {error}") from error
+
+
+def audit_linux_office(payload):
+    # Only host glibc/loader are baseline dependencies; everything else is app-local.
+    baseline = {"ld-linux-x86-64.so.2", "libc.so.6", "libm.so.6", "libdl.so.2", "libpthread.so.0",
+                "librt.so.1", "libresolv.so.2", "libutil.so.1"}
+    # These retained optional GUI/multimedia/Java integrations are never part of
+    # headless conversion (SAL_USE_VCLPLUGIN=svp). No import filters are excluded.
+    optional = {"liblibreofficekitgtk.so", "libavmediagtk.so", "libavmediaqt6.so", "libavmediagst.so", "libofficebean.so"}
+    root = payload / "root"
+    program = root / "opt/libreoffice26.2/program"
+    exposed = [program, root / "usr/lib/x86_64-linux-gnu", root / "lib/x86_64-linux-gnu", root / "usr/lib", root / "lib"]
+    excluded = {(program / name).resolve() for name in optional}
+    native, result = {}, {}
+    for path in sorted(root.rglob("*")):
+        if not path.is_file():
+            continue
+        if not path.resolve().is_relative_to(payload.resolve()):
+            raise ValueError(f"Escaping Linux runtime file: {path}")
+        with path.open("rb") as stream:
+            if stream.read(4) != b"\x7fELF":
+                continue
+        metadata = elf_dependencies(path)
+        relative = path.relative_to(payload).as_posix()
+        if path.resolve() in excluded:
+            result[relative] = {"excludedFromHeadlessConversionAudit": "Optional GUI/multimedia/Java integration; bytes/notices retained"}
+            continue
+        native[path.resolve()] = metadata
+
+    searches = {}
+    for path, metadata in native.items():
+        search = []
+        for entry in metadata["search"]:
+            if not (entry == "$ORIGIN" or entry.startswith("$ORIGIN/")) or "$" in entry.removeprefix("$ORIGIN"):
+                raise ValueError(f"Non-app-local or unsupported ELF search path: {path}: {entry}")
+            directory = (path.parent / entry.removeprefix("$ORIGIN").lstrip("/")).resolve()
+            if not directory.is_relative_to(payload.resolve()):
+                raise ValueError(f"Escaping ELF search path: {path}: {entry}")
+            search.append(directory)
+        searches[path] = search
+        result[path.relative_to(payload.resolve()).as_posix()] = metadata["needed"]
+
+    # This static audit does not infer the eventual x86 CPU's capabilities.
+    # Fail closed if glibc could prepend hardware-specific provider directories.
+    for directory in {d for paths in searches.values() for d in paths} | set(exposed):
+        if any((directory / name).is_dir() for name in ["glibc-hwcaps", "tls", "x86_64", "haswell", "xeon_phi", "avx512_1"]):
+            raise ValueError(f"Unsupported hardware-specific ELF search directory: {directory}")
+
+    # Audit every object as a possible plugin root as well as in each loader
+    # ancestry. RPATH is inherited; RUNPATH applies only to direct dependencies.
+    pending = [(path, ()) for path in native]
+    visited = set()
+    while pending:
+        path, inherited = pending.pop()
+        if (path, inherited) in visited:
+            continue
+        visited.add((path, inherited))
+        if len(visited) > 100000:
+            raise ValueError("Linux dependency search graph exceeds audit limit")
+        metadata, search = native[path], searches[path]
+        ancestry = tuple(dict.fromkeys([*(search if metadata["runpath"] is None else []), *inherited]))
+        directories = [*ancestry, *exposed] if metadata["runpath"] is None else [*exposed, *search]
+        for name in metadata["needed"]:
+            # Do not flatten basenames: an invalid first hit must not be rescued
+            # by a valid object later in the launcher's library search path.
+            provider = next((d / name for d in directories if (d / name).exists()), None)
+            if provider is not None:
+                resolved = provider.resolve()
+                if resolved in excluded:
+                    raise ValueError(f"Incomplete Linux runtime: {path.name} imports excluded provider {name}")
+                shared = native.get(resolved)
+                if shared is None or shared["type"] != 3 or shared["interpreter"] is not None or shared["pie"]:
+                    raise ValueError(f"Invalid Linux shared-object provider: {provider} for {path.name} imports {name}")
+                pending.append((resolved, ancestry))
+            elif name not in baseline:
+                raise ValueError(f"Incomplete Linux runtime: {path.name} imports {name}; no runner-library fallback is allowed")
+    if not result:
+        raise ValueError("No native Linux executables to audit")
     return result
 
 
@@ -343,6 +581,10 @@ def build(component, target, work, output):
         dependencies = audit_windows_runtime(payload, component=component)
         for directory in [payload, sources]:
             (directory / "PE-DEPENDENCIES.json").write_text(json.dumps(dependencies, indent=2) + "\n", encoding="utf-8")
+    if target == "linux-x86_64" and component == "libreoffice":
+        dependencies = audit_linux_office(payload)
+        for directory in [payload, sources]:
+            (directory / "ELF-DEPENDENCIES.json").write_text(json.dumps(dependencies, indent=2) + "\n", encoding="utf-8")
     shutil.copy2(__file__, sources / "build_component.py")
     (sources / "build-plan.json").write_text(json.dumps(plan, indent=2) + "\n", encoding="utf-8")
     checksums = {}
@@ -430,15 +672,92 @@ def build_windows_ocr(plan, work, payload, sources):
                 license="Apache-2.0; BSD-2-Clause; libpng-2.0; Zlib; MSVC runtime terms (see notices)", executable="bin/tesseract.exe")
 
 
+def msi_cabinet_stream(installer, work):
+    """Read the pinned MSI's embedded CAB via Windows' read-only MSI API.
+
+    Admin extraction flattens colliding ARM64/AMD64 CRT target names in this
+    release. Select the exact AMD64 cabinet members instead of guessing a winner.
+    """
+    import ctypes
+    if os.name != "nt":
+        raise RuntimeError("Reading the official MSI cabinet requires native Windows")
+    api = ctypes.WinDLL("msi.dll")
+    uint, wide = ctypes.c_uint, ctypes.c_wchar_p
+    declarations = {
+        "MsiOpenDatabaseW": [wide, wide, ctypes.POINTER(uint)],
+        "MsiDatabaseOpenViewW": [uint, wide, ctypes.POINTER(uint)],
+        "MsiViewExecute": [uint, uint], "MsiViewFetch": [uint, ctypes.POINTER(uint)],
+        "MsiRecordReadStream": [uint, uint, ctypes.c_void_p, ctypes.POINTER(uint)],
+        "MsiCloseHandle": [uint],
+    }
+    for name, arguments in declarations.items():
+        getattr(api, name).argtypes, getattr(api, name).restype = arguments, uint
+    handles = []
+    def checked(result):
+        if result:
+            raise RuntimeError(f"Windows MSI cabinet read failed: {result}")
+    destination = work / "official-libreoffice1.cab"
+    try:
+        database, view, record = uint(), uint(), uint()
+        checked(api.MsiOpenDatabaseW(str(installer), None, ctypes.byref(database)))
+        handles.append(database)
+        checked(api.MsiDatabaseOpenViewW(database, "SELECT `Data` FROM `_Streams` WHERE `Name` = 'libreoffice1.cab'", ctypes.byref(view)))
+        handles.append(view)
+        checked(api.MsiViewExecute(view, 0))
+        checked(api.MsiViewFetch(view, ctypes.byref(record)))
+        handles.append(record)
+        buffer = ctypes.create_string_buffer(1024 * 1024)
+        with destination.open("wb") as target:
+            while True:
+                size = uint(len(buffer))
+                checked(api.MsiRecordReadStream(record, 1, buffer, ctypes.byref(size)))
+                if not size.value:
+                    break
+                target.write(buffer.raw[:size.value])
+                if target.tell() > MAX_DOWNLOAD:
+                    raise ValueError("Embedded MSI cabinet exceeds size limit")
+        with destination.open("rb") as stream:
+            if stream.read(4) != b"MSCF":
+                raise ValueError("Official MSI cabinet is missing or invalid")
+        return destination
+    finally:
+        for handle in reversed(handles):
+            api.MsiCloseHandle(handle)
+
+
+def stage_msi_crt(installer, pins, work, program):
+    cabinet = msi_cabinet_stream(installer, work)
+    extracted = work / "amd64-crt"
+    extracted.mkdir(exist_ok=True)
+    result = []
+    if not pins:
+        raise ValueError("Missing exact official MSI AMD64 CRT member pins")
+    for pin in pins:
+        if not re.fullmatch(r"[A-Za-z0-9_.-]+", pin["member"]) or not re.fullmatch(r"[a-z0-9_]+\.dll", pin["name"]):
+            raise ValueError("Unsafe MSI CRT member")
+        run([str(Path(os.environ.get("SystemRoot", "C:/Windows")) / "System32/expand.exe"),
+             "-F:" + pin["member"], cabinet, extracted], timeout=120)
+        path = extracted / pin["member"]
+        with path.open("rb") as stream:
+            if hashlib.file_digest(stream, "sha256").hexdigest() != pin["sha256"]:
+                raise ValueError(f"Official MSI AMD64 CRT checksum mismatch: {pin['name']}")
+        pe_dependencies(path)
+        shutil.copy2(path, program / pin["name"])
+        result.append(dict(pin))
+    return result
+
+
 def build_windows_office(plan, work, payload, sources):
     if os.environ.get("GITHUB_ACTIONS") != "true":
         raise RuntimeError("LibreOffice MSI administrative extraction is allowed only on a disposable GitHub Actions CI runner")
     installer = fetch_source(plan["installer"], work / "downloads")
     # SHA-256 above is mandatory even if Windows trusts the signing certificate.
-    signature_script = "$s=Get-AuthenticodeSignature -LiteralPath $env:MSI_AUDIT_FILE; @{Status=[string]$s.Status;Subject=[string]$s.SignerCertificate.Subject;Thumbprint=[string]$s.SignerCertificate.Thumbprint}|ConvertTo-Json -Compress"
+    signature_script = "$ErrorActionPreference='Stop'; $env:PSModulePath=Join-Path $PSHOME 'Modules'; Import-Module Microsoft.PowerShell.Security -ErrorAction Stop; $s=Get-AuthenticodeSignature -LiteralPath $env:MSI_AUDIT_FILE; @{Status=[string]$s.Status;Subject=[string]$s.SignerCertificate.Subject;Thumbprint=[string]$s.SignerCertificate.Thumbprint}|ConvertTo-Json -Compress"
+    signature_environment = {key: value for key, value in os.environ.items() if key.upper() != "PSMODULEPATH"}
+    signature_environment["MSI_AUDIT_FILE"] = str(installer)
     signature = json.loads(subprocess.check_output(
         ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", signature_script], text=True,
-        env=dict(os.environ, MSI_AUDIT_FILE=str(installer)), timeout=120))
+        env=signature_environment, timeout=120))
     if signature.get("Status") != "Valid" or not re.search(r"(?:^|,\s*)(?:O|CN)=The Document Foundation(?:,|$)", signature.get("Subject", "")):
         raise ValueError("Official LibreOffice MSI Authenticode audit failed; no extraction performed")
     # Preserve all four release source bundles, all their patches, and every listed external.
@@ -456,16 +775,9 @@ def build_windows_office(plan, work, payload, sources):
         if not (runtime / name).is_file() or not (runtime / name).stat().st_size:
             raise ValueError(f"Official LibreOffice runtime/notice is missing: {name}")
     shutil.copytree(runtime, payload / "office", symlinks=True)
-    # The audited MSI File/Directory tables place its licensed x64 VC runtime in
-    # System64, outside LibreOffice. Relocate those exact bytes; never use host DLLs.
-    redistributables = []
-    for path in sorted((admin / "System64").glob("*.dll")):
-        pe_dependencies(path)  # Reject a substituted x86/non-PE dependency.
-        shutil.copy2(path, payload / "office/program" / path.name)
-        with path.open("rb") as stream:
-            redistributables.append({"name": path.name, "sha256": hashlib.file_digest(stream, "sha256").hexdigest()})
-    if not redistributables:
-        raise ValueError("Official MSI did not yield its audited System64 VC runtime; no runner-installed DLL fallback is allowed")
+    # The MSI has colliding AMD64/ARM64 System64 CRT filenames. Administrative
+    # extraction is not architecture selection: read the exact pinned CAB members.
+    redistributables = stage_msi_crt(installer, plan["crtMembers"], work, payload / "office/program")
     if (admin / "Fonts").is_dir():
         shutil.copytree(admin / "Fonts", payload / "office/share/fonts/truetype", dirs_exist_ok=True)
     # No trimming of fonts, locale filters, runtime DLLs, dictionaries or license files.
@@ -477,11 +789,12 @@ def build_windows_office(plan, work, payload, sources):
     shutil.copy2(payload / "PROVENANCE.json", sources / "PROVENANCE.json")
     shutil.copy2(work / "msi-admin.log", sources / "msi-admin.log") if (work / "msi-admin.log").is_file() else None
     (payload / "SOURCE-OFFER.txt").write_text(
-        f"LibreOffice {plan['version']}: MPL-2.0/LGPL-3.0-or-later and third-party terms in office/LICENSE.html, office/NOTICE and the preserved runtime notices. "
+        f"LibreOffice {plan['version']} pre-release candidate; upstream does not recommend production use. "
+        "MPL-2.0/LGPL-3.0-or-later and third-party terms in office/LICENSE.html, office/NOTICE and the preserved runtime notices. "
         f"The matching libreoffice-{plan['version']}-windows-x86_64-sources.zip MUST be published beside this engine ZIP at the same immutable version. "
         "It contains the exact official release source bundles, external sources/data/fonts and upstream patches/build configurations, this builder and checksums. "
         "The MIT application does not relicense this engine. No administrator access is needed to unpack/run the app-local runtime.\n", encoding="utf-8")
-    return dict(id="libreoffice", name="LibreOffice conversion", version=plan["version"], platform="windows-x86_64",
+    return dict(id="libreoffice", name=plan["displayName"], version=plan["version"], platform="windows-x86_64",
                 license="MPL-2.0/LGPL-3.0-or-later plus preserved third-party notices", executable="office/program/soffice.com")
 
 
@@ -564,6 +877,45 @@ def materialize_deb_links(root):
 
 
 def build_debs(component, plan, work, payload, sources):
+    office = None
+    if component == "libreoffice":
+        if plan.get("builder") != "official-debs-app-local" or plan.get("version") != OFFICE_VERSION:
+            raise ValueError("Unverified LibreOffice distribution; obsolete distro fallback is forbidden")
+        installer = fetch_source(plan["installer"], work / "downloads")
+        unpacked = unpack_source(installer, work / "official-debs")
+        archives = [fetch_source(pin, sources) for pin in plan["sources"]]
+        externals = office_external_sources(archives[0])
+        for pin in externals:
+            fetch_source(pin, sources / "externals")
+        # Optional desktop integration and Python/LibreLogo scripting only.
+        # Keep all fonts, filters, dictionaries, module data and original notices.
+        omitted = {"libobasis26.2-gnome-integration", "libobasis26.2-kde-integration",
+                   "libreoffice26.2-debian-menus", "libobasis26.2-pyuno",
+                   "libobasis26.2-librelogo", "libobasis26.2-python-script-provider"}
+        office_packages = []
+        for deb in sorted(unpacked.rglob("*.deb")):
+            if deb.name.split("_")[0] in omitted:
+                continue
+            fields = email.parser.Parser().parsestr(subprocess.check_output(["dpkg-deb", "--field", str(deb)], text=True))
+            if fields["Architecture"] != "amd64" or fields["Version"] != OFFICE_VERSION + "-1":
+                raise ValueError("Unexpected official LibreOffice package architecture/version")
+            with deb.open("rb") as stream:
+                digest = hashlib.file_digest(stream, "sha256").hexdigest()
+            office_packages.append({"package": fields["Package"], "version": fields["Version"], "sha256": digest})
+            run(["dpkg-deb", "--extract", deb, payload / "root"])
+        runtime = payload / "root/opt/libreoffice26.2"
+        for name in ["program/soffice", "program/soffice.bin", "program/fundamentalrc", "LICENSE.html", "NOTICE"]:
+            if not (runtime / name).is_file() or not (runtime / name).stat().st_size:
+                raise ValueError(f"Official LibreOffice runtime/notice is missing: {name}")
+        office = dict(plan, externalSources=externals, packages=office_packages, omittedPackages=sorted(omitted),
+                      extraction="dpkg-deb --extract only; no maintainer scripts or global registration")
+        (payload / "SOURCE-OFFER.txt").write_text(
+            f"LibreOffice {OFFICE_VERSION} pre-release candidate; upstream does not recommend production use. "
+            "Original MPL-2.0/LGPL-3.0-or-later and third-party notices in root/opt/libreoffice26.2. "
+            f"Publish libreoffice-{OFFICE_VERSION}-linux-x86_64-sources.zip beside this engine. "
+            "It preserves all four official release source archives, ALL checksum-pinned download.lst externals, upstream patches/configuration, "
+            "exact corresponding Ubuntu dependency sources and this builder. Dependency notices: root/usr/share/doc/*/copyright. "
+            "The MIT application does not relicense this engine.\n", encoding="utf-8")
     apt = work / "apt"
     for directory in ["lists/partial", "cache/archives/partial", "state", "log"]:
         (apt / directory).mkdir(parents=True)
@@ -588,11 +940,13 @@ APT::Install-Suggests "false";
     run(command + ["update"])
     run(command + ["--yes", "--download-only", "install", *plan["packages"]])
     root = payload / "root"
-    root.mkdir()
+    root.mkdir(exist_ok=True)
     packages, source_versions = [], set()
     for deb in sorted((apt / "cache/archives").glob("*.deb")):
         fields = email.parser.Parser().parsestr(subprocess.check_output(["dpkg-deb", "--field", str(deb)], text=True))
         name, version = fields["Package"], fields["Version"]
+        if component == "libreoffice" and name.startswith(("libreoffice", "libobasis")):
+            raise ValueError("APT attempted to replace the current official Office engine")
         if name.startswith(("ghostscript", "libgs9", "libgs10", "mupdf", "libmupdf")):
             raise ValueError(f"Forbidden AGPL engine in dependency closure: {name}")
         # Use the baseline host's dynamic loader/glibc, never mix bundled glibc with its loader.
@@ -619,7 +973,7 @@ APT::Install-Suggests "false";
     shutil.copytree(common_licenses, root / "usr/share/common-licenses", dirs_exist_ok=True)
     materialize_deb_links(root)
     version_package = "tesseract-ocr" if component == "tesseract" else "libreoffice-core"
-    version = next(p["version"] for p in packages if p["package"] == version_package)
+    version = OFFICE_VERSION if office else next(p["version"] for p in packages if p["package"] == version_package)
     version = version.replace(":", "_").replace("+", "_").replace("~", "_")
     (payload / "bin").mkdir()
     executable = f"bin/{component}"
@@ -627,7 +981,7 @@ APT::Install-Suggests "false";
 set -eu
 HERE=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 ROOT="$HERE/root"
-export LD_LIBRARY_PATH="$ROOT/usr/lib/x86_64-linux-gnu:$ROOT/lib/x86_64-linux-gnu:$ROOT/usr/lib/libreoffice/program${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+export LD_LIBRARY_PATH="$ROOT/opt/libreoffice26.2/program:$ROOT/usr/lib/x86_64-linux-gnu:$ROOT/lib/x86_64-linux-gnu:$ROOT/usr/lib:$ROOT/lib"
 '''
     if component == "tesseract":
         body += '''for data in "$ROOT"/usr/share/tesseract-ocr/*/tessdata; do
@@ -639,20 +993,22 @@ exec "$ROOT/usr/bin/tesseract" "$@"
     else:
         body += '''export SAL_USE_VCLPLUGIN=svp
 export FONTCONFIG_FILE="$HERE/fonts.conf"
-export URE_BOOTSTRAP="vnd.sun.star.pathname:$ROOT/usr/lib/libreoffice/program/fundamentalrc"
-for name in oosplash soffice.bin uno.bin; do
-  if [ -f "$ROOT/usr/lib/libreoffice/program/$name" ]; then chmod u+x "$ROOT/usr/lib/libreoffice/program/$name"; fi
+export URE_BOOTSTRAP="vnd.sun.star.pathname:$ROOT/opt/libreoffice26.2/program/fundamentalrc"
+for name in oosplash soffice.bin uno.bin xpdfimport; do
+  if [ -f "$ROOT/opt/libreoffice26.2/program/$name" ]; then chmod u+x "$ROOT/opt/libreoffice26.2/program/$name"; fi
 done
-exec /bin/sh "$ROOT/usr/lib/libreoffice/program/soffice" "$@"
+exec /bin/sh "$ROOT/opt/libreoffice26.2/program/soffice" "$@"
 '''
-        (payload / "fonts.conf").write_text('<?xml version="1.0"?><!DOCTYPE fontconfig SYSTEM "fonts.dtd"><fontconfig><dir prefix="relative">root/usr/share/fonts</dir><cachedir prefix="xdg">fontconfig</cachedir></fontconfig>\n', encoding="utf-8")
+        (payload / "fonts.conf").write_text('<?xml version="1.0"?><!DOCTYPE fontconfig SYSTEM "fonts.dtd"><fontconfig><dir prefix="relative">root/usr/share/fonts</dir><dir prefix="relative">root/opt/libreoffice26.2/share/fonts/truetype</dir><cachedir prefix="xdg">fontconfig</cachedir></fontconfig>\n', encoding="utf-8")
     (payload / executable).write_text(body, encoding="utf-8")
     (payload / executable).chmod(0o755)
     provenance = {"snapshot": plan["snapshot"], "baseline": "Ubuntu 22.04 / glibc >= 2.35, x86_64", "packages": packages,
                   "licenses": "Exact package copyright/license texts: root/usr/share/doc/*/copyright; corresponding sources accompany the pack"}
+    if office:
+        provenance["office"] = office
     (payload / "PROVENANCE.json").write_text(json.dumps(provenance, indent=2) + "\n", encoding="utf-8")
     shutil.copy2(payload / "PROVENANCE.json", sources / "PROVENANCE.json")
-    return dict(id=component, name="Tesseract OCR" if component == "tesseract" else "LibreOffice conversion", version=version,
+    return dict(id=component, name="Tesseract OCR" if component == "tesseract" else plan["displayName"], version=version,
                 platform="linux-x86_64", license="Apache-2.0 plus dependency notices" if component == "tesseract" else "MPL-2.0/LGPL-3.0-or-later plus dependency notices", executable=executable)
 
 
