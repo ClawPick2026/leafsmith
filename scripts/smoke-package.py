@@ -127,7 +127,8 @@ def smoke(kind, path, logs, report):
             run([str(path), "--appimage-extract"], "appimage-extract", logs, report,
                 cwd=scratch, env=clean_environment())
             appdir = scratch / "squashfs-root"
-            worker = appdir / "usr/lib/paperwork-desktop/worker/paperwork-worker"
+            # Tauri bundles resources under usr/lib/<productName> (tauri.conf.json).
+            worker = appdir / "usr/lib/Paperwork/worker/paperwork-worker"
             if not worker.is_file():
                 found = [str(p.relative_to(appdir)) for p in appdir.rglob("paperwork-worker") if p.is_file()]
                 raise ValueError("Unexpected AppImage worker resource layout: " + repr(found))

@@ -675,11 +675,15 @@ def audit_payload(root, inventory, notices, source_output):
     for record in inventory["libraries"]:
         index.setdefault(record["basename"], []).append(record)
     actual = []
+    unmapped = []
     for path in shared_libraries(root):
         candidates = index.get(path.name, [])
         identities = {(r["kind"], r["name"], r.get("version"), r.get("source_package"), r.get("source_version")) for r in candidates}
         if len(identities) != 1:
-            raise ValueError(("Unmapped" if not identities else "Ambiguous") + " postbundle library: " + str(path))
+            # Report every Tauri-added library from one build, then fail.
+            unmapped.append(("Unmapped" if not identities else "Ambiguous") + " postbundle library: "
+                            + path.relative_to(root).as_posix())
+            continue
         record = candidates[0]
         if not record.get("notices"):
             raise ValueError("Missing dependency notices for " + path.name)
@@ -697,6 +701,8 @@ def audit_payload(root, inventory, notices, source_output):
             raise ValueError("Missing exact corresponding source for " + path.name)
         actual.append({**record, "path": path.relative_to(root).as_posix(),
                        "inventory_sha256": record["sha256"], "sha256": sha256(path)})
+    if unmapped:
+        raise ValueError("; ".join(unmapped))
     return {"success": True, "shared_library_count": len(actual), "libraries": actual,
             "source_package_count": len(sources), "interactive_desktop_tested": False}
 
@@ -722,7 +728,8 @@ def audit_appimage(pattern, inventory_path, source_output, logs):
         (logs / "extract.log").write_text(result.stdout + result.stderr, encoding="utf-8")
         result.check_returncode()
         root = Path(folder) / "squashfs-root"
-        worker = root / "usr/lib/paperwork-desktop/worker"
+        # Tauri bundles resources under usr/lib/<productName> (tauri.conf.json).
+        worker = root / "usr/lib/Paperwork/worker"
         if not (worker / "paperwork-worker").is_file():
             raise ValueError("Unexpected AppImage worker resource layout")
         notices = worker / "third-party-licenses"

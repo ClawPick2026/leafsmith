@@ -1009,6 +1009,19 @@ class GateTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Unmapped"):
                 api().audit_payload(root, {"libraries": [], "sources": []}, root, root)
 
+    def test_postbundle_reports_every_unmapped_library_at_once(self):
+        # One AppImage build must reveal every Tauri-added library, not one per run.
+        import tempfile
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder).resolve()
+            (root / "usr/lib").mkdir(parents=True)
+            for name in ("usr/lib/first.so.1", "usr/lib/second.so.2", "third.so"):
+                (root / name).write_bytes(b"unknown fixture")
+            with self.assertRaises(ValueError) as caught:
+                api().audit_payload(root, {"libraries": [], "sources": []}, root, root)
+            for name in ("usr/lib/first.so.1", "usr/lib/second.so.2", "third.so"):
+                self.assertIn(name, str(caught.exception))
+
     def test_postbundle_rewritten_rpath_records_actual_hash_not_original_hash(self):
         import tempfile
         module = api()
@@ -1121,7 +1134,7 @@ class ExtractedPayloadTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder).resolve()
             payload = root / "fixture-appdir"
-            worker = payload / "usr/lib/paperwork-desktop/worker"
+            worker = payload / "usr/lib/Paperwork/worker"  # Tauri: usr/lib/<productName>
             library = worker / "_internal/libexample.so.1"
             library.parent.mkdir(parents=True)
             library.write_bytes(b"RPATH-rewritten fixture library")

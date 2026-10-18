@@ -101,7 +101,7 @@ python scripts/smoke-package.py --kind appimage \
   verify SHA-256 hashes of all bundled notice resources.
 
 Native self-test resource lookup expects Windows `worker/paperwork-worker.exe`
-next to the app, or Linux `usr/lib/paperwork-desktop/worker/paperwork-worker` in
+next to the app, or Linux `usr/lib/Paperwork/worker/paperwork-worker` in
 the AppImage. An unexpected layout fails explicitly; it is not papered over by
 running a worker from the source checkout.
 
