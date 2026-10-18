@@ -101,6 +101,7 @@ def test_actual_frozen_worker_builtin_artifacts(tmp_path):
     assert len(summary["excluded"]) == 7
 
 
+@pytest.mark.skipif(os.name == "nt", reason="xvfb-run and shebang fixtures are Linux-only")
 def test_headless_display_keeps_app_stderr_out_of_protocol_stdout(tmp_path, monkeypatch):
     # Debian's xvfb-run runs the command with 2>&1; a GTK warning on stderr
     # (CI 39157675883: AT-SPI bus) must not precede the self-test JSON.
