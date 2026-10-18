@@ -1139,3 +1139,39 @@ exit=0
 SKIPPED [1] scripts/tests/test_aur_package.py:284: pacman's vercmp runs in CI's Arch container
 SKIPPED [1] scripts/tests/test_aur_package.py:292: makepkg runs in CI's Arch container
 13 passed, 2 skipped in 3.12s
+
+NOTICE-COPY PYTHON SOURCES RED (CI run 39174773806 rejected them) 2026-10-18T23:04:38%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/aur_package.py sha256=19623bd93be6dcb59eb2c3f0a8251f08091ff4719faeffc5bb41f56272220f23
+scripts/tests/test_aur_package.py sha256=15ea69cf5d5c6cbfccc99220bac999c110e85c66f9f8acf38b787fda162d87a0
+packaging/aur/PKGBUILD.in sha256=f5f6152d06ace6177e52b49ff3cb011b46e3cbd2640ae39db7e96b3980ad4331
+exit=1
+............ss.F                                                         [100%]
+=================================== FAILURES ===================================
+______ test_namcap_gate_accepts_python_sources_copied_as_license_notices _______
+
+    def test_namcap_gate_accepts_python_sources_copied_as_license_notices():
+        # packaging keeps its SPDX data in a `licenses` module; the notice collector
+        # copies those .py files, which are text beside the worker and never run.
+        notices = "opt/leafsmith/usr/lib/Leafsmith/worker/third-party-licenses/"
+        line = ("leafsmith-bin E: dependency-detected-not-included python (python-modules-needed ['json', 'typing'] "
+                f"['{WORKER}pptx/util.py', '{notices}python/packaging/packaging/licenses/_spdx.py'])")
+>       assert aur["namcap_errors"](line) == ([], [line])
+E       assert (["leafsmith-...x.py'])"], []) == ([], ["leafsm..._spdx.py'])"])
+E         
+E         At index 0 diff: ["leafsmith-bin E: dependency-detected-not-included python (python-modules-needed ['json', 'typing'] ['opt/leafsmith/usr/lib/Leafsmith/worker/_internal/pptx/util.py', 'opt/leafsmith/usr/lib/Leafsmith/worker/third-party-licenses/python/packaging/packaging/licenses/_spdx.py'])"] != []
+E         Use -v to get more diff
+
+scripts/tests/test_aur_package.py:330: AssertionError
+=========================== short test summary info ============================
+FAILED scripts/tests/test_aur_package.py::test_namcap_gate_accepts_python_sources_copied_as_license_notices
+1 failed, 13 passed, 2 skipped in 3.16s
+
+NOTICE-COPY PYTHON SOURCES GREEN 2026-10-18T23:04:56%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/aur_package.py sha256=93363129e1c086e817684a761cf58c32039805907ff7ff43dbba6d23b28f8f2c
+scripts/tests/test_aur_package.py sha256=15ea69cf5d5c6cbfccc99220bac999c110e85c66f9f8acf38b787fda162d87a0
+packaging/aur/PKGBUILD.in sha256=f5f6152d06ace6177e52b49ff3cb011b46e3cbd2640ae39db7e96b3980ad4331
+exit=0
+............ss..                                                         [100%]
+14 passed, 2 skipped in 3.58s

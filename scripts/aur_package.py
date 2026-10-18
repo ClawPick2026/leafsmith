@@ -39,6 +39,8 @@ APP = "leafsmith"
 PRODUCT = "Leafsmith"
 BUNDLE = f"opt/{APP}/"
 WORKER_PYTHON = BUNDLE + f"usr/lib/{PRODUCT}/worker/_internal/"
+# Notice copies include .py files (packaging's SPDX `licenses` module); text, never run.
+WORKER_NOTICES = BUNDLE + f"usr/lib/{PRODUCT}/worker/third-party-licenses/"
 INSTALLED_WORKER = Path(f"/{BUNDLE}usr/lib/{PRODUCT}/worker/{APP}-worker")
 LOCAL_SOURCES = (f"{APP}.sh", f"{APP}.desktop")
 PACKAGE_FILES = ("PKGBUILD", ".SRCINFO", *LOCAL_SOURCES)
@@ -277,7 +279,7 @@ DEPENDENCY_REASON = re.compile(r"([a-z-]+) (\[[^]]*\]) (\[[^]]*\])")
 
 def bundled_dependency(line: str, bundled: set[str]) -> bool:
     """namcap resolves libraries the bundle ships without an $ORIGIN RUNPATH,
-    and the frozen worker's Python sources, against host packages. Such a
+    and the frozen worker's Python sources and notice copies, against host packages. Such a
     report is bundle-internal only if every needing file is inside the bundle
     and every library is one the package ships; anything else is a real host
     dependency for depends=()."""
@@ -295,7 +297,7 @@ def bundled_dependency(line: str, bundled: set[str]) -> bool:
         if reason[1] == "libraries-needed":
             inside = all(f.startswith(BUNDLE) for f in files) and all(Path(lib).name in bundled for lib in needed)
         elif reason[1] == "python-modules-needed":
-            inside = all(f.startswith(WORKER_PYTHON) for f in files)
+            inside = all(f.startswith((WORKER_PYTHON, WORKER_NOTICES)) for f in files)
         else:
             inside = False
         if not inside:

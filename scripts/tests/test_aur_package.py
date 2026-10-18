@@ -319,3 +319,16 @@ def test_namcap_gate_accepts_opt_and_dependency_reports_only_for_what_the_bundle
             "leafsmith-bin E: dependency-detected-not-included dconf (dconf-needed-for-glib-schemas)",
             "leafsmith-bin E: elffile-not-in-allowed-dirs usr/share/leafsmith/tool"):
         assert aur["namcap_errors"](line, bundled) == ([line], []), line
+
+
+def test_namcap_gate_accepts_python_sources_copied_as_license_notices():
+    # packaging keeps its SPDX data in a `licenses` module; the notice collector
+    # copies those .py files, which are text beside the worker and never run.
+    notices = "opt/leafsmith/usr/lib/Leafsmith/worker/third-party-licenses/"
+    line = ("leafsmith-bin E: dependency-detected-not-included python (python-modules-needed ['json', 'typing'] "
+            f"['{WORKER}pptx/util.py', '{notices}python/packaging/packaging/licenses/_spdx.py'])")
+    assert aur["namcap_errors"](line) == ([], [line])
+    for outside in ("opt/leafsmith/usr/share/tool.py", "opt/leafsmith/usr/lib/Leafsmith/worker/third-party-licenses-x/a.py",
+                    f"{notices}../../../../../usr/share/tool.py"):
+        rejected = line.replace(f"{notices}python/packaging/packaging/licenses/_spdx.py", outside)
+        assert aur["namcap_errors"](rejected) == ([rejected], []), outside
