@@ -145,6 +145,7 @@ python scripts/license-report.py --require-rust \
   --linux-extra-library '/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/*/loaders/*.so' \
   --linux-extra-library '/usr/lib/x86_64-linux-gnu/gtk-3.0/*/immodules/*.so' \
   --linux-extra-library '/usr/lib/x86_64-linux-gnu/gio/modules/*.so' \
+  --linux-extra-library '/usr/lib/x86_64-linux-gnu/gtk-3.0/*/printbackends/*.so' \
   --linux-extra-library '/usr/lib/x86_64-linux-gnu/webkit2gtk-4.1/injected-bundle/*.so' \
   --linux-extra-library '/usr/lib/x86_64-linux-gnu/webkit2gtk-4.1/WebKit*Process'
 npm run tauri -- bundle --target x86_64-unknown-linux-gnu --bundles appimage
@@ -187,7 +188,7 @@ python scripts/audit_linux_libraries.py \
   header copy, a named non-source build-system file (not a `build-aux/*`
   wildcard), or a reviewed path in `REVIEWED_NONRUNTIME_OVERRIDES` (each with
   its reason). Prose such as "GPL-2 or later" is not an alternative license.
-  Krb5, keyutils, libidn2 and libzstd are classified from their exact reviewed
+  Krb5, keyutils, libidn2, libzstd and colord are classified from their exact reviewed
   notices (`REVIEWED_LIBRARY_NOTICES` pins the notice SHA-256, library names and
   upstream version; Ubuntu security revisions may change). A changed notice or
   new upstream version fails until it is reviewed again.
@@ -211,7 +212,8 @@ python scripts/audit_linux_libraries.py \
 * **Postbundle:** independently extract the built AppImage without FUSE, require
   the expected worker layout and the exact packaged prebundle inventory, verify
   all packaged notice hashes, and enumerate every actual shared library across
-  the entire AppDir. Every entry must map to that prebundle inventory and its
+  the entire AppDir. Every entry must map to that prebundle inventory (by file
+  name, or by ELF SONAME for versioned copies and dev links) and its
   copied notices; Debian entries also require their verified corresponding source.
   Unknown Tauri-added libraries fail: add reviewed prebundle roots and rebuild,
   rather than patching notices into an already-produced package. Tauri may omit

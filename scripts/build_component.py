@@ -392,9 +392,9 @@ def elf_dependencies(path):
 
             string_size = single(10)
             strings = read(mapped(single(5), string_size), string_size, 16 * 1024 * 1024)
-            needed, paths = [], {}
+            needed, paths, sonames = [], {}, []
             for tag, value in entries:
-                if tag not in {1, 15, 29}:
+                if tag not in {1, 14, 15, 29}:
                     continue
                 if value >= len(strings):
                     raise ValueError("Invalid ELF dynamic string offset")
@@ -402,10 +402,10 @@ def elf_dependencies(path):
                 if end < 0:
                     raise ValueError("Unterminated ELF dynamic string")
                 text = strings[value:end].decode("ascii")
-                if tag == 1:
+                if tag in {1, 14}:
                     if not re.fullmatch(r"[A-Za-z0-9_.+\-]+", text) or text in {".", ".."}:
                         raise ValueError("Unsafe ELF dependency name")
-                    needed.append(text)
+                    (needed if tag == 1 else sonames).append(text)
                 else:
                     if tag in paths:
                         raise ValueError("Duplicate ELF search-path tag")
@@ -417,8 +417,11 @@ def elf_dependencies(path):
             flags1 = [value for tag, value in entries if tag == 0x6ffffffb]
             if len(flags1) > 1:
                 raise ValueError("Duplicate ELF DT_FLAGS_1")
+            if len(sonames) > 1:
+                raise ValueError("Duplicate ELF DT_SONAME")
             return {"needed": sorted(set(needed)), "search": rpath if runpath is None else runpath,
                     "rpath": rpath, "runpath": runpath, "type": kind, "interpreter": interpreter,
+                    "soname": sonames[0] if sonames else None,
                     "pie": bool(flags1 and flags1[0] & 0x08000000)}
     except (struct.error, UnicodeDecodeError, ValueError) as error:
         raise ValueError(f"Invalid Linux runtime {path}: {error}") from error

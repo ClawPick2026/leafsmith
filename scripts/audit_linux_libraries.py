@@ -11,6 +11,7 @@ import ast
 import glob
 import hashlib
 import importlib.metadata as md
+import importlib.util
 import json
 import os
 import sys
@@ -291,6 +292,12 @@ REVIEWED_LIBRARY_NOTICES = {
     # "You may select, at your option, one of the above-listed licenses."
     "libzstd": ("8cf66791fbe72801cb1d701c832b7e395dad0000bb9699dc42df94b49d699e91", "1.4.8+dfsg",
                 frozenset({"libzstd.so.1"}), "notice-and-exact-source-preserved"),
+    # The GPL-2+ default covers the daemon and tools; the 1.4.6
+    # lib/colord/meson.build builds libcolord and libcolordprivate only from
+    # lib/colord sources ("lib/colord/*" is LGPL-2.1+). The GPL-2+ colorhug,
+    # dtp94, huey and munki directories are separate device libraries.
+    "colord": ("b8160249dce3ff5e43e3f5b6739fdee1feecc06c5ff41ddd3289532f97844de4", "1.4.6",
+               frozenset({"libcolord.so.2", "libcolordprivate.so.2"}), "lgpl-source-required"),
 }
 
 
@@ -717,6 +724,14 @@ def verify_sources(inventory, source_output):
     return sources
 
 
+def elf_soname(path):
+    """DT_SONAME via the bounded loader-metadata parser (never executes ldd)."""
+    spec = importlib.util.spec_from_file_location("build_component", Path(__file__).with_name("build_component.py"))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.elf_dependencies(path)["soname"]
+
+
 def audit_payload(root, inventory, notices, source_output):
     """Verify actual libraries against prebundle ownership/source inventory.
 
@@ -731,6 +746,13 @@ def audit_payload(root, inventory, notices, source_output):
     unmapped = []
     for path in shared_libraries(root):
         candidates = index.get(path.name, [])
+        if not candidates:
+            # Bundlers also copy full versioned files and dev links
+            # (libgio-2.0.so.0.7200.4, libgio-2.0.so); ldd recorded the SONAME.
+            try:
+                candidates = index.get(elf_soname(path) or "", [])
+            except ValueError:
+                candidates = []
         identities = {(r["kind"], r["name"], r.get("version"), r.get("source_package"), r.get("source_version")) for r in candidates}
         if len(identities) != 1:
             # Report every Tauri-added library from one build, then fail.

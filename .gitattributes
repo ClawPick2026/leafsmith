@@ -12,3 +12,4 @@ scripts/tests/fixtures/krb5-copyright.txt text eol=lf -whitespace
 scripts/tests/fixtures/keyutils-copyright.txt text eol=lf -whitespace
 scripts/tests/fixtures/libidn2-copyright.txt text eol=lf -whitespace
 scripts/tests/fixtures/libzstd-copyright.txt text eol=lf -whitespace
+scripts/tests/fixtures/colord-copyright.txt text eol=lf -whitespace

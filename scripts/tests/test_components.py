@@ -22,7 +22,7 @@ def builder():
 
 
 def elf_fixture(needed, machine=62, *, search=None, search_tag=29, elf_type=3,
-                interpreter=None, section_needed=None, section_search=None, flags1=0):
+                interpreter=None, section_needed=None, section_search=None, flags1=0, soname=None):
     """ELF loader-metadata fixture; not executable machine code.
 
     PT_LOAD maps the file, PT_DYNAMIC points at DT_STRTAB/DT_STRSZ, and
@@ -37,7 +37,8 @@ def elf_fixture(needed, machine=62, *, search=None, search_tag=29, elf_type=3,
     def tables(names, paths, strings_offset, dynamic_offset):
         strings = bytearray(b"\0")
         entries = []
-        for tag, text in [(1, n) for n in names] + ([(search_tag, paths)] if paths is not None else []):
+        for tag, text in ([(1, n) for n in names] + ([(search_tag, paths)] if paths is not None else [])
+                          + ([(14, soname)] if soname is not None else [])):
             entries.append((tag, len(strings)))
             strings.extend(text.encode("ascii") + b"\0")
         if flags1:
@@ -550,6 +551,15 @@ class PackTests(unittest.TestCase):
                 module.audit_windows_runtime(root, component="libreoffice")
             for name in ["httpapi", "mfplat", "mfplay", "mfreadwrite"]:
                 self.assertIn(name, module.WINDOWS_SYSTEM_DLLS)
+
+    def test_elf_metadata_reports_loader_soname(self):
+        module = builder()
+        with tempfile.TemporaryDirectory() as directory:
+            library = Path(directory) / "libgio-2.0.so.0.7200.4"
+            library.write_bytes(elf_fixture(["libc.so.6"], soname="libgio-2.0.so.0"))
+            self.assertEqual(module.elf_dependencies(library)["soname"], "libgio-2.0.so.0")
+            library.write_bytes(elf_fixture(["libc.so.6"]))
+            self.assertIsNone(module.elf_dependencies(library)["soname"])
 
     def test_linux_elf_closure_rejects_missing_libraries_and_wrong_architecture(self):
         module = builder()

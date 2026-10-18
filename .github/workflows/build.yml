@@ -190,6 +190,7 @@ jobs:
             extra+=(--linux-extra-library '/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/*/loaders/*.so')
             extra+=(--linux-extra-library '/usr/lib/x86_64-linux-gnu/gtk-3.0/*/immodules/*.so')
             extra+=(--linux-extra-library '/usr/lib/x86_64-linux-gnu/gio/modules/*.so')
+            extra+=(--linux-extra-library '/usr/lib/x86_64-linux-gnu/gtk-3.0/*/printbackends/*.so')
             # Tauri's AppImage step copies WebKitGTK's helper processes and
             # injected bundle; nothing links them, so name them as roots.
             extra+=(--linux-extra-library '/usr/lib/x86_64-linux-gnu/webkit2gtk-4.1/injected-bundle/*.so')

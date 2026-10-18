@@ -1,5 +1,6 @@
 """Linux redistribution contracts; synthetic data is never release evidence."""
 import importlib.util
+import os
 from pathlib import Path
 import re
 import unittest
@@ -101,6 +102,7 @@ class OwnershipTests(unittest.TestCase):
         self.assertEqual(record["source_version"], "3.4.2-4")
         self.assertEqual(record["original"], str(Path("/lib/x86_64-linux-gnu/libffi.so.8")))
 
+    @unittest.skipIf(os.name == "nt", "dpkg ownership is Linux-only")
     def test_dpkg_ownership_is_batched_not_one_query_per_library(self):
         # Each dpkg-query call scans the whole database (~0.2 s on hosted runners).
         from unittest.mock import patch
@@ -576,7 +578,8 @@ class SourceTests(unittest.TestCase):
         versions = {"krb5": ("1.19.2-2ubuntu0.10", "1.19.2-2ubuntu0.11", "1.20.1-2"),
                     "keyutils": ("1.6.1-2ubuntu3", "1.6.1-2ubuntu3.1", "1.6.3-1"),
                     "libidn2": ("2.3.2-2build1", "2.3.2-2ubuntu0.1", "2.3.3-1"),
-                    "libzstd": ("1.4.8+dfsg-3build1", "1.4.8+dfsg-3ubuntu0.1", "1.5.2+dfsg-1")}
+                    "libzstd": ("1.4.8+dfsg-3build1", "1.4.8+dfsg-3ubuntu0.1", "1.5.2+dfsg-1"),
+                    "colord": ("1.4.6-1", "1.4.6-1ubuntu0.1", "1.4.7-1")}
         cases = [("krb5-copyright.txt", "krb5", "4a2d321ab57260e8de4b67bde8cff76c07d28be69c2d8b22dfc2bfa42f5c41b9",
                   ["libgssapi_krb5.so.2", "libk5crypto.so.3", "libkrb5.so.3", "libkrb5support.so.0"],
                   "notice-and-exact-source-preserved"),
@@ -585,7 +588,9 @@ class SourceTests(unittest.TestCase):
                  ("libidn2-copyright.txt", "libidn2", "41702469f28e8ff406345e3d1dd0c741f11bdfca319264f67036efd6aaa79e4b",
                   ["libidn2.so.0"], "lgpl-source-required"),
                  ("libzstd-copyright.txt", "libzstd", "8cf66791fbe72801cb1d701c832b7e395dad0000bb9699dc42df94b49d699e91",
-                  ["libzstd.so.1"], "notice-and-exact-source-preserved")]
+                  ["libzstd.so.1"], "notice-and-exact-source-preserved"),
+                 ("colord-copyright.txt", "colord", "b8160249dce3ff5e43e3f5b6739fdee1feecc06c5ff41ddd3289532f97844de4",
+                  ["libcolord.so.2", "libcolordprivate.so.2"], "lgpl-source-required")]
         for fixture, source, digest, basenames, policy in cases:
             path = Path(__file__).with_name("fixtures") / fixture
             self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), digest)
@@ -1083,6 +1088,35 @@ class GateTests(unittest.TestCase):
                 api().audit_payload(root, {"libraries": [], "sources": []}, root, root)
             for name in ("usr/lib/first.so.1", "usr/lib/second.so.2", "third.so"):
                 self.assertIn(name, str(caught.exception))
+
+    def test_postbundle_maps_versioned_and_dev_names_by_elf_soname(self):
+        # CI 39158842743: Tauri's GTK plugin copied libgio-2.0.so.0.7200.4 and
+        # the libgio-2.0.so dev link; the inventory knows ldd's libgio-2.0.so.0.
+        import tempfile
+        from unittest.mock import patch
+        module = api()
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder).resolve()
+            (root / "usr/lib").mkdir(parents=True)
+            real = root / "usr/lib/libgio-2.0.so.0.7200.4"
+            real.write_bytes(b"gio fixture")
+            (root / "usr/lib/libgio-2.0.so").symlink_to(real.name)
+            (root / "usr/lib/libunknown.so.9.1").write_bytes(b"unknown fixture")
+            notice = root / "notice.txt"
+            notice.write_text("fixture notice")
+            record = {"kind": "debian", "name": "libglib2.0-0:amd64", "version": "2.72.4", "basename": "libgio-2.0.so.0",
+                      "source_package": "glib2.0", "source_version": "2.72.4", "notices": ["notice.txt"], "sha256": "0" * 64}
+            sonames = {"libgio-2.0.so.0.7200.4": "libgio-2.0.so.0", "libgio-2.0.so": "libgio-2.0.so.0",
+                       "libunknown.so.9.1": "libunknown.so.9"}
+            with patch.object(module, "verify_sources", return_value={("glib2.0", "2.72.4"): {}}), \
+                    patch.object(module, "elf_soname", side_effect=lambda path: sonames[path.name]):
+                with self.assertRaises(ValueError) as caught:
+                    module.audit_payload(root, {"libraries": [record], "sources": []}, root, root)
+                self.assertEqual(str(caught.exception), "Unmapped postbundle library: usr/lib/libunknown.so.9.1")
+                (root / "usr/lib/libunknown.so.9.1").unlink()
+                report = module.audit_payload(root, {"libraries": [record], "sources": []}, root, root)
+            self.assertEqual(sorted(item["path"] for item in report["libraries"]),
+                             ["usr/lib/libgio-2.0.so", "usr/lib/libgio-2.0.so.0.7200.4"])
 
     def test_postbundle_rewritten_rpath_records_actual_hash_not_original_hash(self):
         import tempfile
