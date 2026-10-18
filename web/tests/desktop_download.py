@@ -8,10 +8,10 @@ from playwright.sync_api import sync_playwright, expect
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE = os.environ.get('LEAFSMITH_URL', 'https://leafsmith.lakebed.app')
-RELEASE = 'https://github.com/ClawPick2026/leafsmith/releases/tag/v0.1.0-rc.2'
+RELEASE = 'https://github.com/ClawPick2026/leafsmith/releases/tag/v0.1.0-rc.3'
 PACKAGES = [
-    ('Download Windows preview', 'windows', 'Windows', 'Paperwork_0.1.0_x64-setup.exe', 'fbcaa8473a2d7d51848edc3623aad45999eff12891eaac67fcba4deb5ec3e502'),
-    ('Download Linux preview', 'linux', 'Linux', 'Paperwork_0.1.0_amd64.AppImage', '16b0ebe4484820754224d1850a847990626e4c9e7a35cb7b5ac5b31c638761ca'),
+    ('Download Windows preview', 'windows', 'Windows', 'Leafsmith_0.1.0_x64-setup.exe', '5a43304e1d16811b64c331254869dd034635e931606cd5671d98ad3db6f30810'),
+    ('Download Linux preview', 'linux', 'Linux', 'Leafsmith_0.1.0_amd64.AppImage', '726ff00e552c8e2666c92d82b155d5b4b91211ff8aa1bc841742cbb1a67c6e97'),
 ]
 
 class DesktopDownloadTests(unittest.TestCase):
@@ -35,7 +35,7 @@ class DesktopDownloadTests(unittest.TestCase):
             expect(section).to_be_visible(timeout=5000)
             expect(section.get_by_role('link', name='Release notes & checksums', exact=True)).to_have_attribute('href', RELEASE)
             text = section.inner_text()
-            for phrase in ['0.1.0-rc.2', 'Unsigned', 'Interactive use has not been tested', 'glibc 2.35', 'unrecognized-publisher']:
+            for phrase in ['0.1.0-rc.3', 'Unsigned', 'Interactive use has not been tested', 'glibc 2.35', 'unrecognized-publisher']:
                 self.assertIn(phrase, text)
             self.assertNotIn('rc.1', text)
             for name, icon, label, filename, sha256 in PACKAGES:
@@ -43,7 +43,7 @@ class DesktopDownloadTests(unittest.TestCase):
                 expect(link.locator('svg')).to_have_count(1)
                 expect(link.locator(f'svg[data-icon="{icon}"]')).to_be_visible()
                 expect(link).to_have_text(label)
-                expect(link).to_have_attribute('href', f'https://github.com/ClawPick2026/leafsmith/releases/download/v0.1.0-rc.2/{filename}')
+                expect(link).to_have_attribute('href', f'https://github.com/ClawPick2026/leafsmith/releases/download/v0.1.0-rc.3/{filename}')
                 link.hover()
                 self.assertEqual(link.evaluate('element=>getComputedStyle(element).cursor'), 'pointer')
                 with page.expect_download(timeout=300000) as event:
