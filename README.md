@@ -6,7 +6,7 @@ The [browser edition](web/README.md) runs in your browser with a reduced feature
 
 ## Desktop edition
 
-**Release status:** a [Windows x86_64 preview installer (0.1.0 RC1)](https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.1) is published. It passed automated silent installation, native host/worker checks and 22 packaged document-operation checks. It is unsigned; interactive GUI and uninstall testing are pending. Linux and remaining optional engine/model packs are still being completed. This is not the finished cross-platform release.
+**Release status:** [0.1.0 RC2](https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.2) publishes a Windows x86_64 installer and a Linux x86_64 AppImage. On both platforms the packaged app passed native host/worker checks and 22 packaged document-operation checks, after silent installation on Windows and AppImage extraction under Xvfb on Ubuntu 22.04. Both packages are unsigned. Interactive use, other Linux distributions and the optional engine/model packs have not been tested with this release. This is not the finished release.
 
 ## Main Window
 
@@ -42,7 +42,7 @@ Native files are selected separately from the built-in workspace. Required engin
 
 ## First use
 
-Download the [Windows preview installer](https://github.com/ClawPick2026/paperwork-desktop/releases/download/v0.1.0-rc.1/Paperwork_0.1.0_x64-setup.exe). Read the [release notes, SHA-256 checksums and precise test scope](https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.1) first: Windows may show an unrecognized-publisher warning. Use copies of non-sensitive documents during preview testing. No Linux installer is published yet. The [browser edition](https://paperwork.lakebed.app) remains available with its explicitly reduced feature set.
+Download the [Windows preview installer](https://github.com/ClawPick2026/paperwork-desktop/releases/download/v0.1.0-rc.2/Paperwork_0.1.0_x64-setup.exe) or the [Linux AppImage](https://github.com/ClawPick2026/paperwork-desktop/releases/download/v0.1.0-rc.2/Paperwork_0.1.0_amd64.AppImage). Read the [release notes, SHA-256 checksums and precise test scope](https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.2) first: Windows may show an unrecognized-publisher warning, and the AppImage needs glibc 2.35 or later and must be made executable (`chmod +x`) before running. Use copies of non-sensitive documents during preview testing. The [browser edition](https://paperwork.lakebed.app) remains available with its explicitly reduced feature set.
 
 For the built-in workspace, choose **Try a sample**, open **Organize PDF**, select an operation and download the resulting document. For your own work, use **Choose files** and retain the originals.
 

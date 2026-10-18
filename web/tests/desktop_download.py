@@ -1,4 +1,4 @@
-"""Verify the real website preview link and the bytes downloaded through it."""
+"""Verify the real website preview links and the bytes downloaded through them."""
 import hashlib
 import json
 import os
@@ -8,9 +8,11 @@ from playwright.sync_api import sync_playwright, expect
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE = os.environ.get('PAPERWORK_URL', 'https://paperwork.lakebed.app')
-INSTALLER = 'https://github.com/ClawPick2026/paperwork-desktop/releases/download/v0.1.0-rc.1/Paperwork_0.1.0_x64-setup.exe'
-RELEASE = 'https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.1'
-SHA256 = '8d823fccb3cd29232a34146815b1ed0c6b809d63089c2b9056715ed75990b112'
+RELEASE = 'https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.2'
+PACKAGES = [
+    ('Download Windows preview', 'Paperwork_0.1.0_x64-setup.exe', 'fbcaa8473a2d7d51848edc3623aad45999eff12891eaac67fcba4deb5ec3e502'),
+    ('Download Linux preview', 'Paperwork_0.1.0_amd64.AppImage', '16b0ebe4484820754224d1850a847990626e4c9e7a35cb7b5ac5b31c638761ca'),
+]
 
 class DesktopDownloadTests(unittest.TestCase):
     @classmethod
@@ -25,26 +27,29 @@ class DesktopDownloadTests(unittest.TestCase):
         cls.browser.close()
         cls.pw.stop()
 
-    def test_preview_link_downloads_verified_installer_with_honest_scope(self):
+    def test_preview_links_download_verified_packages_with_honest_scope(self):
         page = self.browser.new_page(viewport={'width':1440, 'height':1080}, accept_downloads=True)
         try:
             page.goto(BASE, wait_until='networkidle')
             section = page.get_by_role('region', name='Desktop downloads', exact=True)
             expect(section).to_be_visible(timeout=5000)
-            link = section.get_by_role('link', name='Download Windows preview', exact=True)
-            expect(link).to_have_attribute('href', INSTALLER)
             expect(section.get_by_role('link', name='Release notes & checksums', exact=True)).to_have_attribute('href', RELEASE)
-            for phrase in ['Unsigned', 'Linux', 'not ready', 'Interactive Windows GUI testing is pending']:
-                self.assertIn(phrase, section.inner_text())
-            link.hover()
-            self.assertEqual(link.evaluate('element=>getComputedStyle(element).cursor'), 'pointer')
-            with page.expect_download(timeout=90000) as event:
-                link.click()
-            download = event.value
-            self.assertEqual(download.suggested_filename, 'Paperwork_0.1.0_x64-setup.exe')
-            self.assertIsNone(download.failure())
-            with Path(download.path()).open('rb') as stream:
-                self.assertEqual(hashlib.file_digest(stream,'sha256').hexdigest(), SHA256)
+            text = section.inner_text()
+            for phrase in ['0.1.0-rc.2', 'Unsigned', 'Interactive use has not been tested', 'glibc 2.35', 'unrecognized-publisher']:
+                self.assertIn(phrase, text)
+            self.assertNotIn('rc.1', text)
+            for name, filename, sha256 in PACKAGES:
+                link = section.get_by_role('link', name=name, exact=True)
+                expect(link).to_have_attribute('href', f'https://github.com/ClawPick2026/paperwork-desktop/releases/download/v0.1.0-rc.2/{filename}')
+                link.hover()
+                self.assertEqual(link.evaluate('element=>getComputedStyle(element).cursor'), 'pointer')
+                with page.expect_download(timeout=300000) as event:
+                    link.click()
+                download = event.value
+                self.assertEqual(download.suggested_filename, filename)
+                self.assertIsNone(download.failure())
+                with Path(download.path()).open('rb') as stream:
+                    self.assertEqual(hashlib.file_digest(stream,'sha256').hexdigest(), sha256)
             section.screenshot(path=str(ROOT/'tests/browser-env/desktop-downloads.png'))
         finally:
             page.close()

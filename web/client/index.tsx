@@ -3,7 +3,7 @@ import { Icon, primary, muted } from './workspace.tsx';
 import type { WorkspacePlatform } from './workspace.tsx';
 import * as engine from './engine.ts';
 import { unsupported } from '../shared/catalog.ts';
-import { windowsPreview } from '../shared/desktop.ts';
+import { desktopPreview } from '../shared/desktop.ts';
 import { HomeMetadata } from './discovery.ts';
 import { guides } from '../shared/discovery.ts';
 
@@ -22,7 +22,7 @@ const platform: WorkspacePlatform = {
  scopeItems: unsupported,
  sidebarFooter: <p className="mt-5 px-2 text-[10px] tracking-wide text-[#87907e]">BUILT WITH LAKEBED · ALPHA</p>,
  footer: <><HomeMetadata/><nav aria-label="PDF guides" className="mt-8 border-t border-[#dfe4d6] pt-6"><h2 className="text-xl font-semibold">PDF guides</h2><p className={muted+' mt-2'}>Instructions and limitations for browser-only PDF tools.</p><ul className="mt-4 flex flex-wrap gap-x-6 gap-y-3 text-sm text-[#294c3e]">{guides.map(guide=><li key={guide.path}><a className="underline underline-offset-4" href={guide.path}>{guide.heading}</a></li>)}<li><a className="underline underline-offset-4" href="/tools">All PDF guides</a></li></ul></nav></>,
- homeAfterTools: <section id="desktop-downloads" aria-label="Desktop downloads" className="mt-8 rounded-xl border border-[#dfe4d6] bg-[#fffefa] p-5 sm:p-6"><h2 className="text-xl font-semibold tracking-tight">Desktop preview</h2><p className={muted+' mt-3'}>{windowsPreview.platform} · {windowsPreview.version} · Unsigned release candidate. Linux and remaining optional engine downloads are not ready.</p><div className="mt-5 flex flex-wrap items-center gap-4"><a className={primary} href={windowsPreview.installerUrl} rel="noreferrer"><Icon name="download" size={17}/>Download Windows preview</a><a className="text-sm text-[#294c3e] underline underline-offset-4" href={windowsPreview.releaseUrl} rel="noreferrer">Release notes &amp; checksums</a></div><p className="mt-4 text-xs leading-6 text-[#677169]">Silent installation and 22 packaged document-operation checks passed. Interactive Windows GUI testing is pending. Windows may show an unrecognized-publisher warning. Use copies of non-sensitive documents for this preview.</p></section>,
+ homeAfterTools: <section id="desktop-downloads" aria-label="Desktop downloads" className="mt-8 rounded-xl border border-[#dfe4d6] bg-[#fffefa] p-5 sm:p-6"><h2 className="text-xl font-semibold tracking-tight">Desktop preview</h2><p className={muted+' mt-3'}>Windows x86_64 installer · Linux x86_64 AppImage · {desktopPreview.version} · Unsigned release candidate.</p><div className="mt-5 flex flex-wrap items-center gap-4">{desktopPreview.packages.map(pkg=><a key={pkg.platform} className={primary} href={pkg.url} rel="noreferrer"><Icon name="download" size={17}/>{pkg.label}</a>)}<a className="text-sm text-[#294c3e] underline underline-offset-4" href={desktopPreview.releaseUrl} rel="noreferrer">Release notes &amp; checksums</a></div><p className="mt-4 text-xs leading-6 text-[#677169]">Automated checks passed on both platforms: silent installation on Windows, AppImage extraction on Ubuntu 22.04, and 22 packaged document-operation checks. Interactive use has not been tested on either platform. The AppImage needs glibc 2.35 or later; other Linux distributions have not been tested. Optional OCR, Office, media and AI packs were not tested with this release. Windows may show an unrecognized-publisher warning. Use copies of non-sensitive documents for this preview.</p></section>,
 };
 
 export function App(){
