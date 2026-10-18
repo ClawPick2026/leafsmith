@@ -1,8 +1,20 @@
 //! Capability and output-path policy shared by the native host tests.
 use std::path::Path;
 
-pub fn is_supported_operation(_operation: &str) -> bool { false }
-pub fn safe_relative_path(_path: &Path) -> bool { false }
+pub fn is_supported_operation(operation: &str) -> bool {
+    matches!(operation,
+        "inspect_pdf" | "edit_pdf_text" | "annotate_pdf" | "convert_to_pdf" |
+        "convert_from_pdf" | "ocr_pdf" | "ocr_image" | "form_template" |
+        "protect_pdf" | "unlock_pdf" | "remove_watermark" | "compress_pdf" |
+        "enhance_image" | "compress_video" | "transcribe" | "summarize" | "translate_pdf"
+    )
+}
+pub fn safe_relative_path(path: &Path) -> bool {
+    let Some(text) = path.to_str() else { return false; };
+    !text.is_empty() && !text.contains(['\\', ':', '\0']) &&
+        !text.chars().any(char::is_control) &&
+        path.components().all(|part| matches!(part, std::path::Component::Normal(_)))
+}
 
 #[cfg(test)]
 mod tests {
