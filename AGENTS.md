@@ -27,4 +27,5 @@
 - `npm test` runs both frontend suites. `npm run build` typechecks shared code and bundles desktop; `npm run web:build` builds the Lakebed capsule. `npm run dev` starts desktop preview; `npm run web:dev` starts the website on loopback port 3030. Native package workflows retain their existing root-relative paths.
 - Follow web/AGENTS.md for website privacy, Lakebed runtime and browser acceptance. The website must never gain native imports, document uploads, or cloud processing as a consequence of code sharing.
 - Run browser acceptance against freshly built/served outputs of both targets and independently parse downloads. Browser-preview tests do not prove native IPC or installer acceptance.
-- Do not create a nested Git repository under web/. Both histories are preserved in this repository; `archive/web-initial` retains the original Lakebed scaffold commit. Existing desktop release work may be staged/unstaged: preserve it and keep unrelated release fixes out of migration-only commits.
+- Do not create a nested Git repository under web/. Both histories are preserved in this repository; its root commit is the original Lakebed scaffold.
+- Browser/e2e fixtures, downloads, screenshots and reports go to ignored tests/artifacts/ directories. Commit only screenshots that a README references, under docs/screenshots/ or web/docs/screenshots/.

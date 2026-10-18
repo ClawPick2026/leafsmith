@@ -7,9 +7,10 @@ launch_args config (defaults to web/tests/browser-env.json if present).
 Only test-local browser environment is changed. For stable release acceptance,
 serve a frozen copy of dist rather than an actively edited Vite/HMR session;
 PAPERWORK_SERVED_BUILD records that served directory's asset hashes. Capture
-stdout with `set -o pipefail; ... | tee docs/screenshots/browser/run-output.txt`.
-All fixtures/downloads/screenshots
-are retained under docs/screenshots/browser; report: tests/browser-verification.json.
+stdout with `set -o pipefail; ... | tee tests/artifacts/browser/run-output.txt`.
+All fixtures/downloads/screenshots are retained under the ignored
+tests/artifacts/browser; report: tests/artifacts/browser-verification.json.
+Copy refreshed README screenshots to docs/screenshots/ deliberately.
 Native IPC, engine installation and packaged apps require separate native testing.
 """
 import hashlib
@@ -29,10 +30,10 @@ from pypdf import PdfReader, PdfWriter
 from reportlab.pdfgen import canvas
 
 ROOT = Path(__file__).resolve().parents[1]
-ART = ROOT / 'docs/screenshots/browser'
+ART = ROOT / 'tests/artifacts/browser'
 ART.mkdir(parents=True, exist_ok=True)
 BASE = sys.argv[1] if len(sys.argv) > 1 else 'http://127.0.0.1:1420'
-REPORT = ROOT / 'tests/browser-verification.json'
+REPORT = ROOT / 'tests/artifacts/browser-verification.json'
 CONFIG = Path(os.environ.get('PAPERWORK_BROWSER_ENV', str(ROOT / 'web/tests/browser-env.json')))
 STARTED = datetime.now(timezone.utc).isoformat()
 SERVED_BUILD = Path(os.environ['PAPERWORK_SERVED_BUILD']).resolve() if os.environ.get('PAPERWORK_SERVED_BUILD') else None

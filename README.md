@@ -10,7 +10,7 @@ The [browser edition](web/README.md) runs in your browser with a reduced feature
 
 ## Main Window
 
-![Paperwork Desktop main interface with PDF tools and file workspace](docs/screenshots/browser/desktop-home.png)
+![Paperwork Desktop main interface with PDF tools and file workspace](docs/screenshots/desktop-home.png)
 
 The desktop interface captured during real-browser verification. This image does not establish packaged-app or installer compatibility.
 
@@ -30,13 +30,13 @@ The separate **Native tools** workspace adds existing-text editing and standard-
 
 ### Organize PDF pages
 
-![PDF page workspace with ordering, rotation, extraction and crop controls](docs/screenshots/browser/desktop-workspace.png)
+![PDF page workspace with ordering, rotation, extraction and crop controls](docs/screenshots/desktop-workspace.png)
 
 Select pages and export a new document without overwriting the input.
 
 ### Native document tools
 
-![Native PDF editing panel with selected-object and font controls](docs/screenshots/browser/desktop-native-panel.png)
+![Native PDF editing panel with selected-object and font controls](docs/screenshots/desktop-native-panel.png)
 
 Native files are selected separately from the built-in workspace. Required engines must be available before a job can run.
 
