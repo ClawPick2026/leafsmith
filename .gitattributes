@@ -7,3 +7,4 @@
 *.log -whitespace
 # Preserve the exact upstream copyright fixture, including its whitespace.
 scripts/tests/fixtures/libffi-copyright.txt text eol=lf -whitespace
+scripts/tests/fixtures/libuuid-copyright.txt text eol=lf -whitespace

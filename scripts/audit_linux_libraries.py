@@ -161,13 +161,29 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 
-def license_policy(text, source_package, basename):
+# Reviewed libuuid1:amd64 2.37.2-4ubuntu3.6, not all util-linux libraries.
+# Ubuntu pool/main/u/util-linux/util-linux_2.37.2-4ubuntu3.6.dsc SHA256:
+# e2b458d2005c328b0187ded5acac81c530cca8bf164f7c20b8370d02c4ffaebc.
+# Its debian/copyright exactly matches the retained CI fixture. The upstream
+# libuuid/COPYING and libuuid/src/* grants are BSD-3-Clause. The runtime source
+# list in libuuid/src/Makemodule.am also includes lib/randutils.c (explicit
+# BSD-3-Clause header, despite Debian's stale LGPL stanza), lib/md5.c and
+# lib/sha1.c (public domain). No distro patch changes those runtime sources.
+# Require the COMPLETE reviewed notice, not a BSD keyword or a selected stanza:
+# any new override, changed grant, unknown layout, or source version needs
+# another review even if the notice stays unchanged.
+LIBUUID_COPYRIGHT_SHA256 = "2c447817698777e3b2365a5afe2a58ececb85367dfdf0ea2c0df49add90e93eb"
+LIBUUID_SOURCE_VERSION = "2.37.2-4ubuntu3.6"
+
+
+def license_policy(text, source_package, basename, *, source_version=None):
     """Reject GPL-only/AGPL libraries, not LGPL runtime libraries.
 
     Debian copyright can cover GPL build utilities alongside LGPL libraries.
     Keep that complete text and exact sources; do not reject LGPL because its
-    notice incorporates GPL text. Reviewed exceptions cover GCC runtime libs and
-    libffi's non-DEP5 MIT runtime grant, never arbitrary mixed-license sources.
+    notice incorporates GPL text. Reviewed exceptions cover GCC runtime libs,
+    libffi's non-DEP5 MIT grant, and one exact libuuid mixed-package notice,
+    never arbitrary mixed-license sources.
     This heuristic is a tripwire, not a binary-level legal determination.
     """
     evidence = text
@@ -181,8 +197,17 @@ def license_policy(text, source_package, basename):
             if control.get("Files", "").strip() == "*" and control.get("License"):
                 evidence = control["License"].splitlines()[0]
                 break
+    if source_package == "util-linux" and basename == "libuuid.so.1":
+        # Inspect all stanzas for AGPL before the reviewed runtime classification.
+        evidence = text
     if re.search(r"\bAGPL(?:v?\d|[-\s]|\b)|Affero General Public", evidence, re.I):
         raise ValueError("AGPL library is prohibited: " + basename)
+    if source_package == "util-linux" and basename == "libuuid.so.1":
+        if source_version != LIBUUID_SOURCE_VERSION:
+            raise ValueError("Unrecognized libuuid runtime source version; explicit review required: " + basename)
+        if hashlib.sha256(text.encode("utf-8")).hexdigest() != LIBUUID_COPYRIGHT_SHA256:
+            raise ValueError("Unrecognized libuuid runtime copyright; explicit review required: " + basename)
+        return "notice-and-exact-source-preserved"
     if source_package == "libffi" and re.fullmatch(r"libffi\.so(?:\.[0-9]+)*", basename):
         # Only this reviewed legacy layout is recognized. Require the entire
         # attributed runtime grant before Documentation; absent/changed terms
@@ -416,7 +441,8 @@ def collect(worker, native, output, source_output, python_records, distributions
             owner["notices"] = debian_cache[key]
             copyright_path = next(p for p in owner["notices"] if p.endswith("/copyright"))
             copyright_text = checked_file(output, copyright_path).read_text(errors="replace")
-            owner["policy"] = license_policy(copyright_text, owner["source_package"], path.name)
+            owner["policy"] = license_policy(copyright_text, owner["source_package"], path.name,
+                                             source_version=owner.get("source_version"))
             owner["original_sha256"] = sha256(Path(owner["original"]))
             sources_needed.add((owner["source_package"], owner["source_version"]))
         libraries.append({**owner, "path": path.relative_to(worker).as_posix() if role == "shipped-worker" else str(path),
@@ -484,6 +510,14 @@ def audit_payload(root, inventory, notices, source_output):
             raise ValueError("Missing dependency notices for " + path.name)
         for notice in record["notices"]:
             checked_file(notices, notice)
+        if record["kind"] == "debian" and record.get("source_package") == "util-linux" and path.name == "libuuid.so.1":
+            # Recheck this version-bound exception; a stored policy decision
+            # does not establish that the packaged runtime was reviewed.
+            copyright_path = next((p for p in record["notices"] if p.endswith("/copyright")), None)
+            if copyright_path is None:
+                raise ValueError("Missing libuuid runtime copyright; explicit review required: " + path.name)
+            license_policy(checked_file(notices, copyright_path).read_text(errors="replace"),
+                           record["source_package"], path.name, source_version=record.get("source_version"))
         if record["kind"] == "debian" and (record["source_package"], record["source_version"]) not in sources:
             raise ValueError("Missing exact corresponding source for " + path.name)
         actual.append({**record, "path": path.relative_to(root).as_posix(),

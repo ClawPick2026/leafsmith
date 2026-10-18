@@ -272,6 +272,63 @@ class SourceTests(unittest.TestCase):
                 with self.subTest(term=term, notice=notice), self.assertRaisesRegex(ValueError, "AGPL"):
                     module.license_policy(notice, "libffi", "libffi.so.8")
 
+    def test_actual_libuuid_copyright_distinguishes_bsd_runtime_from_gpl_utilities(self):
+        # Unmodified libuuid1:amd64 2.37.2-4ubuntu3.6 copyright from CI
+        # 39143386304, artifacts/linux-without-readline-evidence/build/worker/
+        # paperwork-worker/third-party-licenses/linux/debian/
+        # libuuid1_amd64-2.37.2-4ubuntu3.6/copyright. Also byte-identical to
+        # debian/copyright in the matching Ubuntu source archive.
+        import hashlib
+        fixture = Path(__file__).with_name("fixtures") / "libuuid-copyright.txt"
+        self.assertEqual(hashlib.sha256(fixture.read_bytes()).hexdigest(),
+                         "2c447817698777e3b2365a5afe2a58ececb85367dfdf0ea2c0df49add90e93eb")
+        self.assertEqual(api().license_policy(fixture.read_text(encoding="utf-8"),
+                                             "util-linux", "libuuid.so.1", source_version="2.37.2-4ubuntu3.6"),
+                         "notice-and-exact-source-preserved")
+
+    def test_libuuid_unchanged_notice_requires_reviewed_source_version(self):
+        text = (Path(__file__).with_name("fixtures") / "libuuid-copyright.txt").read_text(encoding="utf-8")
+        module = api()
+        with self.assertRaisesRegex(ValueError, "libuuid.*source version.*explicit review"):
+            module.license_policy(text, "util-linux", "libuuid.so.1")
+        for version in [None, "", "2.37.2-4ubuntu3.5", "2.37.2-4ubuntu3.7", "2.38-1"]:
+            with self.subTest(version=version), self.assertRaisesRegex(ValueError, "libuuid.*source version.*explicit review"):
+                module.license_policy(text, "util-linux", "libuuid.so.1", source_version=version)
+        self.assertEqual(module.license_policy(text, "util-linux", "libuuid.so.1", source_version="2.37.2-4ubuntu3.6"),
+                         "notice-and-exact-source-preserved")
+
+    def test_libuuid_exception_is_not_a_package_or_bsd_keyword_allowlist(self):
+        text = (Path(__file__).with_name("fixtures") / "libuuid-copyright.txt").read_text(encoding="utf-8")
+        module = api()
+        for source, basename in [("unknown", "libuuid.so.1"), ("util-linux-extra", "libuuid.so.1"),
+                                 ("util-linux", "libmount.so.1"), ("util-linux", "libblkid.so.1"),
+                                 ("util-linux", "libuuid.so"), ("util-linux", "libuuid.so.1.3.0"),
+                                 ("util-linux", "libuuid.so.1-extra"), ("util-linux", "other/libuuid.so.1")]:
+            with self.subTest(source=source, basename=basename), self.assertRaisesRegex(ValueError, "GPL-only"):
+                module.license_policy(text, source, basename, source_version="2.37.2-4ubuntu3.6")
+        for label, notice in [
+            ("GPL-only runtime", "License: GPL-2+"),
+            ("bare BSD keyword", "License: BSD-3-clause"),
+            ("empty notice", ""),
+            ("changed runtime license", text.replace("1999 Andreas Dilger (adilger@enel.ucalgary.ca)\nLicense: BSD-3-clause",
+                                                     "1999 Andreas Dilger (adilger@enel.ucalgary.ca)\nLicense: GPL-2+")),
+            ("changed condition", text.replace("without specific prior written permission.", "with no permission.")),
+            ("missing disclaimer", text.replace("THIS SOFTWARE IS PROVIDED", "DISCLAIMER REMOVED")),
+            ("missing attribution", text.replace("1999 Andreas Dilger (adilger@enel.ucalgary.ca)", "")),
+            ("additional override", text + "\nFiles: libuuid/src/gen_uuid.c\nLicense: GPL-3+\n"),
+        ]:
+            self.assertNotEqual(notice, text, label)
+            with self.subTest(label=label), self.assertRaisesRegex(ValueError, "review|GPL-only"):
+                module.license_policy(notice, "util-linux", "libuuid.so.1", source_version="2.37.2-4ubuntu3.6")
+
+    def test_libuuid_checks_all_stanzas_for_agpl_before_runtime_classification(self):
+        text = (Path(__file__).with_name("fixtures") / "libuuid-copyright.txt").read_text(encoding="utf-8")
+        for term in ["AGPL-3.0", "AGPLv3", "Affero General Public License"]:
+            for notice in [term + "\n" + text, text + "\nLicense: " + term,
+                           text + "\nFiles: libuuid/src/gen_uuid.c\nLicense: " + term + "\n"]:
+                with self.subTest(term=term, notice=notice), self.assertRaisesRegex(ValueError, "AGPL library is prohibited"):
+                    api().license_policy(notice, "util-linux", "libuuid.so.1", source_version="2.37.2-4ubuntu3.6")
+
     def test_permissive_runtime_dep5_is_not_rejected_for_gpl_build_tools(self):
         text = ("Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/\n\n"
                 "Files: *\nCopyright: fixture only\nLicense: Apache-2.0\n\n"
@@ -390,6 +447,133 @@ class GateTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "Missing Debian package copyright"):
                     module.collect(worker, native, output, root / "sources-2", records, [])
                 self.assertEqual(fetch.call_count, 1)
+
+    def test_libuuid_keeps_full_notice_and_still_requires_exact_source(self):
+        import tempfile
+        import shutil
+        from unittest.mock import patch
+        module = api()
+        fixture = Path(__file__).with_name("fixtures") / "libuuid-copyright.txt"
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder).resolve()
+            worker = root / "worker"
+            staged = worker / "_internal/libuuid.so.1"
+            staged.parent.mkdir(parents=True)
+            staged.write_bytes(b"synthetic runtime library; not release evidence")
+            (worker / "paperwork-worker").write_bytes(b"synthetic bootloader")
+            native = root / "native"
+            native.write_bytes(b"synthetic executable")
+            output = worker / "third-party-licenses"
+            boot = output / "python/pyinstaller/COPYING.txt"
+            boot.parent.mkdir(parents=True)
+            boot.write_text("PyInstaller bootloader exception fixture")
+            copyright = root / "usr/share/doc/libuuid1/copyright"
+            copyright.parent.mkdir(parents=True)
+            shutil.copyfile(fixture, copyright)
+            common = root / "usr/share/common-licenses"
+            common.mkdir(parents=True)
+            # The real mixed notice references these licenses, including GPL.
+            for name in ["GPL-2", "GPL-3", "LGPL", "LGPL-2", "LGPL-2.1", "LGPL-3"]:
+                (common / name).write_text("synthetic common-license fixture: " + name)
+            owner = {"kind": "debian", "name": "libuuid1:amd64", "version": "2.37.2-4ubuntu3.6",
+                     "source_package": "util-linux", "source_version": "2.37.2-4ubuntu3.6", "original": str(staged)}
+            records = [{"name": "pyinstaller", "notices": ["python/pyinstaller/COPYING.txt"]}]
+            copy_notices = module.debian_notices
+            with patch.object(module, "linker_paths", return_value={}), \
+                    patch.object(module, "linked_libraries", return_value=[]), \
+                    patch.object(module, "python_runtime_owner", return_value=None), \
+                    patch.object(module, "debian_owner", return_value=owner), \
+                    patch.object(module, "debian_notices", side_effect=lambda owner, out: copy_notices(owner, out, root)), \
+                    patch.object(module, "fetch_source", side_effect=ValueError("missing exact corresponding source")) as fetch:
+                # The binary version and complete notice stay unchanged: only
+                # the source identity may authorize the reviewed exception.
+                for version in [None, "", "2.37.2-4ubuntu3.7"]:
+                    if version is None:
+                        owner.pop("source_version", None)
+                    else:
+                        owner["source_version"] = version
+                    with self.subTest(source_version=version), self.assertRaisesRegex(ValueError, "libuuid.*source version.*explicit review"):
+                        module.collect(worker, native, output, root / "sources", records, [])
+                    fetch.assert_not_called()
+                owner["source_version"] = "2.37.2-4ubuntu3.6"
+                with self.assertRaisesRegex(ValueError, "exact corresponding source"):
+                    module.collect(worker, native, output, root / "sources", records, [])
+                fetch.assert_called_once_with("util-linux", "2.37.2-4ubuntu3.6", root / "sources")
+                copied = output / "linux/debian/libuuid1_amd64-2.37.2-4ubuntu3.6/copyright"
+                self.assertEqual(copied.read_bytes(), fixture.read_bytes())
+                self.assertFalse(copied.is_symlink())
+                for license_file in common.iterdir():
+                    self.assertEqual((output / "linux/common-licenses" / license_file.name).read_bytes(), license_file.read_bytes())
+                # Existing positive path: collection succeeds with a complete,
+                # checksum-verified synthetic source record for this version.
+                def synthetic_source(package, version, destination):
+                    directory = destination / (package + "-" + version)
+                    directory.mkdir()
+                    _, dsc = SourceTests().source_fixture(directory, version)
+                    dsc.write_text(dsc.read_text().replace("Source: example\n", "Source: " + package + "\n"))
+                    files = module.verify_source_directory(directory, package, version)
+                    return {"source_package": package, "source_version": version,
+                            "files": {directory.name + "/" + name: digest for name, digest in files.items()}}
+                with patch.object(module, "fetch_source", side_effect=synthetic_source):
+                    collected = module.collect(worker, native, output, root / "complete-sources", records, [])
+                self.assertEqual(collected["libraries"][0]["source_version"], "2.37.2-4ubuntu3.6")
+                self.assertEqual(collected["libraries"][0]["policy"], "notice-and-exact-source-preserved")
+                self.assertTrue(module.audit_payload(staged.parent, collected, output, root / "complete-sources")["success"])
+                copyright.unlink()
+                with self.assertRaisesRegex(ValueError, "Missing Debian package copyright"):
+                    module.collect(worker, native, output, root / "sources-2", records, [])
+                self.assertEqual(fetch.call_count, 1)
+            # Postbundle inspection also requires the source; the runtime policy
+            # is not an exemption from the Debian corresponding-source gate.
+            inventory = {"libraries": [{**owner, "basename": staged.name,
+                         "notices": [copied.relative_to(output).as_posix()],
+                         "sha256": module.sha256(staged), "policy": "notice-and-exact-source-preserved"}], "sources": []}
+            with self.assertRaisesRegex(ValueError, "Missing exact corresponding source"):
+                module.audit_payload(staged.parent, inventory, output, root / "sources")
+
+    def test_libuuid_postbundle_rechecks_reviewed_source_version(self):
+        import tempfile
+        import shutil
+        module = api()
+        fixture = Path(__file__).with_name("fixtures") / "libuuid-copyright.txt"
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder).resolve()
+            payload = root / "payload"
+            payload.mkdir()
+            staged = payload / "libuuid.so.1"
+            staged.write_bytes(b"synthetic postbundle runtime; not release evidence")
+            notices = root / "notices"
+            notice = notices / "libuuid/copyright"
+            notice.parent.mkdir(parents=True)
+            shutil.copyfile(fixture, notice)
+            sources = root / "sources"
+            sources.mkdir()
+            # A matching .dsc and complete synthetic archives are insufficient
+            # when that source version's runtime has not been reviewed.
+            for version in ["2.37.2-4ubuntu3.7", "2.37.2-4ubuntu3.6", None, ""]:
+                source_version = version or "2.37.2-4ubuntu3.6"
+                directory = sources / source_version
+                directory.mkdir(exist_ok=True)
+                _, dsc = SourceTests().source_fixture(directory, source_version)
+                dsc.write_text(dsc.read_text().replace("Source: example\n", "Source: util-linux\n"))
+                files = module.verify_source_directory(directory, "util-linux", source_version)
+                record = {"kind": "debian", "name": "libuuid1:amd64", "version": "2.37.2-4ubuntu3.6",
+                          "source_package": "util-linux", "source_version": version, "basename": staged.name,
+                          "notices": ["libuuid/copyright"], "sha256": module.sha256(staged),
+                          "policy": "notice-and-exact-source-preserved"}
+                if version is None:
+                    record.pop("source_version")
+                inventory = {"libraries": [record], "sources": [{"source_package": "util-linux",
+                             "source_version": source_version,
+                             "files": {source_version + "/" + name: digest for name, digest in files.items()}}]}
+                if version == "2.37.2-4ubuntu3.6":
+                    report = module.audit_payload(payload, inventory, notices, sources)
+                    self.assertTrue(report["success"])
+                    self.assertEqual(report["shared_library_count"], 1)
+                    self.assertEqual(report["source_package_count"], 1)
+                else:
+                    with self.assertRaisesRegex(ValueError, "libuuid.*source version.*explicit review"):
+                        module.audit_payload(payload, inventory, notices, sources)
 
     def test_postbundle_unknown_library_is_not_allowed_by_other_notices(self):
         import tempfile
