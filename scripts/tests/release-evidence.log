@@ -1,0 +1,30 @@
+=== 2026-10-18 scripts/publish_website.py and scripts/release.py ===
+RED publish (stub with no behaviour):
+f9e5ac7d238cd7c2caa005609f7c504f748062b6a590d00b27e8a69bcf299845  scripts/publish_website.py
+9290fd00d55166cde3295e1b0e55183cdc762754f47c488d1ad803b909475ff8  scripts/tests/test_publish_website.py
+Ran 13 tests in 0.014s
+FAILED (failures=1, errors=12)
+GREEN publish:
+1d05603dac5255f13e4c0202a17f32561f82f7d883b1cad0719d6aa1391b6fde  scripts/publish_website.py
+9290fd00d55166cde3295e1b0e55183cdc762754f47c488d1ad803b909475ff8  scripts/tests/test_publish_website.py
+Ran 13 tests in 0.035s
+OK
+
+RED release (stub with no behaviour):
+7db097b290207cd6f45e19c6b1980cb3e153d271244ff94558298b0e7716cac0  scripts/release.py
+9b4079577cd2afd881b6239fc90a32476d2ecb26342a973a80d906653ff2a106  scripts/tests/test_release.py
+Ran 14 tests in 0.046s
+FAILED (errors=14)
+First GREEN attempt: import error only (dataclass module not registered in sys.modules by the test loader); test loader fixed, assertions unchanged.
+Later test-only change: copies pin app version 0.1.0 and link test targets 9.0.0 so the suite survives future releases.
+GREEN release:
+cc10837a0808870a9a2bfe0416bbef5f00cd7fd5d5664616d7e90690d95aad24  scripts/release.py
+24759320f81463c3c94b9fadc4125eb3f519a1b2c3c146d2933479f7a16e887e  scripts/tests/test_release.py
+Ran 14 tests in 0.212s
+OK
+
+Real runs:
+- publish --dry-run --allow-uncommitted: exit 0 (npm test, npm run build, npm run web:build, 8 browser suites on a fresh local dev server).
+- publish --allow-uncommitted: exit 0. Deployed dep_yefw3xsfKf5oAixk; live HTML client.js?v=sha256:082f67d21764fe2de1579d027c242a1bb76e1f784eb225f3fdd390f63983848b equals the build and the downloaded client.js hash; 8 live suites exit 0. Record: tests/artifacts/publish/2026-10-18T212613Z.json (ignored). Deployed from HEAD 37d7c62 plus uncommitted web/ changes.
+- release.py rc --dry-run in the dirty checkout: refused (uncommitted changes), exit 1.
+- release.py dry runs in a throwaway local clone: rc -> v0.1.0-rc.3, final -> v0.1.0, minor --rc -> v0.2.0-rc.1, patch -> v0.1.1, major -> v1.0.0 (skip warning shown). No real release, tag, push or CI run.

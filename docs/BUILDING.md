@@ -260,6 +260,19 @@ Artifacts:
 
 ## Publish a release
 
+`npm run release -- rc` (or `final`, `patch`, `minor`, `major`, `minor --rc`,
+`--version X.Y.Z`) automates the steps below: it bumps the four manifests, writes
+release notes when `docs/releases/<tag>.md` is missing, commits and pushes main,
+waits for that commit's build, pushes the tag, waits for the release, verifies
+the assets against the GitHub digests and `SHA256SUMS`, then updates the README
+and website download links and publishes the website. Add `--dry-run` to see the
+plan and generated notes without changing anything. It refuses uncommitted
+changes. If it stops after the tag, finish with
+`npm run release -- --links-only <tag>`. Tests:
+`python3 -m unittest discover -s scripts/tests -p test_release.py`.
+
+Manual steps:
+
 1. Commit release notes to `docs/releases/<tag>.md`. The first line is the
    release title (`# ...`); the rest is the body. State what CI actually
    exercised and what remains untested; the workflow appends the commit and run.

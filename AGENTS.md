@@ -24,7 +24,7 @@
 - Workers do not commit, push, tag, publish, deploy, use paid services or recurse into more agents. Coordinator owns external side effects.
 
 ## Monorepo commands and preservation
-- `npm test` runs both frontend suites. `npm run build` typechecks shared code and bundles desktop; `npm run web:build` builds the Lakebed capsule. `npm run dev` starts desktop preview; `npm run web:dev` starts the website on loopback port 3030. Native package workflows retain their existing root-relative paths.
+- `npm test` runs both frontend suites. `npm run build` typechecks shared code and bundles desktop; `npm run web:build` builds the Lakebed capsule. `npm run dev` starts desktop preview; `npm run web:dev` starts the website on loopback port 3030. `npm run web:publish` checks and deploys the website only; `npm run release -- <bump>` performs a full desktop release (coordinator only; both are external side effects). Native package workflows retain their existing root-relative paths.
 - Follow web/AGENTS.md for website privacy, Lakebed runtime and browser acceptance. The website must never gain native imports, document uploads, or cloud processing as a consequence of code sharing.
 - Run browser acceptance against freshly built/served outputs of both targets and independently parse downloads. Browser-preview tests do not prove native IPC or installer acceptance.
 - Do not create a nested Git repository under web/. Both histories are preserved in this repository; its root commit is the original Lakebed scaffold.
