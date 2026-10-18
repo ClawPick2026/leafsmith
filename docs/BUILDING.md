@@ -1,9 +1,10 @@
 # Build and smoke-test desktop packages
 
 The `Desktop packages` workflow builds **Windows x86_64 NSIS** on
-`windows-latest` and **Linux x86_64 AppImage** on `ubuntu-22.04`. It runs on
-pushes to `main` and by manual dispatch. It uploads Actions artifacts only:
-there is no release job, tag creation, publishing, or repository-write permission.
+`windows-latest` and **Linux x86_64 AppImage** on `ubuntu-22.04`. Pushes to
+`main` and manual dispatches upload Actions artifacts only. Pushing a `v*` tag
+runs the same build and then publishes a GitHub release; see
+[Publish a release](#publish-a-release).
 
 ## Start CI after the coordinator has committed/pushed these files
 
@@ -225,16 +226,40 @@ are legal advice or a substitute for reviewing redistribution obligations.
 
 Artifacts:
 
-* `Paperwork-windows-x86_64` / `Paperwork-linux-x86_64`: verified package plus
-  platform `SHA256SUMS` file. The Linux artifact **also contains**
-  `Paperwork-linux-corresponding-sources.zip`; its checksum is in the same sums
-  file. The publisher must upload this exact ZIP beside the matching AppImage
-  and retain source availability with the binary (including mirrors). Expiring,
-  access-controlled Actions artifacts alone are not public source delivery.
+* `Paperwork-windows-x86_64` / `Paperwork-linux-x86_64`: verified package,
+  `Paperwork-<target>-third-party-notices.zip` (the notices also shipped inside
+  the package) and platform `SHA256SUMS` file. The Linux artifact **also
+  contains** `Paperwork-linux-corresponding-sources.zip`; its checksum is in the
+  same sums file. A release must carry this exact ZIP beside the matching
+  AppImage and retain source availability with the binary (including mirrors).
+  Expiring, access-controlled Actions artifacts alone are not public source
+  delivery.
 * `Paperwork-evidence-<target>`: toolchains, frontend/Rust/Python logs and JUnit,
   freeze logs, smoke `report.json`, raw stdout/stderr and exact process exit
   codes, actual notices/inventories, PyInstaller warnings, generated Cargo locks,
   source download logs and Linux postbundle library/hash/source audit report.
+
+## Publish a release
+
+1. Commit release notes to `docs/releases/<tag>.md`. The first line is the
+   release title (`# ...`); the rest is the body. State what CI actually
+   exercised and what remains untested; the workflow appends the commit and run.
+2. Push a tag matching the app version in `src-tauri/tauri.conf.json`: `v0.1.0`
+   or a pre-release such as `v0.1.0-rc.2`. A tag with a `-` suffix is published
+   as a pre-release.
+
+```sh
+git tag -a v0.1.0-rc.2 -m "Paperwork 0.1.0 RC2" && git push origin v0.1.0-rc.2
+gh run watch RUN_ID --repo ClawPick2026/paperwork-desktop --exit-status
+```
+
+The `publish` job runs only if both platform builds pass, including the Linux
+postbundle license/source audit. It verifies every downloaded asset against both
+`SHA256SUMS` files, uploads the AppImage, NSIS installer, notices ZIPs, Linux
+corresponding-source ZIP and checksum lists to a draft release, then publishes
+it. It is the only job with `contents: write`. A failed build publishes nothing.
+To retry after fixing a failure, delete the tag (and any leftover draft
+release) and push the tag again on the fixed commit.
 
 ## Local development
 

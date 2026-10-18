@@ -3,9 +3,12 @@ name: Desktop packages
 on:
   push:
     branches: [main]
+    tags: ['v*']
   workflow_dispatch:
 
-# Build artifacts only. No release, tagging, publishing, or repository writes.
+# Branch pushes and manual runs build artifacts only. A v* tag additionally
+# publishes a GitHub release, only after both platform packages pass; the
+# publish job alone can write releases.
 permissions:
   contents: read
 
@@ -155,9 +158,31 @@ jobs:
             --sources build/linux-corresponding-sources \
             --source-archive artifacts/Paperwork-linux-corresponding-sources.zip \
             --logs build/logs/linux-library-audit 2>&1 | tee build/logs/linux-library-audit.log
-      - name: Collect verified package and SHA-256
+      - name: Collect verified package, notices and SHA-256
+        shell: python
         run: |
-          python -c "from pathlib import Path; import shutil,hashlib; out=Path('artifacts'); out.mkdir(exist_ok=True); base=Path('src-tauri/target/${{ matrix.rust_target }}/release/bundle/${{ matrix.bundle }}'); files=list(base.glob('*.exe' if '${{ matrix.bundle }}'=='nsis' else '*.AppImage')); assert len(files)==1, files; sums=[]; [(shutil.copyfile(p,out/p.name), sums.append(hashlib.sha256(p.read_bytes()).hexdigest()+'  '+p.name)) for p in files]; sources=list(out.glob('*-corresponding-sources.zip')); assert '${{ matrix.bundle }}'!='appimage' or len(sources)==1, 'Missing verified Linux source ZIP'; sums.extend(hashlib.file_digest(p.open('rb'),'sha256').hexdigest()+'  '+p.name for p in sources); (out/'SHA256SUMS-${{ matrix.target }}.txt').write_text('\n'.join(sums)+'\n',encoding='utf-8')"
+          from pathlib import Path
+          import hashlib, shutil
+          out = Path('artifacts')
+          out.mkdir(exist_ok=True)
+          bundle = '${{ matrix.bundle }}'
+          base = Path('src-tauri/target/${{ matrix.rust_target }}/release/bundle') / bundle
+          files = list(base.glob('*.exe' if bundle == 'nsis' else '*.AppImage'))
+          assert len(files) == 1, files
+          for path in files:
+              shutil.copyfile(path, out / path.name)
+          # The same notices ship inside the package; this copy is readable before installing.
+          notices = Path('build/worker/paperwork-worker/third-party-licenses')
+          assert (notices / 'manifest.json').is_file(), 'Missing packaged notice manifest'
+          shutil.make_archive(str(out / 'Paperwork-${{ matrix.target }}-third-party-notices'), 'zip', notices)
+          sources = list(out.glob('*-corresponding-sources.zip'))
+          assert bundle != 'appimage' or len(sources) == 1, 'Missing verified Linux source ZIP'
+          release = [out / p.name for p in files] + sorted(out.glob('*-third-party-notices.zip')) + sources
+          sums = []
+          for path in release:
+              with path.open('rb') as stream:
+                  sums.append(hashlib.file_digest(stream, 'sha256').hexdigest() + '  ' + path.name)
+          (out / 'SHA256SUMS-${{ matrix.target }}.txt').write_text('\n'.join(sums) + '\n', encoding='utf-8')
       - name: Upload verified standalone package
         uses: actions/upload-artifact@v4
         with:
@@ -181,3 +206,51 @@ jobs:
             crates/native-security/Cargo.lock
           if-no-files-found: warn
           retention-days: 14
+
+  publish:
+    name: Publish GitHub release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check tag, app version and release notes
+        run: |
+          version=$(node -p "require('./src-tauri/tauri.conf.json').version")
+          case "$GITHUB_REF_NAME" in
+            "v$version"|"v$version"-*) ;;
+            *) echo "::error::Tag $GITHUB_REF_NAME does not match app version $version"; exit 1 ;;
+          esac
+          notes="docs/releases/$GITHUB_REF_NAME.md"
+          test -s "$notes" || { echo "::error::Missing release notes $notes"; exit 1; }
+          head -n 1 "$notes" | grep -q '^# ' || { echo "::error::$notes must start with a '# ' title"; exit 1; }
+      - uses: actions/download-artifact@v4
+        with:
+          name: Paperwork-linux-x86_64
+          path: release
+      - uses: actions/download-artifact@v4
+        with:
+          name: Paperwork-windows-x86_64
+          path: release
+      - name: Verify downloaded assets against both checksum lists
+        working-directory: release
+        run: |
+          ls -l
+          sha256sum --strict -c SHA256SUMS-linux-x86_64.txt SHA256SUMS-windows-x86_64.txt
+          test "$(ls | wc -l)" -eq "$(cat SHA256SUMS-*.txt | wc -l | awk '{print $1 + 2}')"
+      - name: Create release (draft until every asset is uploaded)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          notes="docs/releases/$GITHUB_REF_NAME.md"
+          title=$(head -n 1 "$notes" | sed 's/^# //')
+          tail -n +2 "$notes" > "$RUNNER_TEMP/notes.md"
+          printf '\nBuilt from commit `%s` by [workflow run %s](%s/%s/actions/runs/%s).\n' \
+            "$GITHUB_SHA" "$GITHUB_RUN_ID" "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" >> "$RUNNER_TEMP/notes.md"
+          flags=(--draft --verify-tag --title "$title" --notes-file "$RUNNER_TEMP/notes.md")
+          if [[ "$GITHUB_REF_NAME" == *-* ]]; then flags+=(--prerelease); else flags+=(--latest); fi
+          gh release create "$GITHUB_REF_NAME" release/* "${flags[@]}"
+          gh release edit "$GITHUB_REF_NAME" --draft=false
