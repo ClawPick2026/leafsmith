@@ -1,7 +1,5 @@
 name: Native integration checks
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read

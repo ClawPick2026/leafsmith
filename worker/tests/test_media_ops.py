@@ -255,6 +255,7 @@ class MediaTests(unittest.TestCase):
             self.assertFalse(kwargs["shell"])
             self.assertEqual(args[0], str(cli))
             self.assertIn(str(model), args)
+            self.assertNotIn('--log-disable',args,'llama.cpp uses the shared logger for generated tokens; this flag discards the answer')
             prompt_path = Path(args[args.index("-f") + 1])
             prompt_paths.append(prompt_path)
             self.assertEqual(prompt_path.parent.parent, self.out)

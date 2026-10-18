@@ -113,7 +113,7 @@ def _model_client(options, engines, job_directory):
                 with tempfile.TemporaryFile(dir=temporary) as generated:
                     _process([engines["llama"], "-m", engines["llama_model"], "-f", str(prompt), "-n", str(tokens),
                               "-c", "32768", "-t", "2", "--temp", "0", "-no-cnv", "--no-display-prompt",
-                              "--log-disable", "--simple-io"], timeout, generated, job_directory=temporary)
+                              "--simple-io"], timeout, generated, job_directory=temporary)
                     generated.seek(0)
                     raw = generated.read(RESPONSE_LIMIT + 1)
                 if len(raw) > RESPONSE_LIMIT:
