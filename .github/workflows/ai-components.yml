@@ -135,8 +135,8 @@ jobs:
         with:
           name: ai-diagnostics-${{ matrix.component }}-${{ matrix.target }}
           path: |
-            build/ai-components/smoke/
-            build/ai-components/cmake-build/CMakeCache.txt
-            build/ai-components/artifacts/*.manifest.json
+            build/ai-components/*/smoke/
+            build/ai-components/*/cmake-build/CMakeCache.txt
+            build/ai-components/*/artifacts/*.manifest.json
           if-no-files-found: warn
           retention-days: 14
