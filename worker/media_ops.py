@@ -109,10 +109,11 @@ def _model_client(options, engines, job_directory):
         if provider == "llama.cpp":
             with tempfile.TemporaryDirectory(prefix="llama-", dir=job_directory) as temporary:
                 prompt = Path(temporary) / "prompt.txt"
-                prompt.write_text(SYSTEM_PROMPT + "\n\n" + messages[1]["content"] + "\n\nResponse:\n", encoding="utf-8")
+                prompt.write_text(messages[1]["content"], encoding="utf-8")
                 with tempfile.TemporaryFile(dir=temporary) as generated:
                     _process([engines["llama"], "-m", engines["llama_model"], "-f", str(prompt), "-n", str(tokens),
-                              "-c", "32768", "-t", "2", "--temp", "0", "-no-cnv", "--no-display-prompt",
+                              "-c", "32768", "-t", "2", "--temp", "0", "--conversation", "--single-turn",
+                              "--system-prompt", SYSTEM_PROMPT, "--no-display-prompt",
                               "--simple-io"], timeout, generated, job_directory=temporary)
                     generated.seek(0)
                     raw = generated.read(RESPONSE_LIMIT + 1)

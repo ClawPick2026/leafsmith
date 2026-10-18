@@ -5,3 +5,5 @@
 *.jpg binary
 # Retained execution logs preserve exact command output, including whitespace.
 *.log -whitespace
+# Preserve the exact upstream copyright fixture, including its whitespace.
+scripts/tests/fixtures/libffi-copyright.txt -whitespace

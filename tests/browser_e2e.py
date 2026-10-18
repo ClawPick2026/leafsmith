@@ -354,7 +354,7 @@ def scope(page):
     page.get_by_role('button', name='Scope & privacy', exact=True).click()
     expect(page.get_by_role('heading', name='Native processing and limitations')).to_be_visible()
     body = page.locator('main').inner_text()
-    for phrase in ['bundled', 'explicit per-job consent', 'Electronic signatures are not certificate signatures', 'may remain after closing or a crash']:
+    for phrase in ['bundled', 'explicit per-job consent', 'Electronic signatures are not certificate signatures', 'attempts to remove cached job files', 'crash or forced termination', 'if cleanup fails', 'not secure erasure']:
         assert phrase in body, phrase
     pointer_controls(page)
     screenshot(page, 'desktop-privacy.png', full_page=True)

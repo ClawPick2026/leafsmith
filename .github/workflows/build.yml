@@ -101,7 +101,7 @@ jobs:
             extra+=(--deselect=worker/tests/test_pdf_ops.py::test_office_engine_receives_locked_down_job_profile --deselect=worker/tests/test_pdf_ops.py::test_subprocess_timeout_sanitized)
             printf '%s\n' 'Windows excludes two POSIX-only probe fixtures; Linux runs both.' | tee build/logs/platform-test-scope.txt
           fi
-          python -m pytest worker/tests scripts/tests/test_freeze.py scripts/tests/test_linux_licenses.py -v "${extra[@]}" --junitxml=build/logs/python-tests.xml 2>&1 | tee build/logs/python-tests.log
+          python -m pytest worker/tests scripts/tests/test_freeze.py scripts/tests/test_linux_licenses.py scripts/tests/test_frozen_pptx.py scripts/tests/test_packaged_operations.py -v "${extra[@]}" --junitxml=build/logs/python-tests.xml 2>&1 | tee build/logs/python-tests.log
       - name: Freeze embedded Python worker and verify PDF form roundtrip
         run: |
           set -o pipefail

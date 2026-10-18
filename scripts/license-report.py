@@ -88,7 +88,7 @@ def collect_npm(root, output):
 
 def collect_rust(root, output):
     completed = subprocess.run(["cargo", "metadata", "--format-version", "1", "--manifest-path", str(root / "src-tauri/Cargo.toml")],
-                               text=True, capture_output=True, check=True, timeout=300)
+                               text=True, encoding='utf-8', capture_output=True, check=True, timeout=300)
     packages = []
     for package in json.loads(completed.stdout)["packages"]:
         notices = []

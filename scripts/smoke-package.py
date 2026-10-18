@@ -22,6 +22,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 validate_health = runpy.run_path(str(ROOT / "scripts/freeze-worker.py"))["validate_health"]
+exercise_builtin_operations = runpy.run_path(str(ROOT / "scripts/smoke_operations.py"))["exercise_builtin_operations"]
 
 
 def clean_environment(no_path=False):
@@ -90,6 +91,7 @@ def test_worker(worker, logs, report, label="worker"):
     result = validate_health(stdout)
     report["worker_result"] = result
     report["licenses"] = verify_licenses(worker)
+    exercise_builtin_operations(worker, logs, report)
 
 
 def test_native(app, worker, logs, report, env, prefix=None):

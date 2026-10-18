@@ -230,6 +230,48 @@ class SourceTests(unittest.TestCase):
             with self.subTest(term=term), self.assertRaisesRegex(ValueError, "AGPL"):
                 module.license_policy(term, "unsafe", "libunsafe.so")
 
+    def test_actual_libffi_copyright_distinguishes_runtime_from_gpl_documentation(self):
+        # Unmodified libffi8:amd64 3.4.2-4 copyright from packaging CI
+        # 39135464089, artifacts/first-package-linux/build/worker/paperwork-worker/
+        # third-party-licenses/linux/debian/libffi8_amd64-3.4.2-4/copyright.
+        import hashlib
+        fixture = Path(__file__).with_name("fixtures") / "libffi-copyright.txt"
+        self.assertEqual(hashlib.sha256(fixture.read_bytes()).hexdigest(),
+                         "7258c8acc378030d8dbe1fcdf394e915769fa31dcbaf3d2991d9a79891f3bcdc")
+        text = fixture.read_text(encoding="utf-8")
+        for basename in ["libffi.so", "libffi.so.8", "libffi.so.8.1.0"]:
+            with self.subTest(basename=basename):
+                self.assertEqual(api().license_policy(text, "libffi", basename),
+                                 "notice-and-exact-source-preserved")
+
+    def test_libffi_exception_is_not_a_source_or_mit_keyword_allowlist(self):
+        text = (Path(__file__).with_name("fixtures") / "libffi-copyright.txt").read_text(encoding="utf-8")
+        module = api()
+        for source, basename in [("unknown", "libffi.so.8"), ("libffi-extra", "libffi.so.8"),
+                                 ("libffi", "libother.so.8"), ("libffi", "libffi.so.8-extra"),
+                                 ("libffi", "other/libffi.so.8")]:
+            with self.subTest(source=source, basename=basename), self.assertRaisesRegex(ValueError, "GPL-only"):
+                module.license_policy(text, source, basename)
+        before, after = text.split("    Documentation:", 1)
+        damaged = [
+            ("altered grant", text.replace("without restriction", "with restrictions")),
+            ("missing condition", text.replace("in all copies or substantial portions of the Software.", "")),
+            ("missing disclaimer", text.replace("THE SOFTWARE IS PROVIDED", "DISCLAIMER REMOVED")),
+            ("missing attribution", text.replace("libffi - Copyright", "unattributed - Copyright")),
+            ("documentation grant only", "License:\nGPL-3\nDocumentation:\n" + before + after),
+            ("additional runtime terms", text.replace("    Documentation:", "GPL-3 runtime restriction\n    Documentation:")),
+            ("missing boundary", text.replace("    Documentation:", "")),
+            ("bare MIT keyword", "License: MIT"),
+            ("empty notice", ""),
+        ]
+        for label, notice in damaged:
+            with self.subTest(label=label), self.assertRaisesRegex(ValueError, "review|GPL-only"):
+                module.license_policy(notice, "libffi", "libffi.so.8")
+        for term in ["AGPL-3.0", "Affero General Public License"]:
+            for notice in [term + "\n" + text, text + "\n" + term]:
+                with self.subTest(term=term, notice=notice), self.assertRaisesRegex(ValueError, "AGPL"):
+                    module.license_policy(notice, "libffi", "libffi.so.8")
+
     def test_permissive_runtime_dep5_is_not_rejected_for_gpl_build_tools(self):
         text = ("Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/\n\n"
                 "Files: *\nCopyright: fixture only\nLicense: Apache-2.0\n\n"
@@ -300,6 +342,54 @@ class GateTests(unittest.TestCase):
             self.assertEqual(record["sha256"], module.sha256(staged))
             self.assertNotEqual(record["sha256"], record["original_sha256"])
             self.assertEqual(record["notices"], ["python/example/LICENSE"])
+
+    def test_libffi_keeps_full_notice_and_still_requires_exact_source(self):
+        import tempfile
+        import shutil
+        from unittest.mock import patch
+        module = api()
+        fixture = Path(__file__).with_name("fixtures") / "libffi-copyright.txt"
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder).resolve()
+            worker = root / "worker"
+            staged = worker / "_internal/libffi.so.8"
+            staged.parent.mkdir(parents=True)
+            staged.write_bytes(b"synthetic runtime library; not release evidence")
+            (worker / "paperwork-worker").write_bytes(b"synthetic bootloader")
+            native = root / "native"
+            native.write_bytes(b"synthetic executable")
+            output = worker / "third-party-licenses"
+            boot = output / "python/pyinstaller/COPYING.txt"
+            boot.parent.mkdir(parents=True)
+            boot.write_text("PyInstaller bootloader exception fixture")
+            copyright = root / "usr/share/doc/libffi8/copyright"
+            copyright.parent.mkdir(parents=True)
+            shutil.copyfile(fixture, copyright)
+            common = root / "usr/share/common-licenses/GPL"
+            common.parent.mkdir(parents=True)
+            common.write_text("synthetic common-license fixture; not release evidence")
+            owner = {"kind": "debian", "name": "libffi8:amd64", "version": "3.4.2-4",
+                     "source_package": "libffi", "source_version": "3.4.2-4", "original": str(staged)}
+            records = [{"name": "pyinstaller", "notices": ["python/pyinstaller/COPYING.txt"]}]
+            copy_notices = module.debian_notices
+            with patch.object(module, "linker_paths", return_value={}), \
+                    patch.object(module, "linked_libraries", return_value=[]), \
+                    patch.object(module, "python_runtime_owner", return_value=None), \
+                    patch.object(module, "debian_owner", return_value=owner), \
+                    patch.object(module, "debian_notices", side_effect=lambda owner, out: copy_notices(owner, out, root)), \
+                    patch.object(module, "fetch_source", side_effect=ValueError("missing exact corresponding source")) as fetch:
+                with self.assertRaisesRegex(ValueError, "exact corresponding source"):
+                    module.collect(worker, native, output, root / "sources", records, [])
+                fetch.assert_called_once_with("libffi", "3.4.2-4", root / "sources")
+                copied = output / "linux/debian/libffi8_amd64-3.4.2-4/copyright"
+                self.assertEqual(copied.read_bytes(), fixture.read_bytes())
+                self.assertFalse(copied.is_symlink())
+                self.assertEqual((output / "linux/common-licenses/GPL").read_bytes(), common.read_bytes())
+                # A reviewed policy never substitutes for the actual notice.
+                copyright.unlink()
+                with self.assertRaisesRegex(ValueError, "Missing Debian package copyright"):
+                    module.collect(worker, native, output, root / "sources-2", records, [])
+                self.assertEqual(fetch.call_count, 1)
 
     def test_postbundle_unknown_library_is_not_allowed_by_other_notices(self):
         import tempfile

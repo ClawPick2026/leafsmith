@@ -84,6 +84,15 @@ def test_rust_notices_include_nested_vendored_library_terms(tmp_path, monkeypatc
     assert any((output / p).read_text() == "Vendored library actual notice fixture" for p in records[0]["notices"])
 
 
+def test_cargo_metadata_decodes_explicit_utf8_not_windows_ansi(tmp_path, monkeypatch):
+    def metadata(command, **kwargs):
+        assert kwargs.get('encoding') == 'utf-8', 'Cargo JSON is UTF-8, including non-ASCII crate metadata on Windows'
+        return subprocess.CompletedProcess(command,0,json.dumps({'packages':[], 'description':'日本語 ⚙'},ensure_ascii=False),'')
+    monkeypatch.setattr(subprocess,'run',metadata)
+    collector=runpy.run_path(str(ROOT/'scripts/license-report.py'))['collect_rust']
+    assert collector(tmp_path,tmp_path/'notices') == []
+
+
 def test_smoke_retains_failure_evidence_for_zero_exit_non_worker(tmp_path):
     # A real process that exits zero but emits no worker protocol must fail.
     completed = subprocess.run([sys.executable, str(ROOT / "scripts/smoke-package.py"),

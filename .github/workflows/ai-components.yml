@@ -129,3 +129,14 @@ jobs:
                   out.write('Actual worker/native inference passed on this runner. Not interactive desktop validation.\n\n')
                   out.write('```json\n' + json.dumps(record, indent=2) + '\n```\n')
           PY
+      - name: Preserve synthetic fixture output after native inference failure
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ai-diagnostics-${{ matrix.component }}-${{ matrix.target }}
+          path: |
+            build/ai-components/smoke/
+            build/ai-components/cmake-build/CMakeCache.txt
+            build/ai-components/artifacts/*.manifest.json
+          if-no-files-found: warn
+          retention-days: 14

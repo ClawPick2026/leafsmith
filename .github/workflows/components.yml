@@ -74,6 +74,7 @@ jobs:
           install: >-
             make
             diffutils
+            perl
             nasm
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-python

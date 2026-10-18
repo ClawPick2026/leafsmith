@@ -133,12 +133,41 @@ def debian_owner(path, linker):
     return next(iter(owners.values()))
 
 
+# Reviewed non-DEP5 libffi8 3.4.2-4 runtime grant. Match the complete License
+# section before Documentation, not an MIT keyword elsewhere in a GPL notice.
+# Keep the original copyright (including GPL documentation/packaging) unchanged.
+LIBFFI_RUNTIME_GRANT = """
+libffi - Copyright (c) 1996-2010  Red Hat, Inc and others.
+See source files for details.
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+``Software''), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED ``AS IS'', WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"""
+
+
 def license_policy(text, source_package, basename):
     """Reject GPL-only/AGPL libraries, not LGPL runtime libraries.
 
     Debian copyright can cover GPL build utilities alongside LGPL libraries.
     Keep that complete text and exact sources; do not reject LGPL because its
-    notice incorporates GPL text. Exceptions are restricted to GCC runtime libs.
+    notice incorporates GPL text. Reviewed exceptions cover GCC runtime libs and
+    libffi's non-DEP5 MIT runtime grant, never arbitrary mixed-license sources.
     This heuristic is a tripwire, not a binary-level legal determination.
     """
     evidence = text
@@ -154,6 +183,16 @@ def license_policy(text, source_package, basename):
                 break
     if re.search(r"\bAGPL(?:v?\d|[-\s]|\b)|Affero General Public", evidence, re.I):
         raise ValueError("AGPL library is prohibited: " + basename)
+    if source_package == "libffi" and re.fullmatch(r"libffi\.so(?:\.[0-9]+)*", basename):
+        # Only this reviewed legacy layout is recognized. Require the entire
+        # attributed runtime grant before Documentation; absent/changed terms
+        # require review even if the damaged notice no longer mentions GPL.
+        sections = re.split(r"(?m)^\s*Documentation:\s*$", text, maxsplit=1)
+        runtime = re.split(r"(?m)^License:\s*$", sections[0], maxsplit=1)
+        if (evidence != text or len(sections) != 2 or len(runtime) != 2
+                or runtime[1].split() != LIBFFI_RUNTIME_GRANT.split()):
+            raise ValueError("Unrecognized libffi runtime copyright; explicit review required: " + basename)
+        return "notice-and-exact-source-preserved"
     gpl = re.search(r"\bGPL(?:v?\d|[-\s]|\b)|GNU GENERAL PUBLIC LICENSE", evidence, re.I)
     lgpl = re.search(r"\bLGPL(?:v?\d|[-\s]|\b)|GNU (?:LESSER|LIBRARY) GENERAL PUBLIC LICENSE", evidence, re.I)
     gcc = (re.fullmatch(r"gcc-\d+", source_package or "")

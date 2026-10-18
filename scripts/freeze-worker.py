@@ -38,7 +38,10 @@ def build_command(root: Path = ROOT) -> list[str]:
         "--paths", str(root / "worker"), "--hidden-import", "pdf_ops",
         "--hidden-import", "media_ops", "--collect-all", "pypdfium2",
         "--collect-all", "pypdfium2_raw", "--collect-data", "reportlab",
-        "--collect-data", "docx", "--collect-data", "pptx",
+        "--collect-data", "docx",
+        # Speaker-note templates use oxml/../templates: oxml must exist on disk,
+        # not just inside PYZ, even though the XML templates are already data.
+        "--collect-all", "pptx",
         str(root / "worker/main.py"),
     ]
 
