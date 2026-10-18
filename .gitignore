@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.venv*/
+__pycache__/
+*.pyc
+.pytest_cache/
+src-tauri/target/
+src-tauri/binaries/
+artifacts/
+*.stderr
+architecture-review.json
