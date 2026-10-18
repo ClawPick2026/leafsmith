@@ -182,10 +182,13 @@ python scripts/audit_linux_libraries.py \
   non-GPL alternative (`BSD-3-clause or GPL-2`) or a standard exception (Bison,
   Autoconf, libtool distribution, Linux-syscall-note), or when every listed file is
   packaging, documentation, tests, examples, programs, scripts, a Linux UAPI
-  header copy, a non-source build-system file, or a reviewed path in
-  `REVIEWED_NONRUNTIME_OVERRIDES` (each with its reason). Krb5, keyutils, libidn2
-  and libzstd are classified from their exact reviewed notices (SHA-256 and
-  library names pinned in `REVIEWED_LIBRARY_NOTICES`); a changed notice fails.
+  header copy, a named non-source build-system file (not a `build-aux/*`
+  wildcard), or a reviewed path in `REVIEWED_NONRUNTIME_OVERRIDES` (each with
+  its reason). Prose such as "GPL-2 or later" is not an alternative license.
+  Krb5, keyutils, libidn2 and libzstd are classified from their exact reviewed
+  notices (`REVIEWED_LIBRARY_NOTICES` pins the notice SHA-256, library names and
+  upstream version; Ubuntu security revisions may change). A changed notice or
+  new upstream version fails until it is reviewed again.
   The error lists every unexcused file. This tripwire is **not** a determination
   of file-specific licensing. Review source-file exceptions and mixed/dual-license
   notices before release.
