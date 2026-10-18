@@ -19,7 +19,7 @@ class InventoryTests(unittest.TestCase):
     def test_real_payload_includes_versioned_and_vendored_shared_libraries(self):
         import tempfile
         with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
+            root = Path(folder).resolve()
             for name in ["_internal/libffi.so.8", "_internal/Pillow.libs/libjpeg-abc.so.62", "_internal/pkg/mod.cpython-312-x86_64-linux-gnu.so"]:
                 path = root / name
                 path.parent.mkdir(parents=True, exist_ok=True)
@@ -36,7 +36,7 @@ class OwnershipTests(unittest.TestCase):
         from unittest.mock import patch
         module = api()
         with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
+            root = Path(folder).resolve()
             (root / "lib/python3.12/lib-dynload").mkdir(parents=True)
             (root / "lib/libpython3.12.so.1.0").write_bytes(b"actual runtime fixture")
             (root / "lib/python3.12/lib-dynload/_ssl.cpython-312-x86_64-linux-gnu.so").write_bytes(b"actual stdlib fixture")
@@ -53,7 +53,7 @@ class OwnershipTests(unittest.TestCase):
         import tempfile
         from types import SimpleNamespace
         with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
+            root = Path(folder).resolve()
             notice = root / "python/pillow/LICENSE"
             notice.parent.mkdir(parents=True)
             notice.write_text("Actual wheel notice fixture")
@@ -174,7 +174,7 @@ class SourceTests(unittest.TestCase):
     def test_wrong_source_version_is_not_corresponding_source(self):
         import tempfile
         with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
+            root = Path(folder).resolve()
             self.source_fixture(root, "1.2-4")
             with self.assertRaisesRegex(ValueError, "source identity"):
                 api().verify_source_directory(root, "example", "1.2-3")
@@ -182,7 +182,7 @@ class SourceTests(unittest.TestCase):
     def test_missing_or_modified_source_archive_fails(self):
         import tempfile
         with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
+            root = Path(folder).resolve()
             archive, _ = self.source_fixture(root)
             archive.write_bytes(b"corrupted")
             with self.assertRaisesRegex(ValueError, "source checksum"):
@@ -191,7 +191,7 @@ class SourceTests(unittest.TestCase):
     def test_missing_debian_patch_archive_fails_even_if_upstream_tarball_exists(self):
         import tempfile
         with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
+            root = Path(folder).resolve()
             self.source_fixture(root)
             (root / "example_1.2-3.debian.tar.xz").unlink()
             with self.assertRaisesRegex(ValueError, "Missing.*debian.tar"):
@@ -200,7 +200,7 @@ class SourceTests(unittest.TestCase):
     def test_signed_dsc_and_epoch_version_are_preserved(self):
         import tempfile
         with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
+            root = Path(folder).resolve()
             _, dsc = self.source_fixture(root, "1:1.2-3")
             contents = dsc.read_text()
             dsc.write_text("-----BEGIN PGP SIGNED MESSAGE-----\nHash: SHA512\n\n" + contents + "\n-----BEGIN PGP SIGNATURE-----\nfixture NOT a real signature\n-----END PGP SIGNATURE-----\n")
@@ -239,7 +239,7 @@ class SourceTests(unittest.TestCase):
     def test_copyright_and_referenced_common_license_are_copied_not_linked(self):
         import tempfile
         with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
+            root = Path(folder).resolve()
             copyright = root / "usr/share/doc/libexample/copyright"
             copyright.parent.mkdir(parents=True)
             copyright.write_text("License: LGPL-2.1+\nSee /usr/share/common-licenses/LGPL-2.1\n")
@@ -273,7 +273,7 @@ class GateTests(unittest.TestCase):
         from unittest.mock import patch
         module = api()
         with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
+            root = Path(folder).resolve()
             worker = root / "worker"
             staged = worker / "_internal/pkg/native.so"
             staged.parent.mkdir(parents=True)
@@ -304,7 +304,7 @@ class GateTests(unittest.TestCase):
     def test_postbundle_unknown_library_is_not_allowed_by_other_notices(self):
         import tempfile
         with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
+            root = Path(folder).resolve()
             (root / "newlib.so.1").write_bytes(b"unknown fixture")
             with self.assertRaisesRegex(ValueError, "Unmapped"):
                 api().audit_payload(root, {"libraries": [], "sources": []}, root, root)
@@ -313,7 +313,7 @@ class GateTests(unittest.TestCase):
         import tempfile
         module = api()
         with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
+            root = Path(folder).resolve()
             staged = root / "libexample.so.1"
             staged.write_bytes(b"rewritten RPATH fixture")
             notice = root / "copyright"
@@ -327,7 +327,7 @@ class GateTests(unittest.TestCase):
         import tempfile
         module = api()
         with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
+            root = Path(folder).resolve()
             (root / "libexample.so.1").write_bytes(b"fixture")
             (root / "copyright").write_text("LGPL fixture")
             inventory = {"libraries": [{"basename": "libexample.so.1", "kind": "debian", "name": "libexample", "version": "1", "source_package": "example", "source_version": "1", "notices": ["copyright"], "sha256": "0" * 64}], "sources": []}
@@ -344,7 +344,7 @@ class WiringTests(unittest.TestCase):
         report_script = SCRIPT.with_name("license-report.py")
         module = runpy.run_path(str(report_script))
         with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
+            root = Path(folder).resolve()
             output = root / "build/worker/paperwork-worker/third-party-licenses"
             main = module["main"]
             def collect_linux(*args, **kwargs):
@@ -367,7 +367,7 @@ class ArchiveTests(unittest.TestCase):
         import zipfile
         module = api()
         with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
+            root = Path(folder).resolve()
             source_dir = root / "sources/example-1.2-3"
             source_dir.mkdir(parents=True)
             SourceTests().source_fixture(source_dir)
@@ -385,7 +385,7 @@ class ArchiveTests(unittest.TestCase):
     def test_library_directory_symlink_cannot_hide_external_payload(self):
         import tempfile
         with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
+            root = Path(folder).resolve()
             (root / "payload").mkdir()
             (root / "outside").mkdir()
             (root / "outside/native.so").write_bytes(b"external fixture")
@@ -399,7 +399,7 @@ class ArchiveTests(unittest.TestCase):
     def test_escaping_library_symlink_is_rejected(self):
         import tempfile
         with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
+            root = Path(folder).resolve()
             (root / "payload").mkdir()
             (root / "outside").write_bytes(b"outside")
             try:
@@ -419,7 +419,7 @@ class ExtractedPayloadTests(unittest.TestCase):
         from unittest.mock import patch
         module = api()
         with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
+            root = Path(folder).resolve()
             payload = root / "fixture-appdir"
             worker = payload / "usr/lib/paperwork-desktop/worker"
             library = worker / "_internal/libexample.so.1"
@@ -464,7 +464,7 @@ class ExtractedPayloadTests(unittest.TestCase):
         from unittest.mock import patch
         module = api()
         with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
+            root = Path(folder).resolve()
             inventory = root / "inventory.json"
             inventory.write_text('{"sources": []}')
             sources = root / "sources"

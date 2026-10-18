@@ -1,12 +1,6 @@
 # Optional local AI packs — build and release gates
 
-**Status: ready-to-trigger recipe, not a verified release.** No engine binaries or
-model ZIPs were compiled, published, committed or added to the registry by this
-change. The preparation host is Linux ARM64 without a C/C++ compiler. Native
-Windows/Linux x86_64 compilation, real model inference, ZIP sizes and ZIP hashes
-must come from the workflow results. The existing general-engine builder is
-independent; its README's previous AI “not implemented” rows do not describe this
-new recipe.
+**Release status:** Whisper CPU engine and tiny-English model packs have passed real native transcription on Windows and Linux x86_64, and are [published with verified hashes and matching sources](https://github.com/ClawPick2026/paperwork-desktop/releases/tag/components-v0.1.0). The llama.cpp/text-model packs are still under native validation and must not be treated as available until their own checks pass. The general OCR/Office/FFmpeg pipeline is independent.
 
 ## Independent downloads and consent
 
