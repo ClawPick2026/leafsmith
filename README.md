@@ -2,7 +2,7 @@
 
 Local-first PDF, document, image and media tools, with the same interface as [Paperwork on the web](https://paperwork.lakebed.app).
 
-**Release status:** the application source is available, but native Windows/Linux builds and optional engine packs are still being validated. No finished installer is published yet. Do not mistake successful frontend tests or a CI recipe for a verified desktop release.
+**Release status:** a [Windows x86_64 preview installer (0.1.0 RC1)](https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.1) is published. It passed automated silent installation, native host/worker checks and 22 packaged document-operation checks. It is unsigned; interactive GUI and uninstall testing are pending. Linux and remaining optional engine/model packs are still being completed. This is not the finished cross-platform release.
 
 ## Main Window
 
@@ -38,7 +38,7 @@ Native files are selected separately from the built-in workspace. Required engin
 
 ## First use
 
-Until verified installers are published, the [browser edition](https://paperwork.lakebed.app) remains available with its explicitly reduced feature set. Downloadable desktop releases will be listed on this repository's [Releases page](https://github.com/ClawPick2026/paperwork-desktop/releases).
+Download the [Windows preview installer](https://github.com/ClawPick2026/paperwork-desktop/releases/download/v0.1.0-rc.1/Paperwork_0.1.0_x64-setup.exe). Read the [release notes, SHA-256 checksums and precise test scope](https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.1) first: Windows may show an unrecognized-publisher warning. Use copies of non-sensitive documents during preview testing. No Linux installer is published yet. The [browser edition](https://paperwork.lakebed.app) remains available with its explicitly reduced feature set.
 
 For the built-in workspace, choose **Try a sample**, open **Organize PDF**, select an operation and download the resulting document. For your own work, use **Choose files** and retain the originals.
 
@@ -60,7 +60,7 @@ For local AI, use an explicitly selected local model file, an available download
 
 - Local processing is the default. No document content is automatically uploaded for cloud AI; cloud jobs require individual approval.
 - Optional component/model downloads contact their distribution servers and require consent. Their licenses are displayed separately.
-- Native processing writes private temporary files and outputs to the app cache. Successful outputs remain available to save during the session. Normal app exit and the next startup clean job caches; a crash or forced termination may leave files on disk until cleanup succeeds.
+- Native processing writes private temporary files and outputs to the app cache. Successful outputs remain available to save during the session. Normal exit and startup attempt to clean job caches; a crash, forced termination or cleanup failure can leave files on disk. This is ordinary deletion, not secure erasure.
 - Closing the app clears the in-memory workspace. Save desired outputs first; keep separate backups of original documents.
 - Processing untrusted files is not an operating-system sandbox. Review sensitive or adversarial documents accordingly.
 

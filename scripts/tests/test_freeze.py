@@ -84,6 +84,12 @@ def test_rust_notices_include_nested_vendored_library_terms(tmp_path, monkeypatc
     assert any((output / p).read_text() == "Vendored library actual notice fixture" for p in records[0]["notices"])
 
 
+def test_worker_does_not_ship_unused_gpl_readline_editor():
+    command=runpy.run_path(str(ROOT/'scripts/freeze-worker.py'))['build_command']()
+    exclusions=[command[i+1] for i,argument in enumerate(command[:-1]) if argument=='--exclude-module']
+    assert 'readline' in exclusions, 'JSON-line worker has no interactive editor; GNU readline must not be redistributed'
+
+
 def test_cargo_metadata_decodes_explicit_utf8_not_windows_ansi(tmp_path, monkeypatch):
     def metadata(command, **kwargs):
         assert kwargs.get('encoding') == 'utf-8', 'Cargo JSON is UTF-8, including non-ASCII crate metadata on Windows'

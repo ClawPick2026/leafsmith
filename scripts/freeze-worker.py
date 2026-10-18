@@ -36,6 +36,9 @@ def build_command(root: Path = ROOT) -> list[str]:
         "--name", "paperwork-worker", "--distpath", str(root / "build/worker"),
         "--workpath", str(root / "build/pyinstaller"), "--specpath", str(root / "build"),
         "--paths", str(root / "worker"), "--hidden-import", "pdf_ops",
+        # The worker is a batch JSON protocol, never an interactive Python REPL.
+        # Ubuntu's optional readline extension would pull in GPL-only libreadline.
+        "--exclude-module", "readline",
         "--hidden-import", "media_ops", "--collect-all", "pypdfium2",
         "--collect-all", "pypdfium2_raw", "--collect-data", "reportlab",
         "--collect-data", "docx",
