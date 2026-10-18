@@ -192,8 +192,10 @@ class NativeTraceTests(unittest.TestCase):
 
         result = element(json.dumps(details, indent=2), text_rect, False)
         controls = {
+            # Real Windows WebView UIA exposes the selected <li> as ListItem,
+            # with no descendant Text node. Keep this provider behavior exact.
+            'ListItem': [element('synthetic-input.pdf', button_rect, True)],
             'Text': [result] + [element(text, button_rect, True) for text in (
-                'synthetic-input.pdf',
                 'Processing finished. Read the returned details below.',
                 'Processing finished. Save outputs below.',
                 'Output saved to the location you selected.',
@@ -217,7 +219,11 @@ class NativeTraceTests(unittest.TestCase):
         trace.step = lambda *args, **kwargs: None
         self.assertFalse(trace.usable(result))  # Reading must not require a click target.
 
-        with tempfile.TemporaryDirectory() as temporary, patch.object(smoke.time, 'sleep'):
+        real_wait = smoke.wait_until
+        with tempfile.TemporaryDirectory() as temporary, patch.object(smoke.time, 'sleep'), \
+                patch.object(smoke, 'wait_until',
+                             lambda predicate, description, timeout=30:
+                             real_wait(predicate, description, timeout=.1)):
             trace.evidence = Path(temporary)
             trace.drive()
             observed = json.loads((trace.evidence / 'inspection-ui-readback.json').read_text())

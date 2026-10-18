@@ -310,8 +310,8 @@ class NativeTrace:
         target = scope if scope is not None else self.window
         return target.descendants(**({'control_type': role} if role else {}))
 
-    def has_text(self, text):
-        return any(text in e.window_text() for e in self.elements('Text'))
+    def has_text(self, text, role='Text'):
+        return any(text in e.window_text() for e in self.elements(role))
 
     def named(self, name, role='Button', scope=None, contains=False):
         def matches(element):
@@ -417,7 +417,8 @@ class NativeTrace:
         self.click('Choose native files')
         self.file_dialog('Select documents or media to process', self.evidence / 'synthetic-input.pdf',
                          'Open', '02-native-open')
-        wait_until(lambda: self.has_text('synthetic-input.pdf'), 'picker-selected file rendered')
+        wait_until(lambda: self.has_text('synthetic-input.pdf', role='ListItem'),
+                   'picker-selected file rendered')
         self.seek('Run Inspect PDF text')
         self.capture('03-native-selection', require_nonblank=True)
         self.click('Run Inspect PDF text')
