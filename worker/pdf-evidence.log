@@ -1,0 +1,730 @@
+RED inspect | command: pytest worker/tests/test_pdf_ops.py -q | tests_sha256=b4999c4368d679d68a4d523ab51304cbd49d7677c8b4b91847727026a4b4f993 | exit=1
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________________ test_inspect_real_objects ___________________________
+
+tmp_path = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-0/test_inspect_real_objects0')
+source = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-0/test_inspect_real_objects0/source.pdf')
+
+    def test_inspect_real_objects(tmp_path, source):
+>       r = run(tmp_path, 'inspect_pdf', [source])
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+worker/tests/test_pdf_ops.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-0/test_inspect_real_objects0')
+operation = 'inspect_pdf'
+inputs = [PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-0/test_inspect_real_objects0/source.pdf')]
+options = {}
+
+    def run(tmp_path, operation, inputs=(), **options):
+        if not MODULE.exists():
+>           pytest.fail('native PDF worker not implemented')
+E           Failed: native PDF worker not implemented
+
+worker/tests/test_pdf_ops.py:13: Failed
+=========================== short test summary info ============================
+FAILED worker/tests/test_pdf_ops.py::test_inspect_real_objects - Failed: nati...
+1 failed in 0.23s
+GREEN inspect | exit=1 | source=5c3e5a5eebeb7145b7426aa30508cb1dfa1ee358e87094f47a24d3e42d90da9b
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________________ test_inspect_real_objects ___________________________
+
+tmp_path = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-1/test_inspect_real_objects0')
+source = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-1/test_inspect_real_objects0/source.pdf')
+
+    def test_inspect_real_objects(tmp_path, source):
+>       r = run(tmp_path, 'inspect_pdf', [source])
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+worker/tests/test_pdf_ops.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+worker/tests/test_pdf_ops.py:17: in run
+    return module.run({'operation':operation,'inputs':[str(p) for p in inputs],
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+request = {'operation': 'inspect_pdf', 'inputs': ['/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-1/test_i...e/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-1/test_inspect_real_objects0/out', 'options': {}, ...}
+
+    def run(request):
+        try:
+            return _run(request)
+        except PdfOperationError:
+            raise
+        except Exception:
+>           raise PdfOperationError('Document processing failed. Check the file format, encryption, and selected options.') from None
+E           pdf_ops.PdfOperationError: Document processing failed. Check the file format, encryption, and selected options.
+
+worker/pdf_ops.py:61: PdfOperationError
+=========================== short test summary info ============================
+FAILED worker/tests/test_pdf_ops.py::test_inspect_real_objects - pdf_ops.PdfO...
+1 failed in 0.36s
+GREEN inspect retry | exit=0 | source=4a82a0888f3063047e88bb1fa12099e14e760fe01051d5eb4cb08b2b763dcb80
+.                                                                        [100%]
+1 passed in 0.30s
+RED edit | exit=1 | tests=b92b14018ab34d2dab62014eef8012de2d6f0d5b45891960ff261ac8e246df86
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+____________________ test_edit_replaces_object_not_overlay _____________________
+
+tmp_path = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-3/test_edit_replaces_object_not_0')
+source = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-3/test_edit_replaces_object_not_0/source.pdf')
+
+    def test_edit_replaces_object_not_overlay(tmp_path, source):
+        original = source.read_bytes()
+        info = run(tmp_path, 'inspect_pdf', [source])
+        index = next(o['object_index'] for o in info['details']['pages'][0]['objects'] if o.get('text')=='Original text')
+>       p = output(run(tmp_path, 'edit_pdf_text', [source], page=1, object_index=index,
+                       text='Replacement', font='Courier', font_size=18))
+
+worker/tests/test_pdf_ops.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+worker/tests/test_pdf_ops.py:17: in run
+    return module.run({'operation':operation,'inputs':[str(p) for p in inputs],
+worker/pdf_ops.py:58: in run
+    return _run(request)
+           ^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+request = {'operation': 'edit_pdf_text', 'inputs': ['/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-3/test...laces_object_not_0/out', 'options': {'page': 1, 'object_index': 0, 'text': 'Replacement', 'font': 'Courier', ...}, ...}
+
+    def _run(request):
+        operation = request.get('operation')
+        if operation not in OPERATIONS:
+            raise PdfOperationError('Unsupported native PDF operation.')
+        inputs = _inputs(request)
+        directory = Path(request.get('output_dir', ''))
+        if not directory.is_absolute() or directory.is_symlink():
+            raise PdfOperationError('output_dir must be an absolute job directory, not a symlink.')
+        directory.mkdir(parents=True, exist_ok=True)
+        directory = directory.resolve()
+        if not inputs and operation != 'form_template':
+            raise PdfOperationError('Select one input file.')
+        if len(inputs) > 1:
+            raise PdfOperationError('This operation accepts one input file per job.')
+        options = request.get('options', {})
+        if not isinstance(options, dict):
+            raise PdfOperationError('options must be an object.')
+        if operation == 'inspect_pdf':
+            return _result(**_inspect(inputs[0]))
+>       raise PdfOperationError('Operation is not implemented.')
+E       pdf_ops.PdfOperationError: Operation is not implemented.
+
+worker/pdf_ops.py:83: PdfOperationError
+=========================== short test summary info ============================
+FAILED worker/tests/test_pdf_ops.py::test_edit_replaces_object_not_overlay - ...
+1 failed, 1 passed in 0.31s
+GREEN edit | exit=0 | source=be1943a586245be613a3c8002df0730c2e4d09a3ae34f1e442cb44e05634152d
+..                                                                       [100%]
+2 passed in 0.28s
+RED security | exit=1 | tests=dfd1a0fca8d522960b35422af51dcd348271a085f8359e4dcc441f21a5d419ee
+.F.                                                                      [100%]
+=================================== FAILURES ===================================
+_______________________ test_password_security_roundtrip _______________________
+
+tmp_path = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-5/test_password_security_roundtr0')
+source = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-5/test_password_security_roundtr0/source.pdf')
+
+    def test_password_security_roundtrip(tmp_path, source):
+>       p = output(run(tmp_path, 'protect_pdf', [source], password='[TEST PASSWORD REDACTED]', owner_password='[TEST PASSWORD REDACTED]'))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+worker/tests/test_pdf_ops.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+worker/tests/test_pdf_ops.py:17: in run
+    return module.run({'operation':operation,'inputs':[str(p) for p in inputs],
+worker/pdf_ops.py:58: in run
+    return _run(request)
+           ^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+request = {'operation': 'protect_pdf', 'inputs': ['/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-5/test_p...-5/test_password_security_roundtr0/out', 'options': {'password': '[TEST PASSWORD REDACTED]', 'owner_password': '[TEST PASSWORD REDACTED]'}, ...}
+
+    def _run(request):
+        operation = request.get('operation')
+        if operation not in OPERATIONS:
+            raise PdfOperationError('Unsupported native PDF operation.')
+        inputs = _inputs(request)
+        directory = Path(request.get('output_dir', ''))
+        if not directory.is_absolute() or directory.is_symlink():
+            raise PdfOperationError('output_dir must be an absolute job directory, not a symlink.')
+        directory.mkdir(parents=True, exist_ok=True)
+        directory = directory.resolve()
+        if not inputs and operation != 'form_template':
+            raise PdfOperationError('Select one input file.')
+        if len(inputs) > 1:
+            raise PdfOperationError('This operation accepts one input file per job.')
+        options = request.get('options', {})
+        if not isinstance(options, dict):
+            raise PdfOperationError('options must be an object.')
+        if operation == 'inspect_pdf':
+            return _result(**_inspect(inputs[0]))
+        if operation == 'edit_pdf_text':
+            return _edit(inputs[0], directory, options)
+>       raise PdfOperationError('Operation is not implemented.')
+E       pdf_ops.PdfOperationError: Operation is not implemented.
+
+worker/pdf_ops.py:85: PdfOperationError
+=========================== short test summary info ============================
+FAILED worker/tests/test_pdf_ops.py::test_password_security_roundtrip - pdf_o...
+1 failed, 2 passed in 0.49s
+GREEN security | exit=0 | source=ae2afda94e44a30634e70dd8d9d35773e69442d29ab0786779eb529c17aa5b07
+...                                                                      [100%]
+3 passed in 0.28s
+RED watermark | exit=1 | tests=9e30a0894f2bda78fd3043de6bb6a732eda6cfb5e16c7c1e8a65d38b611ffd16
+..F.                                                                     [100%]
+=================================== FAILURES ===================================
+_____________________ test_remove_selected_exact_watermark _____________________
+worker/tests/test_pdf_ops.py:65: in test_remove_selected_exact_watermark
+    p = output(run(tmp_path, 'remove_watermark', [source], exact_text='DRAFT', page=1))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+worker/tests/test_pdf_ops.py:17: in run
+    return module.run({'operation':operation,'inputs':[str(p) for p in inputs],
+worker/pdf_ops.py:58: in run
+    return _run(request)
+           ^^^^^^^^^^^^^
+worker/pdf_ops.py:106: in _run
+    raise PdfOperationError('Operation is not implemented.')
+E   pdf_ops.PdfOperationError: Operation is not implemented.
+=========================== short test summary info ============================
+FAILED worker/tests/test_pdf_ops.py::test_remove_selected_exact_watermark - p...
+1 failed, 3 passed in 0.37s
+GREEN watermark | exit=0 | source=9c2bdca7a008f2d5c704aafbfa280397b8233de549eb95c4d03a98e54f592790
+....                                                                     [100%]
+4 passed in 0.32s
+RED templates | exit=1 | tests=4307d9f588db372211addd80dfb4d89ee2582056244dcd5ef200735d830dc9ea
+...FFF.                                                                  [100%]
+=================================== FAILURES ===================================
+_____________ test_form_template_has_real_fields[contact-fields0] ______________
+worker/tests/test_pdf_ops.py:75: in test_form_template_has_real_fields
+    p = output(run(tmp_path,'form_template',template_id=template_id))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+worker/tests/test_pdf_ops.py:17: in run
+    return module.run({'operation':operation,'inputs':[str(p) for p in inputs],
+worker/pdf_ops.py:58: in run
+    return _run(request)
+           ^^^^^^^^^^^^^
+worker/pdf_ops.py:108: in _run
+    raise PdfOperationError('Operation is not implemented.')
+E   pdf_ops.PdfOperationError: Operation is not implemented.
+_____________ test_form_template_has_real_fields[approval-fields1] _____________
+worker/tests/test_pdf_ops.py:75: in test_form_template_has_real_fields
+    p = output(run(tmp_path,'form_template',template_id=template_id))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+worker/tests/test_pdf_ops.py:17: in run
+    return module.run({'operation':operation,'inputs':[str(p) for p in inputs],
+worker/pdf_ops.py:58: in run
+    return _run(request)
+           ^^^^^^^^^^^^^
+worker/pdf_ops.py:108: in _run
+    raise PdfOperationError('Operation is not implemented.')
+E   pdf_ops.PdfOperationError: Operation is not implemented.
+_____________ test_form_template_has_real_fields[invoice-fields2] ______________
+worker/tests/test_pdf_ops.py:75: in test_form_template_has_real_fields
+    p = output(run(tmp_path,'form_template',template_id=template_id))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+worker/tests/test_pdf_ops.py:17: in run
+    return module.run({'operation':operation,'inputs':[str(p) for p in inputs],
+worker/pdf_ops.py:58: in run
+    return _run(request)
+           ^^^^^^^^^^^^^
+worker/pdf_ops.py:108: in _run
+    raise PdfOperationError('Operation is not implemented.')
+E   pdf_ops.PdfOperationError: Operation is not implemented.
+=========================== short test summary info ============================
+FAILED worker/tests/test_pdf_ops.py::test_form_template_has_real_fields[contact-fields0]
+FAILED worker/tests/test_pdf_ops.py::test_form_template_has_real_fields[approval-fields1]
+FAILED worker/tests/test_pdf_ops.py::test_form_template_has_real_fields[invoice-fields2]
+3 failed, 4 passed in 0.45s
+GREEN templates | exit=0 | source=ce2cea287d82d6e9ce079bf40bdcf531cb04aef88446514364466c6af860dc15
+.......                                                                  [100%]
+7 passed in 0.37s
+RED annotations | exit=1 | tests=71f2fce60fdde34de54605776fe461d97299b22d710de369bc8ab32d0d747f53
+......FF.                                                                [100%]
+=================================== FAILURES ===================================
+____________________ test_native_annotations[comment-/Text] ____________________
+worker/tests/test_pdf_ops.py:88: in test_native_annotations
+    p = output(run(tmp_path,'annotate_pdf',[source],page=1,kind=kind,text='Review this',rect=[72,730,180,755]))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+worker/tests/test_pdf_ops.py:17: in run
+    return module.run({'operation':operation,'inputs':[str(p) for p in inputs],
+worker/pdf_ops.py:58: in run
+    return _run(request)
+           ^^^^^^^^^^^^^
+worker/pdf_ops.py:67: in _run
+    raise PdfOperationError('Unsupported native PDF operation.')
+E   pdf_ops.PdfOperationError: Unsupported native PDF operation.
+________________ test_native_annotations[highlight-/Highlight] _________________
+worker/tests/test_pdf_ops.py:88: in test_native_annotations
+    p = output(run(tmp_path,'annotate_pdf',[source],page=1,kind=kind,text='Review this',rect=[72,730,180,755]))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+worker/tests/test_pdf_ops.py:17: in run
+    return module.run({'operation':operation,'inputs':[str(p) for p in inputs],
+worker/pdf_ops.py:58: in run
+    return _run(request)
+           ^^^^^^^^^^^^^
+worker/pdf_ops.py:67: in _run
+    raise PdfOperationError('Unsupported native PDF operation.')
+E   pdf_ops.PdfOperationError: Unsupported native PDF operation.
+=========================== short test summary info ============================
+FAILED worker/tests/test_pdf_ops.py::test_native_annotations[comment-/Text]
+FAILED worker/tests/test_pdf_ops.py::test_native_annotations[highlight-/Highlight]
+2 failed, 7 passed in 0.45s
+GREEN annotations | exit=0 | source=60f6c3ead7cf98e511b3ea322c1c95dd12ec1f3c3fc7eedd1ad65cd3883c5ba8
+.........                                                                [100%]
+9 passed in 0.55s
+RED compression | exit=1 | tests=2adc2eeb7561e91c4e95067ae6f827698c8dc651e6f0c07e6a1ae5f629d5d11b
+........FF.                                                              [100%]
+=================================== FAILURES ===================================
+___________________ test_compression_real_readback[lossless] ___________________
+worker/tests/test_pdf_ops.py:98: in test_compression_real_readback
+    p = output(run(tmp_path,'compress_pdf',[source],mode=mode,dpi=100,quality=60))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+worker/tests/test_pdf_ops.py:17: in run
+    return module.run({'operation':operation,'inputs':[str(p) for p in inputs],
+worker/pdf_ops.py:58: in run
+    return _run(request)
+           ^^^^^^^^^^^^^
+worker/pdf_ops.py:156: in _run
+    raise PdfOperationError('Operation is not implemented.')
+E   pdf_ops.PdfOperationError: Operation is not implemented.
+____________________ test_compression_real_readback[raster] ____________________
+worker/tests/test_pdf_ops.py:98: in test_compression_real_readback
+    p = output(run(tmp_path,'compress_pdf',[source],mode=mode,dpi=100,quality=60))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+worker/tests/test_pdf_ops.py:17: in run
+    return module.run({'operation':operation,'inputs':[str(p) for p in inputs],
+worker/pdf_ops.py:58: in run
+    return _run(request)
+           ^^^^^^^^^^^^^
+worker/pdf_ops.py:156: in _run
+    raise PdfOperationError('Operation is not implemented.')
+E   pdf_ops.PdfOperationError: Operation is not implemented.
+=========================== short test summary info ============================
+FAILED worker/tests/test_pdf_ops.py::test_compression_real_readback[lossless]
+FAILED worker/tests/test_pdf_ops.py::test_compression_real_readback[raster]
+2 failed, 9 passed in 0.62s
+GREEN compression | exit=0 | source=d3a08ad6ae83d5f21134b9e63bb0c26502ea07f031aa68c62195cc889c1a0c83
+...........                                                              [100%]
+=============================== warnings summary ===============================
+worker/tests/test_pdf_ops.py::test_compression_real_readback[lossless]
+  /home/defaultuser/Projects/paperwork-desktop/worker/pdf_ops.py:163: DeprecationWarning: remove_identicals is deprecated and will be removed in pypdf 7.0.0. Use remove_duplicates instead.
+    writer.compress_identical_objects(remove_identicals=True,remove_orphans=True)
+
+worker/tests/test_pdf_ops.py::test_compression_real_readback[lossless]
+  /home/defaultuser/Projects/paperwork-desktop/worker/pdf_ops.py:163: DeprecationWarning: remove_orphans is deprecated and will be removed in pypdf 7.0.0. Use remove_unreferenced instead.
+    writer.compress_identical_objects(remove_identicals=True,remove_orphans=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+11 passed, 2 warnings in 1.68s
+RED export | exit=1 | tests=f3f5336d071acd2ea7bac9e8a2e595eb7ca949a5321cb8bcf4d5f105f04882f8
+..........FFFFFFFF.                                                      [100%]
+=================================== FAILURES ===================================
+_______________________ test_export_real_artifacts[txt] ________________________
+worker/tests/test_pdf_ops.py:111: in test_export_real_artifacts
+    p = output(run(tmp_path,'convert_from_pdf',[source],format=format,dpi=100))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+worker/tests/test_pdf_ops.py:17: in run
+    return module.run({'operation':operation,'inputs':[str(p) for p in inputs],
+worker/pdf_ops.py:58: in run
+    return _run(request)
+           ^^^^^^^^^^^^^
+worker/pdf_ops.py:185: in _run
+    raise PdfOperationError('Operation is not implemented.')
+E   pdf_ops.PdfOperationError: Operation is not implemented.
+_______________________ test_export_real_artifacts[html] _______________________
+worker/tests/test_pdf_ops.py:111: in test_export_real_artifacts
+    p = output(run(tmp_path,'convert_from_pdf',[source],format=format,dpi=100))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+worker/tests/test_pdf_ops.py:17: in run
+    return module.run({'operation':operation,'inputs':[str(p) for p in inputs],
+worker/pdf_ops.py:58: in run
+    return _run(request)
+           ^^^^^^^^^^^^^
+worker/pdf_ops.py:185: in _run
+    raise PdfOperationError('Operation is not implemented.')
+E   pdf_ops.PdfOperationError: Operation is not implemented.
+_______________________ test_export_real_artifacts[csv] ________________________
+worker/tests/test_pdf_ops.py:111: in test_export_real_artifacts
+    p = output(run(tmp_path,'convert_from_pdf',[source],format=format,dpi=100))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+worker/tests/test_pdf_ops.py:17: in run
+    return module.run({'operation':operation,'inputs':[str(p) for p in inputs],
+worker/pdf_ops.py:58: in run
+    return _run(request)
+           ^^^^^^^^^^^^^
+worker/pdf_ops.py:185: in _run
+    raise PdfOperationError('Operation is not implemented.')
+E   pdf_ops.PdfOperationError: Operation is not implemented.
+_______________________ test_export_real_artifacts[docx] _______________________
+worker/tests/test_pdf_ops.py:111: in test_export_real_artifacts
+    p = output(run(tmp_path,'convert_from_pdf',[source],format=format,dpi=100))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+worker/tests/test_pdf_ops.py:17: in run
+    return module.run({'operation':operation,'inputs':[str(p) for p in inputs],
+worker/pdf_ops.py:58: in run
+    return _run(request)
+           ^^^^^^^^^^^^^
+worker/pdf_ops.py:185: in _run
+    raise PdfOperationError('Operation is not implemented.')
+E   pdf_ops.PdfOperationError: Operation is not implemented.
+_______________________ test_export_real_artifacts[xlsx] _______________________
+worker/tests/test_pdf_ops.py:111: in test_export_real_artifacts
+    p = output(run(tmp_path,'convert_from_pdf',[source],format=format,dpi=100))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+worker/tests/test_pdf_ops.py:17: in run
+    return module.run({'operation':operation,'inputs':[str(p) for p in inputs],
+worker/pdf_ops.py:58: in run
+    return _run(request)
+           ^^^^^^^^^^^^^
+worker/pdf_ops.py:185: in _run
+    raise PdfOperationError('Operation is not implemented.')
+E   pdf_ops.PdfOperationError: Operation is not implemented.
+_______________________ test_export_real_artifacts[pptx] _______________________
+worker/tests/test_pdf_ops.py:111: in test_export_real_artifacts
+    p = output(run(tmp_path,'convert_from_pdf',[source],format=format,dpi=100))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+worker/tests/test_pdf_ops.py:17: in run
+    return module.run({'operation':operation,'inputs':[str(p) for p in inputs],
+worker/pdf_ops.py:58: in run
+    return _run(request)
+           ^^^^^^^^^^^^^
+worker/pdf_ops.py:185: in _run
+    raise PdfOperationError('Operation is not implemented.')
+E   pdf_ops.PdfOperationError: Operation is not implemented.
+_______________________ test_export_real_artifacts[png] ________________________
+worker/tests/test_pdf_ops.py:111: in test_export_real_artifacts
+    p = output(run(tmp_path,'convert_from_pdf',[source],format=format,dpi=100))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+worker/tests/test_pdf_ops.py:17: in run
+    return module.run({'operation':operation,'inputs':[str(p) for p in inputs],
+worker/pdf_ops.py:58: in run
+    return _run(request)
+           ^^^^^^^^^^^^^
+worker/pdf_ops.py:185: in _run
+    raise PdfOperationError('Operation is not implemented.')
+E   pdf_ops.PdfOperationError: Operation is not implemented.
+_______________________ test_export_real_artifacts[jpeg] _______________________
+worker/tests/test_pdf_ops.py:111: in test_export_real_artifacts
+    p = output(run(tmp_path,'convert_from_pdf',[source],format=format,dpi=100))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+worker/tests/test_pdf_ops.py:17: in run
+    return module.run({'operation':operation,'inputs':[str(p) for p in inputs],
+worker/pdf_ops.py:58: in run
+    return _run(request)
+           ^^^^^^^^^^^^^
+worker/pdf_ops.py:185: in _run
+    raise PdfOperationError('Operation is not implemented.')
+E   pdf_ops.PdfOperationError: Operation is not implemented.
+=========================== short test summary info ============================
+FAILED worker/tests/test_pdf_ops.py::test_export_real_artifacts[txt] - pdf_op...
+FAILED worker/tests/test_pdf_ops.py::test_export_real_artifacts[html] - pdf_o...
+FAILED worker/tests/test_pdf_ops.py::test_export_real_artifacts[csv] - pdf_op...
+FAILED worker/tests/test_pdf_ops.py::test_export_real_artifacts[docx] - pdf_o...
+FAILED worker/tests/test_pdf_ops.py::test_export_real_artifacts[xlsx] - pdf_o...
+FAILED worker/tests/test_pdf_ops.py::test_export_real_artifacts[pptx] - pdf_o...
+FAILED worker/tests/test_pdf_ops.py::test_export_real_artifacts[png] - pdf_op...
+FAILED worker/tests/test_pdf_ops.py::test_export_real_artifacts[jpeg] - pdf_o...
+8 failed, 11 passed in 2.82s
+GREEN export attempt | exit=1 | source=517710db944f9c6e8eba28f4ec0c14f2c0cde1c75f49d429d555a542ccd40ebb
+...............F...                                                      [100%]
+=================================== FAILURES ===================================
+_______________________ test_export_real_artifacts[pptx] _______________________
+worker/tests/test_pdf_ops.py:121: in test_export_real_artifacts
+    assert any('Original text' in s.text for slide in Presentation(p).slides for s in slide.shapes if s.has_text_frame)
+E   assert False
+E    +  where False = any(<generator object test_export_real_artifacts.<locals>.<genexpr> at 0x7186d34d60>)
+=========================== short test summary info ============================
+FAILED worker/tests/test_pdf_ops.py::test_export_real_artifacts[pptx] - asser...
+1 failed, 18 passed in 2.97s
+GREEN export | exit=0 | source=e56464c7495b00e3dd4eeacc3f1dae2ff0653586c23ea90581c4183b12bc85f2
+...................                                                      [100%]
+19 passed in 1.18s
+RED local conversion | exit=1 | tests=5a48d33cf9f7c756e879d570134096ca12f5726b7f8d77dc6ccaf82c45be5640
+..................FFF.                                                   [100%]
+=================================== FAILURES ===================================
+____________________________ test_local_to_pdf[txt] ____________________________
+worker/tests/test_pdf_ops.py:136: in test_local_to_pdf
+    result=run(tmp_path,'convert_to_pdf',[p])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+worker/tests/test_pdf_ops.py:17: in run
+    return module.run({'operation':operation,'inputs':[str(p) for p in inputs],
+worker/pdf_ops.py:58: in run
+    return _run(request)
+           ^^^^^^^^^^^^^
+worker/pdf_ops.py:187: in _run
+    raise PdfOperationError('Operation is not implemented.')
+E   pdf_ops.PdfOperationError: Operation is not implemented.
+___________________________ test_local_to_pdf[html] ____________________________
+worker/tests/test_pdf_ops.py:136: in test_local_to_pdf
+    result=run(tmp_path,'convert_to_pdf',[p])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+worker/tests/test_pdf_ops.py:17: in run
+    return module.run({'operation':operation,'inputs':[str(p) for p in inputs],
+worker/pdf_ops.py:58: in run
+    return _run(request)
+           ^^^^^^^^^^^^^
+worker/pdf_ops.py:187: in _run
+    raise PdfOperationError('Operation is not implemented.')
+E   pdf_ops.PdfOperationError: Operation is not implemented.
+____________________________ test_local_to_pdf[png] ____________________________
+worker/tests/test_pdf_ops.py:136: in test_local_to_pdf
+    result=run(tmp_path,'convert_to_pdf',[p])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+worker/tests/test_pdf_ops.py:17: in run
+    return module.run({'operation':operation,'inputs':[str(p) for p in inputs],
+worker/pdf_ops.py:58: in run
+    return _run(request)
+           ^^^^^^^^^^^^^
+worker/pdf_ops.py:187: in _run
+    raise PdfOperationError('Operation is not implemented.')
+E   pdf_ops.PdfOperationError: Operation is not implemented.
+=========================== short test summary info ============================
+FAILED worker/tests/test_pdf_ops.py::test_local_to_pdf[txt] - pdf_ops.PdfOper...
+FAILED worker/tests/test_pdf_ops.py::test_local_to_pdf[html] - pdf_ops.PdfOpe...
+FAILED worker/tests/test_pdf_ops.py::test_local_to_pdf[png] - pdf_ops.PdfOper...
+3 failed, 19 passed in 1.52s
+GREEN local conversion | exit=0 | source=2c2142e1a0172330782b31bf5ff462ae6a66ad5c481d1ddb6a3458df4d587c26
+......................                                                   [100%]
+22 passed in 1.45s
+RED Office orchestration | exit=1 | tests=e3c7b41ddcea08a3a263522a8694992d69f8b13dfff35e97cee63ca9d26f01a9
+......................F.                                                 [100%]
+=================================== FAILURES ===================================
+_____________________ test_unsafe_office_archive_rejected ______________________
+worker/tests/test_pdf_ops.py:156: in test_unsafe_office_archive_rejected
+    with pytest.raises(ValueError, match='Unsafe Office archive'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'Unsafe Office archive'
+E     Actual message: 'Unsupported input. Choose UTF-8 text, HTML, a supported image, or an Office document with LibreOffice installed.'
+=========================== short test summary info ============================
+FAILED worker/tests/test_pdf_ops.py::test_unsafe_office_archive_rejected - As...
+1 failed, 23 passed in 1.57s
+RED Office explicit missing engine | exit=1 | tests=a4192c9aaa32be86977deb15a4137ed279831f5bb68d04eef758a68356cd04ca
+.....................FF.                                                 [100%]
+=================================== FAILURES ===================================
+___________________ test_office_missing_engine_is_actionable ___________________
+worker/tests/test_pdf_ops.py:148: in test_office_missing_engine_is_actionable
+    with pytest.raises(ValueError, match='Install the optional LibreOffice component'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'Install the optional LibreOffice component'
+E     Actual message: 'Unsupported input. Choose UTF-8 text, HTML, a supported image, or an Office document with LibreOffice installed.'
+_____________________ test_unsafe_office_archive_rejected ______________________
+worker/tests/test_pdf_ops.py:156: in test_unsafe_office_archive_rejected
+    with pytest.raises(ValueError, match='Unsafe Office archive'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'Unsafe Office archive'
+E     Actual message: 'Unsupported input. Choose UTF-8 text, HTML, a supported image, or an Office document with LibreOffice installed.'
+=========================== short test summary info ============================
+FAILED worker/tests/test_pdf_ops.py::test_office_missing_engine_is_actionable
+FAILED worker/tests/test_pdf_ops.py::test_unsafe_office_archive_rejected - As...
+2 failed, 22 passed in 1.37s
+GREEN Office orchestration (engine absent, not conversion validation) | exit=0 | source=97a5d086a43518afe23f242b52a0d2cc087643458dfd3cf591bb2079aa5c53fd
+........................                                                 [100%]
+24 passed in 4.69s
+RED OCR missing engine | exit=1 | tests=66a4b4be80c91650ac9ff92732a270680c06021a9773beef1f2cf455c8e9e917
+.......................FF.                                               [100%]
+=================================== FAILURES ===================================
+_________________ test_ocr_missing_engine_actionable[ocr_pdf] __________________
+worker/tests/test_pdf_ops.py:165: in test_ocr_missing_engine_actionable
+    with pytest.raises(ValueError, match='Install the optional Tesseract component'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'Install the optional Tesseract component'
+E     Actual message: 'Operation is not implemented.'
+________________ test_ocr_missing_engine_actionable[ocr_image] _________________
+worker/tests/test_pdf_ops.py:165: in test_ocr_missing_engine_actionable
+    with pytest.raises(ValueError, match='Install the optional Tesseract component'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'Install the optional Tesseract component'
+E     Actual message: 'Operation is not implemented.'
+=========================== short test summary info ============================
+FAILED worker/tests/test_pdf_ops.py::test_ocr_missing_engine_actionable[ocr_pdf]
+FAILED worker/tests/test_pdf_ops.py::test_ocr_missing_engine_actionable[ocr_image]
+2 failed, 24 passed in 4.76s
+GREEN OCR missing engine only | exit=0 | source=2ec6dd41a0c6544eb804f82a43dc063ac215aa28eb4f5cd3ad9cfb2249350445
+..........................                                               [100%]
+26 passed in 4.18s
+RED OCR subprocess error path | exit=1 | tests=7783277ddcb7c5f809c739c1edcf5fd559b0753930e09fb963dbda9f9a192be3
+.........................Fss.                                            [100%]
+=================================== FAILURES ===================================
+_______________ test_ocr_failed_executable_never_returns_success _______________
+worker/tests/test_pdf_ops.py:171: in test_ocr_failed_executable_never_returns_success
+    with pytest.raises(ValueError, match='Tesseract failed'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'Tesseract failed'
+E     Actual message: 'Document processing failed. Check the file format, encryption, and selected options.'
+=========================== short test summary info ============================
+FAILED worker/tests/test_pdf_ops.py::test_ocr_failed_executable_never_returns_success
+1 failed, 26 passed, 2 skipped in 1.62s
+GREEN OCR failure orchestration; successful OCR untested engine missing | exit=0 | source=6e15f81abf7ef314e4b0f425806865a706755c99a278923369be22d84024edea
+..........................ss.                                            [100%]
+27 passed, 2 skipped in 1.79s
+RED strict options and cleanup | exit=1 | tests=0091dc90695db92daf2e9c9dd60db36e19d09bba7b1567e715374194a8015b93
+..........................ssFF.                                          [100%]
+=================================== FAILURES ===================================
+___________ test_invalid_options_and_paths_rejected_without_outputs ____________
+worker/tests/test_pdf_ops.py:197: in test_invalid_options_and_paths_rejected_without_outputs
+    with pytest.raises(ValueError,match='Unknown option'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError
+__________________ test_missing_engine_leaves_no_output_files __________________
+worker/tests/test_pdf_ops.py:211: in test_missing_engine_leaves_no_output_files
+    assert not list((tmp_path/'out').glob('paperwork-*'))
+E   AssertionError: assert not [PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-27/test_missing_engine_leaves_no_0/out/paperwork-wrt8vwy4.pdf')]
+E    +  where [PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-27/test_missing_engine_leaves_no_0/out/paperwork-wrt8vwy4.pdf')] = list(<map object at 0x740307ed40>)
+E    +    where <map object at 0x740307ed40> = glob('paperwork-*')
+E    +      where glob = (PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-27/test_missing_engine_leaves_no_0') / 'out').glob
+=========================== short test summary info ============================
+FAILED worker/tests/test_pdf_ops.py::test_invalid_options_and_paths_rejected_without_outputs
+FAILED worker/tests/test_pdf_ops.py::test_missing_engine_leaves_no_output_files
+2 failed, 27 passed, 2 skipped in 6.65s
+GREEN strict options and cleanup | exit=0 | source=aad7d16a19e65a670d1d037d47e9eb74b6f980d8a95ca8488215f9c191af67fd
+..........................ss...                                          [100%]
+29 passed, 2 skipped in 7.71s
+RED Office profile automatic updates disabled (failure probe, not conversion) | exit=1 | tests=ed13c52d0f8dca9381f8e97c7605801876dce55cfdd481fbd340c8948826fe97
+..........................ss..F.                                         [100%]
+=================================== FAILURES ===================================
+_____________ test_office_engine_receives_locked_down_job_profile ______________
+worker/tests/test_pdf_ops.py:229: in test_office_engine_receives_locked_down_job_profile
+    assert props['UpdateDocMode']=='0'
+           ^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'UpdateDocMode'
+=========================== short test summary info ============================
+FAILED worker/tests/test_pdf_ops.py::test_office_engine_receives_locked_down_job_profile
+1 failed, 29 passed, 2 skipped in 8.53s
+GREEN Office profile failure probe, engine absent | exit=0 | source=a8a5ffb7e72d906533fbe4cff191176cf71474199002fa56f478abedecf954ef
+..........................ss....                                         [100%]
+30 passed, 2 skipped in 7.97s
+RED corrected Office enum security: upstream Writer.xcs Never=2, Calc.xcs Never=1; UpdateDocMode is UNO load property not registry key. Sources https://raw.githubusercontent.com/LibreOffice/core/master/officecfg/registry/schema/org/openoffice/Office/{Writer,Calc}.xcs and desktop/source/app/dispatchwatcher.cxx | exit=1 | tests=5cabc9f0d39b0edc6566877fb2fcb42850485793c5756d7be107052b12ecaa84
+..........................ss..F.                                         [100%]
+=================================== FAILURES ===================================
+_____________ test_office_engine_receives_locked_down_job_profile ______________
+worker/tests/test_pdf_ops.py:233: in test_office_engine_receives_locked_down_job_profile
+    assert paths['/org.openoffice.Office.Writer/Content/Update'].find('prop/value').text=='2'
+E   AssertionError: assert '0' == '2'
+E     
+E     - 2
+E     + 0
+=========================== short test summary info ============================
+FAILED worker/tests/test_pdf_ops.py::test_office_engine_receives_locked_down_job_profile
+1 failed, 29 passed, 2 skipped in 6.34s
+RED complex clipping text rejected; Office enum fix regression | exit=1 | tests=6e23c336f204606ae5c76dbef681b37caff1a0a4a4fbf55a745f2321f62220ad
+..........................ss...F.                                        [100%]
+=================================== FAILURES ===================================
+______________ test_edit_preserves_font_and_rejects_clipping_text ______________
+worker/tests/test_pdf_ops.py:243: in test_edit_preserves_font_and_rejects_clipping_text
+    with pytest.raises(ValueError,match='complex'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError
+=========================== short test summary info ============================
+FAILED worker/tests/test_pdf_ops.py::test_edit_preserves_font_and_rejects_clipping_text
+1 failed, 30 passed, 2 skipped in 3.07s
+GREEN complex text rejection and original font edit | exit=0 | source=32e053de7adbebb0f23f31a04637bf83a1a7607edbf8dc301fb3c32b541f73ee
+..........................ss.....                                        [100%]
+31 passed, 2 skipped in 2.28s
+FINAL existing-coverage expansion: table/annotation/timeout probes; optional OCR/Office skipped if absent. Command: ['.venv-worker/bin/python', '-m', 'pytest', 'worker/tests/test_pdf_ops.py', '-q', '-rs', '--tb=short'] | exit=0 | source=32e053de7adbebb0f23f31a04637bf83a1a7607edbf8dc301fb3c32b541f73ee | tests=cbdb074b322879b28b3fae72810affc55bf807f474ed76cf4b4067eb7ecbe097
+..........................ss....ssssss....                               [100%]
+=========================== short test summary info ============================
+SKIPPED [2] worker/tests/test_pdf_ops.py:179: Tesseract absent; real OCR not verified on this host
+SKIPPED [6] worker/tests/test_pdf_ops.py:254: LibreOffice absent; real Office import not verified on this host
+34 passed, 8 skipped in 3.70s
+
+Runtime: 3.14.7 (main, Sep  1 2026, 14:16:03) [Clang 22.1.3 ]
+Executable: /home/defaultuser/Projects/paperwork-desktop/.venv-worker/bin/python
+cffi==2.1.1 license=MIT-0
+pdfplumber==0.11.10 license=['License :: OSI Approved :: MIT License']
+pypdf==6.21.1 license=BSD-3-Clause
+typing_extensions==4.16.0 license=PSF-2.0
+cryptography==50.0.2 license=Apache-2.0 OR BSD-3-Clause
+Pygments==2.21.0 license=BSD-2-Clause
+pluggy==1.7.0 license=MIT
+et_xmlfile==2.0.0 license=MIT
+xlsxwriter==3.2.9 license=BSD-2-Clause
+python-docx==1.2.0 license=MIT
+openpyxl==3.1.5 license=MIT
+pycparser==3.11 license=BSD-3-Clause
+pillow==13.0.0 license=MIT-CMU
+iniconfig==2.3.1 license=MIT
+pypdfium2==5.14.0 license=BSD-3-Clause, Apache-2.0, dependency licenses
+pip==26.2.1 license=MIT
+lxml==6.1.3 license=BSD-3-Clause
+pdfminer.six==20260107 license=MIT
+packaging==26.3 license=Apache-2.0 OR BSD-2-Clause
+pytest==9.1.1 license=MIT
+reportlab==5.0.1 license=BSD license (see license.txt for details), Copyright (c) 2000-2025, ReportLab Inc.
+charset-normalizer==3.5.2 license=MIT
+python-pptx==1.0.2 license=MIT
+RED complex-script explicit rejection | command=['.venv-worker/bin/python', '-m', 'pytest', 'worker/tests/test_pdf_ops.py', '-q', '--tb=short'] | exit=1 | tests=5dca3726aff5c198bd8ed35e9f7e46c49097fa8250caff6167cf8fbe61e73c4e
+..........................ss....ssssss...F.                              [100%]
+=================================== FAILURES ===================================
+_________ test_complex_script_edit_errors_instead_of_claiming_success __________
+worker/tests/test_pdf_ops.py:318: in test_complex_script_edit_errors_instead_of_claiming_success
+    with pytest.raises(ValueError,match='Complex-script'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError
+=========================== short test summary info ============================
+FAILED worker/tests/test_pdf_ops.py::test_complex_script_edit_errors_instead_of_claiming_success
+1 failed, 34 passed, 8 skipped in 4.04s
+FINAL GREEN | command=['.venv-worker/bin/python', '-m', 'pytest', 'worker/tests/test_pdf_ops.py', '-q', '-rs', '--tb=short', '-W', 'error'] | exit=1
+worker/pdf_ops.py sha256=8c173a4dc14657687fde81ede0044c5d0b5b0642a48b0184efdf9417777f58e9
+worker/tests/test_pdf_ops.py sha256=5dca3726aff5c198bd8ed35e9f7e46c49097fa8250caff6167cf8fbe61e73c4e
+worker/test-requirements.txt sha256=1039c681ff02ad7f6869382f7d99ad6bb2056fe0ee3ede27431927387afa24c1
+worker/PDF-OPTIONS.md sha256=96febf4e26fbb4f3f21f3636256d158ad64fd71e765f8cd0dd5d90eae3cbadde
+..........................ss....ssssss.F...                              [100%]
+=================================== FAILURES ===================================
+____________________ test_table_reconstruction_csv_and_xlsx ____________________
+worker/tests/test_pdf_ops.py:300: in test_table_reconstruction_csv_and_xlsx
+    rows=list(csv.reader(exported.open()))
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ResourceWarning: unclosed file <_io.TextIOWrapper name='/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-36/test_table_reconstruction_csv_0/out/paperwork-0v44icbr.csv' mode='r' encoding='UTF-8'>
+
+The above exception was the direct cause of the following exception:
+.venv-worker/lib/python3.14/site-packages/_pytest/runner.py:361: in from_call
+    result: TResult | None = func()
+                             ^^^^^^
+.venv-worker/lib/python3.14/site-packages/_pytest/runner.py:250: in <lambda>
+    lambda: runtest_hook(item=item, **kwds),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv-worker/lib/python3.14/site-packages/pluggy/_caller.py:197: in __call__
+    return self._hookexec(
+.venv-worker/lib/python3.14/site-packages/pluggy/_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv-worker/lib/python3.14/site-packages/_pytest/logging.py:865: in pytest_runtest_call
+    yield
+.venv-worker/lib/python3.14/site-packages/_pytest/capture.py:900: in pytest_runtest_call
+    return (yield)
+            ^^^^^
+.venv-worker/lib/python3.14/site-packages/_pytest/skipping.py:268: in pytest_runtest_call
+    return (yield)
+            ^^^^^
+.venv-worker/lib/python3.14/site-packages/_pytest/unraisableexception.py:183: in pytest_runtest_call
+    collect_unraisable(item.config)
+.venv-worker/lib/python3.14/site-packages/_pytest/unraisableexception.py:79: in collect_unraisable
+    raise errors[0]
+.venv-worker/lib/python3.14/site-packages/_pytest/unraisableexception.py:67: in collect_unraisable
+    warnings.warn(pytest.PytestUnraisableExceptionWarning(msg))
+E   pytest.PytestUnraisableExceptionWarning: Exception ignored while finalizing file <_io.FileIO name='/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-36/test_table_reconstruction_csv_0/out/paperwork-0v44icbr.csv' mode='rb' closefd=True>: None
+=========================== short test summary info ============================
+SKIPPED [2] worker/tests/test_pdf_ops.py:179: Tesseract absent; real OCR not verified on this host
+SKIPPED [6] worker/tests/test_pdf_ops.py:254: LibreOffice absent; real Office import not verified on this host
+1 failed, 34 passed, 8 skipped in 4.35s
+
+Optional engine discovery: {'tesseract': None, 'libreoffice': None, 'soffice': None}
+Fixtures: real ReportLab canvas text/DRAFT, clipping text, ruled tables/AcroForm; Pillow RGB images. Fixture generator identity is test-file SHA256 above. Error probes are separate named tests: OCR failed executable, OCR timeout, Office profile failure probe. No synthetic-success conversion mocks.
+FINAL VERIFIED (fixture CSV read handle closed) | command=['.venv-worker/bin/python', '-m', 'pytest', 'worker/tests/test_pdf_ops.py', '-q', '-rs', '--tb=short', '-W', 'error'] | exit=0
+worker/pdf_ops.py sha256=8c173a4dc14657687fde81ede0044c5d0b5b0642a48b0184efdf9417777f58e9
+worker/tests/test_pdf_ops.py sha256=0993116edd7e937c877619aa29f8adf7f34dfedada220afc1ac69d09f94b5bbf
+worker/test-requirements.txt sha256=1039c681ff02ad7f6869382f7d99ad6bb2056fe0ee3ede27431927387afa24c1
+worker/PDF-OPTIONS.md sha256=96febf4e26fbb4f3f21f3636256d158ad64fd71e765f8cd0dd5d90eae3cbadde
+..........................ss....ssssss.....                              [100%]
+=========================== short test summary info ============================
+SKIPPED [2] worker/tests/test_pdf_ops.py:179: Tesseract absent; real OCR not verified on this host
+SKIPPED [6] worker/tests/test_pdf_ops.py:254: LibreOffice absent; real Office import not verified on this host
+35 passed, 8 skipped in 3.63s

@@ -1,0 +1,73 @@
+name: Native integration checks
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          architecture: x64
+          cache: pip
+          cache-dependency-path: worker/runtime-requirements.txt
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      - name: Linux native dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends build-essential libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev libxdo-dev libssl-dev librsvg2-dev binutils xvfb xauth
+      - name: Frontend and core worker setup
+        run: |
+          set -euo pipefail
+          mkdir -p build/logs
+          npm ci
+          npm test
+          npm run build
+          python -m pip install --only-binary=:all: -r worker/runtime-requirements.txt pyinstaller==6.22.3 pytest==9.1.1
+      - name: Freeze and exercise embedded worker
+        run: |
+          set -euo pipefail
+          python scripts/freeze-worker.py 2>&1 | tee build/logs/freeze.log
+      - name: Native lifecycle, cache, consent and resource-policy tests
+        run: |
+          set -euo pipefail
+          cargo test --manifest-path src-tauri/Cargo.toml 2>&1 | tee build/logs/native-tests.log
+      - name: Compile normal desktop executable without distributing unaudited packages
+        run: |
+          set -euo pipefail
+          cargo build --release --manifest-path src-tauri/Cargo.toml 2>&1 | tee build/logs/native-build.log
+      - name: Record toolchain and resolved dependency locks
+        if: always()
+        run: |
+          mkdir -p build/logs
+          { rustc --version; cargo --version; python --version; node --version; } > build/logs/toolchains.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-integration-${{ matrix.os }}
+          path: |
+            build/logs/
+            src-tauri/Cargo.lock
+          if-no-files-found: warn
+          retention-days: 14

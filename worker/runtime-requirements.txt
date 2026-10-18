@@ -1,0 +1,19 @@
+# Core frozen worker only. No optional engines, AI models, or GPL PDF engines.
+# Direct and transitive versions exercised by the packaging test environment.
+pypdf==6.21.1
+cryptography==50.0.2
+pypdfium2==5.14.0
+reportlab==5.0.1
+pillow==13.0.0
+python-docx==1.2.0
+openpyxl==3.1.5
+python-pptx==1.0.2
+pdfplumber==0.11.10
+pdfminer.six==20260107
+cffi==2.1.1
+charset-normalizer==3.5.2
+et_xmlfile==2.0.0
+lxml==6.1.3
+pycparser==3.11
+typing_extensions==4.16.0
+xlsxwriter==3.2.9

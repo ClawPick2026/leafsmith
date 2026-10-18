@@ -1,3 +1,5 @@
+build/
+crates/**/target/
 node_modules/
 dist/
 .venv*/
@@ -9,3 +11,7 @@ src-tauri/binaries/
 artifacts/
 *.stderr
 architecture-review.json
+native-review.json
+architecture-handoff.md
+.env
+.env.*

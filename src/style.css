@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+html { scroll-behavior: smooth; }
+body { margin: 0; min-width: 320px; background: #f8f9f4; }
+button:not(:disabled), a[href], summary, select:not(:disabled), input[type="checkbox"]:not(:disabled) { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+input, textarea, select, button { font: inherit; }

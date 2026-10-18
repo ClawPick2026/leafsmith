@@ -1,0 +1,595 @@
+
+IMAGE RED 2026-10-18T12:20:30.344703+00:00
+command=['.venv-media/bin/python', '-m', 'unittest', 'discover', '-s', 'worker/tests', '-p', 'test_media_ops.py', '-v']
+worker/media_ops.py sha256=106b831c1a6ecfe9a7c4b8d7a65972ccbb9a1de4c7cc288bad0339ee96f5fa7b
+worker/tests/test_media_ops.py sha256=62f7bd268813834c003632d28ea36234954fe2f7b6e32e1750156a783a4b7a93
+exit=1
+test_image_real_pixels_resize_format_and_no_overwrite (test_media_ops.MediaTests.test_image_real_pixels_resize_format_and_no_overwrite) ... ERROR
+
+======================================================================
+ERROR: test_image_real_pixels_resize_format_and_no_overwrite (test_media_ops.MediaTests.test_image_real_pixels_resize_format_and_no_overwrite)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/defaultuser/Projects/paperwork-desktop/worker/tests/test_media_ops.py", line 31, in test_image_real_pixels_resize_format_and_no_overwrite
+    result = media.run(request)
+  File "/home/defaultuser/Projects/paperwork-desktop/worker/media_ops.py", line 6, in run
+    raise NotImplementedError("Operation not implemented")
+NotImplementedError: Operation not implemented
+
+----------------------------------------------------------------------
+Ran 1 test in 0.016s
+
+FAILED (errors=1)
+
+IMAGE GREEN
+command=['.venv-media/bin/python', '-m', 'unittest', 'discover', '-s', 'worker/tests', '-p', 'test_media_ops.py', '-v']
+worker/media_ops.py sha256=796568185bf02351635e9c2f1573b34f3ca28b87bc6a0a7b1265b99b3f9964d8
+worker/tests/test_media_ops.py sha256=62f7bd268813834c003632d28ea36234954fe2f7b6e32e1750156a783a4b7a93
+exit=0
+test_image_real_pixels_resize_format_and_no_overwrite (test_media_ops.MediaTests.test_image_real_pixels_resize_format_and_no_overwrite) ... /home/defaultuser/Projects/paperwork-desktop/worker/tests/test_media_ops.py:38: ResourceWarning: unclosed file <_io.BufferedReader name='/home/defaultuser/.hermes/cache/scratch/tmp9yl333d6/image.png'>
+  self.assertEqual(Image.open(source).size, (80, 40))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.047s
+
+OK
+
+VIDEO RED
+command=['.venv-media/bin/python', '-m', 'unittest', 'discover', '-s', 'worker/tests', '-p', 'test_media_ops.py', '-v']
+worker/media_ops.py sha256=796568185bf02351635e9c2f1573b34f3ca28b87bc6a0a7b1265b99b3f9964d8
+worker/tests/test_media_ops.py sha256=c2971116f423e7bacda4a38da42d3f6689e16bae834f8c9f6e90b0dd6f8585c0
+exit=1
+test_image_real_pixels_resize_format_and_no_overwrite (test_media_ops.MediaTests.test_image_real_pixels_resize_format_and_no_overwrite) ... ok
+test_video_real_vp9_opus_artifact (test_media_ops.MediaTests.test_video_real_vp9_opus_artifact) ... ERROR
+
+======================================================================
+ERROR: test_video_real_vp9_opus_artifact (test_media_ops.MediaTests.test_video_real_vp9_opus_artifact)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/defaultuser/Projects/paperwork-desktop/worker/tests/test_media_ops.py", line 57, in test_video_real_vp9_opus_artifact
+    result = media.run(request)
+  File "/home/defaultuser/Projects/paperwork-desktop/worker/media_ops.py", line 74, in run
+    raise NotImplementedError("Operation not implemented")
+NotImplementedError: Operation not implemented
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.139s
+
+FAILED (errors=1)
+
+VIDEO GREEN
+command=['.venv-media/bin/python', '-m', 'unittest', 'discover', '-s', 'worker/tests', '-p', 'test_media_ops.py', '-v']
+worker/media_ops.py sha256=3c651214bdb8d898c54894bc9d1fc73273a75ab26a8bacaae497feffdce4476a
+worker/tests/test_media_ops.py sha256=c2971116f423e7bacda4a38da42d3f6689e16bae834f8c9f6e90b0dd6f8585c0
+exit=0
+test_image_real_pixels_resize_format_and_no_overwrite (test_media_ops.MediaTests.test_image_real_pixels_resize_format_and_no_overwrite) ... ok
+test_video_real_vp9_opus_artifact (test_media_ops.MediaTests.test_video_real_vp9_opus_artifact) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.765s
+
+OK
+
+SUMMARY RED (HTTP ADAPTER ONLY)
+command=['.venv-media/bin/python', '-m', 'unittest', 'discover', '-s', 'worker/tests', '-p', 'test_media_ops.py', '-v']
+worker/media_ops.py sha256=3c651214bdb8d898c54894bc9d1fc73273a75ab26a8bacaae497feffdce4476a
+worker/tests/test_media_ops.py sha256=7a683d3850e4c71fcfe9eea546631f4da17bf3c2b8a930a6eb42bcef54cfb31e
+exit=1
+test_image_real_pixels_resize_format_and_no_overwrite (test_media_ops.MediaTests.test_image_real_pixels_resize_format_and_no_overwrite) ... ok
+test_summary_local_http_adapter_map_reduce_not_model_quality (test_media_ops.MediaTests.test_summary_local_http_adapter_map_reduce_not_model_quality) ... ERROR
+test_video_real_vp9_opus_artifact (test_media_ops.MediaTests.test_video_real_vp9_opus_artifact) ... ok
+
+======================================================================
+ERROR: test_summary_local_http_adapter_map_reduce_not_model_quality (test_media_ops.MediaTests.test_summary_local_http_adapter_map_reduce_not_model_quality)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/defaultuser/Projects/paperwork-desktop/worker/tests/test_media_ops.py", line 107, in test_summary_local_http_adapter_map_reduce_not_model_quality
+    result = media.run(self.request("summarize", source, endpoint=server.endpoint,
+                                    model="adapter-fixture", chunk_chars=1000))
+  File "/home/defaultuser/Projects/paperwork-desktop/worker/media_ops.py", line 133, in run
+    raise NotImplementedError("Operation not implemented")
+NotImplementedError: Operation not implemented
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.717s
+
+FAILED (errors=1)
+
+SUMMARY GREEN (HTTP ADAPTER ONLY)
+command=['.venv-media/bin/python', '-m', 'unittest', 'discover', '-s', 'worker/tests', '-p', 'test_media_ops.py', '-v']
+worker/media_ops.py sha256=74292f942bbacdcbe4c40640e8b1cb84ca581ead14e75bf03f9827851feb0866
+worker/tests/test_media_ops.py sha256=7a683d3850e4c71fcfe9eea546631f4da17bf3c2b8a930a6eb42bcef54cfb31e
+exit=0
+test_image_real_pixels_resize_format_and_no_overwrite (test_media_ops.MediaTests.test_image_real_pixels_resize_format_and_no_overwrite) ... ok
+test_summary_local_http_adapter_map_reduce_not_model_quality (test_media_ops.MediaTests.test_summary_local_http_adapter_map_reduce_not_model_quality) ... ok
+test_video_real_vp9_opus_artifact (test_media_ops.MediaTests.test_video_real_vp9_opus_artifact) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.814s
+
+OK
+
+TRANSLATION RED (HTTP ADAPTER ONLY)
+command=['.venv-media/bin/python', '-m', 'unittest', 'discover', '-s', 'worker/tests', '-p', 'test_media_ops.py', '-v']
+worker/media_ops.py sha256=74292f942bbacdcbe4c40640e8b1cb84ca581ead14e75bf03f9827851feb0866
+worker/tests/test_media_ops.py sha256=219a5f510844fcaad288d7fa5f4e0171bb4200e9e5c1d5d4cb8a86393fef14f3
+exit=1
+test_image_real_pixels_resize_format_and_no_overwrite (test_media_ops.MediaTests.test_image_real_pixels_resize_format_and_no_overwrite) ... ok
+test_summary_local_http_adapter_map_reduce_not_model_quality (test_media_ops.MediaTests.test_summary_local_http_adapter_map_reduce_not_model_quality) ... ok
+test_translation_pdf_text_artifacts_http_adapter_not_model_quality (test_media_ops.MediaTests.test_translation_pdf_text_artifacts_http_adapter_not_model_quality) ... ERROR
+test_video_real_vp9_opus_artifact (test_media_ops.MediaTests.test_video_real_vp9_opus_artifact) ... ok
+
+======================================================================
+ERROR: test_translation_pdf_text_artifacts_http_adapter_not_model_quality (test_media_ops.MediaTests.test_translation_pdf_text_artifacts_http_adapter_not_model_quality)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/defaultuser/Projects/paperwork-desktop/worker/tests/test_media_ops.py", line 111, in test_translation_pdf_text_artifacts_http_adapter_not_model_quality
+    result = media.run(self.request("translate_pdf", source, endpoint=server.endpoint,
+                                    model="adapter-fixture", language="French"))
+  File "/home/defaultuser/Projects/paperwork-desktop/worker/media_ops.py", line 261, in run
+    raise NotImplementedError("Operation not implemented")
+NotImplementedError: Operation not implemented
+
+----------------------------------------------------------------------
+Ran 4 tests in 1.496s
+
+FAILED (errors=1)
+
+TRANSLATION GREEN (HTTP ADAPTER ONLY)
+command=['.venv-media/bin/python', '-m', 'unittest', 'discover', '-s', 'worker/tests', '-p', 'test_media_ops.py', '-v']
+worker/media_ops.py sha256=833ee4f738e5891ff7dcea6f60bfa3959f4c329a45243bc937bb908950e67146
+worker/tests/test_media_ops.py sha256=219a5f510844fcaad288d7fa5f4e0171bb4200e9e5c1d5d4cb8a86393fef14f3
+exit=0
+test_image_real_pixels_resize_format_and_no_overwrite (test_media_ops.MediaTests.test_image_real_pixels_resize_format_and_no_overwrite) ... ok
+test_summary_local_http_adapter_map_reduce_not_model_quality (test_media_ops.MediaTests.test_summary_local_http_adapter_map_reduce_not_model_quality) ... ok
+test_translation_pdf_text_artifacts_http_adapter_not_model_quality (test_media_ops.MediaTests.test_translation_pdf_text_artifacts_http_adapter_not_model_quality) ... ok
+test_video_real_vp9_opus_artifact (test_media_ops.MediaTests.test_video_real_vp9_opus_artifact) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 1.601s
+
+OK
+
+CLOUD CONSENT RED (HTTP ADAPTER ONLY)
+command=['.venv-media/bin/python', '-m', 'unittest', 'discover', '-s', 'worker/tests', '-p', 'test_media_ops.py', '-v']
+worker/media_ops.py sha256=833ee4f738e5891ff7dcea6f60bfa3959f4c329a45243bc937bb908950e67146
+worker/tests/test_media_ops.py sha256=70c8f82a9bdb8b0828ecf8b539d3d019f9e3619fb3c5a2fa2390d6c95598421b
+exit=1
+test_image_real_pixels_resize_format_and_no_overwrite (test_media_ops.MediaTests.test_image_real_pixels_resize_format_and_no_overwrite) ... ok
+test_openai_http_adapter_requires_explicit_consent_and_uses_env_key (test_media_ops.MediaTests.test_openai_http_adapter_requires_explicit_consent_and_uses_env_key) ... FAIL
+test_summary_local_http_adapter_map_reduce_not_model_quality (test_media_ops.MediaTests.test_summary_local_http_adapter_map_reduce_not_model_quality) ... ok
+test_translation_pdf_text_artifacts_http_adapter_not_model_quality (test_media_ops.MediaTests.test_translation_pdf_text_artifacts_http_adapter_not_model_quality) ... ok
+test_video_real_vp9_opus_artifact (test_media_ops.MediaTests.test_video_real_vp9_opus_artifact) ... ok
+
+======================================================================
+FAIL: test_openai_http_adapter_requires_explicit_consent_and_uses_env_key (test_media_ops.MediaTests.test_openai_http_adapter_requires_explicit_consent_and_uses_env_key)
+----------------------------------------------------------------------
+ValueError: Unsupported model provider
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/defaultuser/Projects/paperwork-desktop/worker/tests/test_media_ops.py", line 112, in test_openai_http_adapter_requires_explicit_consent_and_uses_env_key
+    with self.assertRaisesRegex(ValueError, "consent"):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "consent" does not match "Unsupported model provider"
+
+----------------------------------------------------------------------
+Ran 5 tests in 2.515s
+
+FAILED (failures=1)
+
+CLOUD CONSENT GREEN (HTTP ADAPTER ONLY)
+command=['.venv-media/bin/python', '-m', 'unittest', 'discover', '-s', 'worker/tests', '-p', 'test_media_ops.py', '-v']
+worker/media_ops.py sha256=e50cb538632c138d3bd4e4fd33c0ab4f9155029a2ea5bb438e504465969c2755
+worker/tests/test_media_ops.py sha256=70c8f82a9bdb8b0828ecf8b539d3d019f9e3619fb3c5a2fa2390d6c95598421b
+exit=0
+test_image_real_pixels_resize_format_and_no_overwrite (test_media_ops.MediaTests.test_image_real_pixels_resize_format_and_no_overwrite) ... ok
+test_openai_http_adapter_requires_explicit_consent_and_uses_env_key (test_media_ops.MediaTests.test_openai_http_adapter_requires_explicit_consent_and_uses_env_key) ... ok
+test_summary_local_http_adapter_map_reduce_not_model_quality (test_media_ops.MediaTests.test_summary_local_http_adapter_map_reduce_not_model_quality) ... ok
+test_translation_pdf_text_artifacts_http_adapter_not_model_quality (test_media_ops.MediaTests.test_translation_pdf_text_artifacts_http_adapter_not_model_quality) ... ok
+test_video_real_vp9_opus_artifact (test_media_ops.MediaTests.test_video_real_vp9_opus_artifact) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 2.339s
+
+OK
+
+MISSING SPEECH MODEL RED
+command=['.venv-media/bin/python', '-m', 'unittest', 'discover', '-s', 'worker/tests', '-p', 'test_media_ops.py', '-v']
+worker/media_ops.py sha256=e50cb538632c138d3bd4e4fd33c0ab4f9155029a2ea5bb438e504465969c2755
+worker/tests/test_media_ops.py sha256=a2f53b457b47fab05f0b3e5d35515a835e51f092eaf560a3cf539a9ea1fff810
+exit=1
+test_image_real_pixels_resize_format_and_no_overwrite (test_media_ops.MediaTests.test_image_real_pixels_resize_format_and_no_overwrite) ... ok
+test_openai_http_adapter_requires_explicit_consent_and_uses_env_key (test_media_ops.MediaTests.test_openai_http_adapter_requires_explicit_consent_and_uses_env_key) ... ok
+test_summary_local_http_adapter_map_reduce_not_model_quality (test_media_ops.MediaTests.test_summary_local_http_adapter_map_reduce_not_model_quality) ... ok
+test_transcribe_missing_local_model_is_blocked_no_outputs (test_media_ops.MediaTests.test_transcribe_missing_local_model_is_blocked_no_outputs) ... ERROR
+test_translation_pdf_text_artifacts_http_adapter_not_model_quality (test_media_ops.MediaTests.test_translation_pdf_text_artifacts_http_adapter_not_model_quality) ... ok
+test_video_real_vp9_opus_artifact (test_media_ops.MediaTests.test_video_real_vp9_opus_artifact) ... ok
+
+======================================================================
+ERROR: test_transcribe_missing_local_model_is_blocked_no_outputs (test_media_ops.MediaTests.test_transcribe_missing_local_model_is_blocked_no_outputs)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/defaultuser/Projects/paperwork-desktop/worker/tests/test_media_ops.py", line 114, in test_transcribe_missing_local_model_is_blocked_no_outputs
+    media.run(self.request("transcribe", source))
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/defaultuser/Projects/paperwork-desktop/worker/media_ops.py", line 359, in run
+    raise NotImplementedError("Operation not implemented")
+NotImplementedError: Operation not implemented
+
+----------------------------------------------------------------------
+Ran 6 tests in 2.190s
+
+FAILED (errors=1)
+
+MISSING SPEECH MODEL GREEN
+command=['.venv-media/bin/python', '-m', 'unittest', 'discover', '-s', 'worker/tests', '-p', 'test_media_ops.py', '-v']
+worker/media_ops.py sha256=cf4cd0983a0e4221bb099e0ba0bb023791234aa20ce01e4ecb99fd4a64451e79
+worker/tests/test_media_ops.py sha256=a2f53b457b47fab05f0b3e5d35515a835e51f092eaf560a3cf539a9ea1fff810
+exit=0
+test_image_real_pixels_resize_format_and_no_overwrite (test_media_ops.MediaTests.test_image_real_pixels_resize_format_and_no_overwrite) ... ok
+test_openai_http_adapter_requires_explicit_consent_and_uses_env_key (test_media_ops.MediaTests.test_openai_http_adapter_requires_explicit_consent_and_uses_env_key) ... ok
+test_summary_local_http_adapter_map_reduce_not_model_quality (test_media_ops.MediaTests.test_summary_local_http_adapter_map_reduce_not_model_quality) ... ok
+test_transcribe_missing_local_model_is_blocked_no_outputs (test_media_ops.MediaTests.test_transcribe_missing_local_model_is_blocked_no_outputs) ... ok
+test_translation_pdf_text_artifacts_http_adapter_not_model_quality (test_media_ops.MediaTests.test_translation_pdf_text_artifacts_http_adapter_not_model_quality) ... ok
+test_video_real_vp9_opus_artifact (test_media_ops.MediaTests.test_video_real_vp9_opus_artifact) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 2.500s
+
+OK
+
+SPEECH CLI RED (ADAPTER ONLY; REAL WAV EXTRACTION)
+command=['.venv-media/bin/python', '-m', 'unittest', 'discover', '-s', 'worker/tests', '-p', 'test_media_ops.py', '-v']
+worker/media_ops.py sha256=cf4cd0983a0e4221bb099e0ba0bb023791234aa20ce01e4ecb99fd4a64451e79
+worker/tests/test_media_ops.py sha256=ea35a50ec6e558f8b1eb9d8dd4e74ad5224a5e91b8d44f4cad0c3284afcec952
+exit=1
+test_image_real_pixels_resize_format_and_no_overwrite (test_media_ops.MediaTests.test_image_real_pixels_resize_format_and_no_overwrite) ... ok
+test_openai_http_adapter_requires_explicit_consent_and_uses_env_key (test_media_ops.MediaTests.test_openai_http_adapter_requires_explicit_consent_and_uses_env_key) ... ok
+test_summary_local_http_adapter_map_reduce_not_model_quality (test_media_ops.MediaTests.test_summary_local_http_adapter_map_reduce_not_model_quality) ... ok
+test_transcribe_missing_local_model_is_blocked_no_outputs (test_media_ops.MediaTests.test_transcribe_missing_local_model_is_blocked_no_outputs) ... ok
+test_translation_pdf_text_artifacts_http_adapter_not_model_quality (test_media_ops.MediaTests.test_translation_pdf_text_artifacts_http_adapter_not_model_quality) ... ok
+test_video_real_vp9_opus_artifact (test_media_ops.MediaTests.test_video_real_vp9_opus_artifact) ... ok
+test_whisper_cli_adapter_real_wav_extraction_not_speech_quality (test_media_ops.MediaTests.test_whisper_cli_adapter_real_wav_extraction_not_speech_quality) ... ERROR
+
+======================================================================
+ERROR: test_whisper_cli_adapter_real_wav_extraction_not_speech_quality (test_media_ops.MediaTests.test_whisper_cli_adapter_real_wav_extraction_not_speech_quality)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/defaultuser/Projects/paperwork-desktop/worker/tests/test_media_ops.py", line 135, in test_whisper_cli_adapter_real_wav_extraction_not_speech_quality
+    result = media.run(request)
+  File "/home/defaultuser/Projects/paperwork-desktop/worker/media_ops.py", line 361, in run
+    raise NotImplementedError("Speech decoding not implemented")
+NotImplementedError: Speech decoding not implemented
+
+----------------------------------------------------------------------
+Ran 7 tests in 2.701s
+
+FAILED (errors=1)
+
+SPEECH CLI GREEN (ADAPTER ONLY; REAL WAV EXTRACTION)
+command=['.venv-media/bin/python', '-m', 'unittest', 'discover', '-s', 'worker/tests', '-p', 'test_media_ops.py', '-v']
+worker/media_ops.py sha256=7bb77e3933de616def1333c49385fd6edf672c1ddb90ea408d7950e90346246e
+worker/tests/test_media_ops.py sha256=ea35a50ec6e558f8b1eb9d8dd4e74ad5224a5e91b8d44f4cad0c3284afcec952
+exit=0
+test_image_real_pixels_resize_format_and_no_overwrite (test_media_ops.MediaTests.test_image_real_pixels_resize_format_and_no_overwrite) ... ok
+test_openai_http_adapter_requires_explicit_consent_and_uses_env_key (test_media_ops.MediaTests.test_openai_http_adapter_requires_explicit_consent_and_uses_env_key) ... ok
+test_summary_local_http_adapter_map_reduce_not_model_quality (test_media_ops.MediaTests.test_summary_local_http_adapter_map_reduce_not_model_quality) ... ok
+test_transcribe_missing_local_model_is_blocked_no_outputs (test_media_ops.MediaTests.test_transcribe_missing_local_model_is_blocked_no_outputs) ... ok
+test_translation_pdf_text_artifacts_http_adapter_not_model_quality (test_media_ops.MediaTests.test_translation_pdf_text_artifacts_http_adapter_not_model_quality) ... ok
+test_video_real_vp9_opus_artifact (test_media_ops.MediaTests.test_video_real_vp9_opus_artifact) ... ok
+test_whisper_cli_adapter_real_wav_extraction_not_speech_quality (test_media_ops.MediaTests.test_whisper_cli_adapter_real_wav_extraction_not_speech_quality) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 2.452s
+
+OK
+
+LLAMA RED (CLI ADAPTER ONLY)
+command=['.venv-media/bin/python', '-m', 'unittest', 'discover', '-s', 'worker/tests', '-p', 'test_media_ops.py', '-v']
+worker/media_ops.py sha256=7bb77e3933de616def1333c49385fd6edf672c1ddb90ea408d7950e90346246e
+worker/tests/test_media_ops.py sha256=93ebc5d4a97cab0f39e283143f751a3f31e36a22eb45187591d8ec9facaf9a4f
+exit=1
+test_image_real_pixels_resize_format_and_no_overwrite (test_media_ops.MediaTests.test_image_real_pixels_resize_format_and_no_overwrite) ... ok
+test_llama_cli_adapter_not_model_quality (test_media_ops.MediaTests.test_llama_cli_adapter_not_model_quality) ... ERROR
+test_openai_http_adapter_requires_explicit_consent_and_uses_env_key (test_media_ops.MediaTests.test_openai_http_adapter_requires_explicit_consent_and_uses_env_key) ... ok
+test_summary_local_http_adapter_map_reduce_not_model_quality (test_media_ops.MediaTests.test_summary_local_http_adapter_map_reduce_not_model_quality) ... ok
+test_transcribe_missing_local_model_is_blocked_no_outputs (test_media_ops.MediaTests.test_transcribe_missing_local_model_is_blocked_no_outputs) ... ok
+test_translation_pdf_text_artifacts_http_adapter_not_model_quality (test_media_ops.MediaTests.test_translation_pdf_text_artifacts_http_adapter_not_model_quality) ... ok
+test_video_real_vp9_opus_artifact (test_media_ops.MediaTests.test_video_real_vp9_opus_artifact) ... ok
+test_whisper_cli_adapter_real_wav_extraction_not_speech_quality (test_media_ops.MediaTests.test_whisper_cli_adapter_real_wav_extraction_not_speech_quality) ... ok
+
+======================================================================
+ERROR: test_llama_cli_adapter_not_model_quality (test_media_ops.MediaTests.test_llama_cli_adapter_not_model_quality)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/defaultuser/Projects/paperwork-desktop/worker/tests/test_media_ops.py", line 126, in test_llama_cli_adapter_not_model_quality
+    result = media.run(request)
+  File "/home/defaultuser/Projects/paperwork-desktop/worker/media_ops.py", line 389, in run
+    return _summary(source, directory, options, engines)
+  File "/home/defaultuser/Projects/paperwork-desktop/worker/media_ops.py", line 212, in _summary
+    generate, provider, state = _model_client(options, engines)
+                                ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/home/defaultuser/Projects/paperwork-desktop/worker/media_ops.py", line 86, in _model_client
+    raise ValueError("Unsupported model provider")
+ValueError: Unsupported model provider
+
+----------------------------------------------------------------------
+Ran 8 tests in 2.444s
+
+FAILED (errors=1)
+
+LLAMA GREEN (CLI ADAPTER ONLY)
+command=['.venv-media/bin/python', '-m', 'unittest', 'discover', '-s', 'worker/tests', '-p', 'test_media_ops.py', '-v']
+worker/media_ops.py sha256=0ee40dac4aaaf6e2ef384146902c3a8f4839aef150057abdef196d0842903e09
+worker/tests/test_media_ops.py sha256=93ebc5d4a97cab0f39e283143f751a3f31e36a22eb45187591d8ec9facaf9a4f
+exit=0
+test_image_real_pixels_resize_format_and_no_overwrite (test_media_ops.MediaTests.test_image_real_pixels_resize_format_and_no_overwrite) ... ok
+test_llama_cli_adapter_not_model_quality (test_media_ops.MediaTests.test_llama_cli_adapter_not_model_quality) ... ok
+test_openai_http_adapter_requires_explicit_consent_and_uses_env_key (test_media_ops.MediaTests.test_openai_http_adapter_requires_explicit_consent_and_uses_env_key) ... ok
+test_summary_local_http_adapter_map_reduce_not_model_quality (test_media_ops.MediaTests.test_summary_local_http_adapter_map_reduce_not_model_quality) ... ok
+test_transcribe_missing_local_model_is_blocked_no_outputs (test_media_ops.MediaTests.test_transcribe_missing_local_model_is_blocked_no_outputs) ... ok
+test_translation_pdf_text_artifacts_http_adapter_not_model_quality (test_media_ops.MediaTests.test_translation_pdf_text_artifacts_http_adapter_not_model_quality) ... ok
+test_video_real_vp9_opus_artifact (test_media_ops.MediaTests.test_video_real_vp9_opus_artifact) ... ok
+test_whisper_cli_adapter_real_wav_extraction_not_speech_quality (test_media_ops.MediaTests.test_whisper_cli_adapter_real_wav_extraction_not_speech_quality) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 2.317s
+
+OK
+
+REMOTE SPEECH RED (HTTP ADAPTER ONLY)
+command=['.venv-media/bin/python', '-m', 'unittest', 'discover', '-s', 'worker/tests', '-p', 'test_media_ops.py', '-v']
+worker/media_ops.py sha256=0ee40dac4aaaf6e2ef384146902c3a8f4839aef150057abdef196d0842903e09
+worker/tests/test_media_ops.py sha256=a6d98ea7aa94fa1b4622348eb1fac6b463498d78ec221b521c73c4a8494ad39b
+exit=1
+test_image_real_pixels_resize_format_and_no_overwrite (test_media_ops.MediaTests.test_image_real_pixels_resize_format_and_no_overwrite) ... ok
+test_llama_cli_adapter_not_model_quality (test_media_ops.MediaTests.test_llama_cli_adapter_not_model_quality) ... ok
+test_openai_http_adapter_requires_explicit_consent_and_uses_env_key (test_media_ops.MediaTests.test_openai_http_adapter_requires_explicit_consent_and_uses_env_key) ... ok
+test_remote_transcription_http_adapter_consent_and_real_wav (test_media_ops.MediaTests.test_remote_transcription_http_adapter_consent_and_real_wav) ... ERROR
+test_summary_local_http_adapter_map_reduce_not_model_quality (test_media_ops.MediaTests.test_summary_local_http_adapter_map_reduce_not_model_quality) ... ok
+test_transcribe_missing_local_model_is_blocked_no_outputs (test_media_ops.MediaTests.test_transcribe_missing_local_model_is_blocked_no_outputs) ... ok
+test_translation_pdf_text_artifacts_http_adapter_not_model_quality (test_media_ops.MediaTests.test_translation_pdf_text_artifacts_http_adapter_not_model_quality) ... ok
+test_video_real_vp9_opus_artifact (test_media_ops.MediaTests.test_video_real_vp9_opus_artifact) ... ok
+test_whisper_cli_adapter_real_wav_extraction_not_speech_quality (test_media_ops.MediaTests.test_whisper_cli_adapter_real_wav_extraction_not_speech_quality) ... ok
+
+======================================================================
+ERROR: test_remote_transcription_http_adapter_consent_and_real_wav (test_media_ops.MediaTests.test_remote_transcription_http_adapter_consent_and_real_wav)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/defaultuser/Projects/paperwork-desktop/worker/tests/test_media_ops.py", line 128, in test_remote_transcription_http_adapter_consent_and_real_wav
+    result = media.run(request)
+  File "/home/defaultuser/Projects/paperwork-desktop/worker/media_ops.py", line 414, in run
+    return _transcribe(source, directory, options, engines)
+  File "/home/defaultuser/Projects/paperwork-desktop/worker/media_ops.py", line 256, in _transcribe
+    whisper = _engine(engines, "whisper")
+  File "/home/defaultuser/Projects/paperwork-desktop/worker/media_ops.py", line 290, in _engine
+    raise ValueError(f"Missing {name}; install/select a consented local component in Settings")
+ValueError: Missing whisper; install/select a consented local component in Settings
+
+----------------------------------------------------------------------
+Ran 9 tests in 2.869s
+
+FAILED (errors=1)
+
+REMOTE SPEECH GREEN (HTTP ADAPTER ONLY)
+command=['.venv-media/bin/python', '-m', 'unittest', 'discover', '-s', 'worker/tests', '-p', 'test_media_ops.py', '-v']
+worker/media_ops.py sha256=00f8de61b99ad22bab313e7cc4e6539184a508143c0c929f09ccbdef37926d2b
+worker/tests/test_media_ops.py sha256=3d9605783a803ce90f7e311b092193f8ecd286b1136acca38f192d63e53f4590
+exit=0
+test_image_real_pixels_resize_format_and_no_overwrite (test_media_ops.MediaTests.test_image_real_pixels_resize_format_and_no_overwrite) ... ok
+test_llama_cli_adapter_not_model_quality (test_media_ops.MediaTests.test_llama_cli_adapter_not_model_quality) ... ok
+test_openai_http_adapter_requires_explicit_consent_and_uses_env_key (test_media_ops.MediaTests.test_openai_http_adapter_requires_explicit_consent_and_uses_env_key) ... ok
+test_remote_transcription_http_adapter_consent_and_real_wav (test_media_ops.MediaTests.test_remote_transcription_http_adapter_consent_and_real_wav) ... ok
+test_summary_local_http_adapter_map_reduce_not_model_quality (test_media_ops.MediaTests.test_summary_local_http_adapter_map_reduce_not_model_quality) ... ok
+test_transcribe_missing_local_model_is_blocked_no_outputs (test_media_ops.MediaTests.test_transcribe_missing_local_model_is_blocked_no_outputs) ... ok
+test_translation_pdf_text_artifacts_http_adapter_not_model_quality (test_media_ops.MediaTests.test_translation_pdf_text_artifacts_http_adapter_not_model_quality) ... ok
+test_video_real_vp9_opus_artifact (test_media_ops.MediaTests.test_video_real_vp9_opus_artifact) ... ok
+test_whisper_cli_adapter_real_wav_extraction_not_speech_quality (test_media_ops.MediaTests.test_whisper_cli_adapter_real_wav_extraction_not_speech_quality) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 4.280s
+
+OK
+
+TRUNCATION RED (ADAPTER)
+command=['.venv-media/bin/python', '-m', 'unittest', 'discover', '-s', 'worker/tests', '-p', 'test_media_ops.py', '-v']
+worker/media_ops.py sha256=00f8de61b99ad22bab313e7cc4e6539184a508143c0c929f09ccbdef37926d2b
+worker/tests/test_media_ops.py sha256=13ce2340991d98a18db3cda907e2a10e129f633ad2805ea5cef660c08847e5b4
+exit=1
+test_image_real_pixels_resize_format_and_no_overwrite (test_media_ops.MediaTests.test_image_real_pixels_resize_format_and_no_overwrite) ... ok
+test_llama_cli_adapter_not_model_quality (test_media_ops.MediaTests.test_llama_cli_adapter_not_model_quality) ... ok
+test_openai_http_adapter_requires_explicit_consent_and_uses_env_key (test_media_ops.MediaTests.test_openai_http_adapter_requires_explicit_consent_and_uses_env_key) ... ok
+test_remote_transcription_http_adapter_consent_and_real_wav (test_media_ops.MediaTests.test_remote_transcription_http_adapter_consent_and_real_wav) ... ok
+test_summary_local_http_adapter_map_reduce_not_model_quality (test_media_ops.MediaTests.test_summary_local_http_adapter_map_reduce_not_model_quality) ... ok
+test_transcribe_missing_local_model_is_blocked_no_outputs (test_media_ops.MediaTests.test_transcribe_missing_local_model_is_blocked_no_outputs) ... ok
+test_translation_pdf_text_artifacts_http_adapter_not_model_quality (test_media_ops.MediaTests.test_translation_pdf_text_artifacts_http_adapter_not_model_quality) ... ok
+test_truncated_model_text_is_not_presented_as_complete_adapter (test_media_ops.MediaTests.test_truncated_model_text_is_not_presented_as_complete_adapter) ... FAIL
+test_video_real_vp9_opus_artifact (test_media_ops.MediaTests.test_video_real_vp9_opus_artifact) ... ok
+test_whisper_cli_adapter_real_wav_extraction_not_speech_quality (test_media_ops.MediaTests.test_whisper_cli_adapter_real_wav_extraction_not_speech_quality) ... ok
+
+======================================================================
+FAIL: test_truncated_model_text_is_not_presented_as_complete_adapter (test_media_ops.MediaTests.test_truncated_model_text_is_not_presented_as_complete_adapter)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/defaultuser/Projects/paperwork-desktop/worker/tests/test_media_ops.py", line 121, in test_truncated_model_text_is_not_presented_as_complete_adapter
+    with self.assertRaisesRegex(ValueError, "truncated"):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 10 tests in 3.310s
+
+FAILED (failures=1)
+
+TRUNCATION GREEN (ADAPTER)
+command=['.venv-media/bin/python', '-m', 'unittest', 'discover', '-s', 'worker/tests', '-p', 'test_media_ops.py', '-v']
+worker/media_ops.py sha256=09c1fd40ee404f6f118106dc97e7b583185595b909a197ba79d75d2a4a58fe26
+worker/tests/test_media_ops.py sha256=13ce2340991d98a18db3cda907e2a10e129f633ad2805ea5cef660c08847e5b4
+exit=0
+test_image_real_pixels_resize_format_and_no_overwrite (test_media_ops.MediaTests.test_image_real_pixels_resize_format_and_no_overwrite) ... ok
+test_llama_cli_adapter_not_model_quality (test_media_ops.MediaTests.test_llama_cli_adapter_not_model_quality) ... ok
+test_openai_http_adapter_requires_explicit_consent_and_uses_env_key (test_media_ops.MediaTests.test_openai_http_adapter_requires_explicit_consent_and_uses_env_key) ... ok
+test_remote_transcription_http_adapter_consent_and_real_wav (test_media_ops.MediaTests.test_remote_transcription_http_adapter_consent_and_real_wav) ... ok
+test_summary_local_http_adapter_map_reduce_not_model_quality (test_media_ops.MediaTests.test_summary_local_http_adapter_map_reduce_not_model_quality) ... ok
+test_transcribe_missing_local_model_is_blocked_no_outputs (test_media_ops.MediaTests.test_transcribe_missing_local_model_is_blocked_no_outputs) ... ok
+test_translation_pdf_text_artifacts_http_adapter_not_model_quality (test_media_ops.MediaTests.test_translation_pdf_text_artifacts_http_adapter_not_model_quality) ... ok
+test_truncated_model_text_is_not_presented_as_complete_adapter (test_media_ops.MediaTests.test_truncated_model_text_is_not_presented_as_complete_adapter) ... ok
+test_video_real_vp9_opus_artifact (test_media_ops.MediaTests.test_video_real_vp9_opus_artifact) ... ok
+test_whisper_cli_adapter_real_wav_extraction_not_speech_quality (test_media_ops.MediaTests.test_whisper_cli_adapter_real_wav_extraction_not_speech_quality) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 3.414s
+
+OK
+
+EXISTING GUARD CHARACTERIZATION (not new RED evidence)
+command=['.venv-media/bin/python', '-W', 'error', '-m', 'unittest', 'discover', '-s', 'worker/tests', '-p', 'test_media_ops.py', '-v']
+worker/media_ops.py sha256=09c1fd40ee404f6f118106dc97e7b583185595b909a197ba79d75d2a4a58fe26
+worker/tests/test_media_ops.py sha256=9c3bd9fd4b243be5c673ef495825d1fe72493c53ecec4514b286e58f8c33d54a
+exit=0
+test_existing_budget_and_empty_pdf_do_not_return_success_adapter (test_media_ops.MediaTests.test_existing_budget_and_empty_pdf_do_not_return_success_adapter) ... ok
+test_existing_font_coverage_rejects_missing_glyphs_adapter (test_media_ops.MediaTests.test_existing_font_coverage_rejects_missing_glyphs_adapter) ... ok
+test_existing_process_timeout_failure_diagnostics_are_private (test_media_ops.MediaTests.test_existing_process_timeout_failure_diagnostics_are_private) ... ok
+test_existing_transport_guards_caps_redirect_no_retry_adapter (test_media_ops.MediaTests.test_existing_transport_guards_caps_redirect_no_retry_adapter) ... Exception ignored while calling deallocator <function _TemporaryFileCloser.__del__ at 0x77c2a6e820>:
+Traceback (most recent call last):
+  File "/home/defaultuser/.hermes/tools/python-3.14.7+20260901-linux-arm64/lib/python3.14/tempfile.py", line 484, in __del__
+    _warnings.warn(self.warn_message, ResourceWarning)
+ResourceWarning: Implicitly cleaning up <HTTPError 500: 'Internal Server Error'>
+Exception ignored while calling deallocator <function _TemporaryFileCloser.__del__ at 0x77c2a6e820>:
+Traceback (most recent call last):
+  File "/home/defaultuser/.hermes/tools/python-3.14.7+20260901-linux-arm64/lib/python3.14/tempfile.py", line 484, in __del__
+    _warnings.warn(self.warn_message, ResourceWarning)
+ResourceWarning: Implicitly cleaning up <HTTPError 307: 'Temporary Redirect'>
+ok
+test_existing_validation_bounds_and_output_confinement (test_media_ops.MediaTests.test_existing_validation_bounds_and_output_confinement) ... ok
+test_image_real_pixels_resize_format_and_no_overwrite (test_media_ops.MediaTests.test_image_real_pixels_resize_format_and_no_overwrite) ... ok
+test_llama_cli_adapter_not_model_quality (test_media_ops.MediaTests.test_llama_cli_adapter_not_model_quality) ... ok
+test_openai_http_adapter_requires_explicit_consent_and_uses_env_key (test_media_ops.MediaTests.test_openai_http_adapter_requires_explicit_consent_and_uses_env_key) ... ok
+test_remote_transcription_http_adapter_consent_and_real_wav (test_media_ops.MediaTests.test_remote_transcription_http_adapter_consent_and_real_wav) ... ok
+test_summary_local_http_adapter_map_reduce_not_model_quality (test_media_ops.MediaTests.test_summary_local_http_adapter_map_reduce_not_model_quality) ... ok
+test_transcribe_missing_local_model_is_blocked_no_outputs (test_media_ops.MediaTests.test_transcribe_missing_local_model_is_blocked_no_outputs) ... ok
+test_translation_pdf_text_artifacts_http_adapter_not_model_quality (test_media_ops.MediaTests.test_translation_pdf_text_artifacts_http_adapter_not_model_quality) ... ok
+test_truncated_model_text_is_not_presented_as_complete_adapter (test_media_ops.MediaTests.test_truncated_model_text_is_not_presented_as_complete_adapter) ... ok
+test_video_real_vp9_opus_artifact (test_media_ops.MediaTests.test_video_real_vp9_opus_artifact) ... ok
+test_whisper_cli_adapter_real_wav_extraction_not_speech_quality (test_media_ops.MediaTests.test_whisper_cli_adapter_real_wav_extraction_not_speech_quality) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 4.623s
+
+OK
+
+HTTP RESOURCE RED
+command=['.venv-media/bin/python', '-m', 'unittest', 'discover', '-s', 'worker/tests', '-p', 'test_media_ops.py', '-k', 'http_error', '-v']
+worker/media_ops.py sha256=09c1fd40ee404f6f118106dc97e7b583185595b909a197ba79d75d2a4a58fe26
+worker/tests/test_media_ops.py sha256=4b8cc34f01f1f7c670dc53e204d588a1e97b4f41859ae9658617fea3a6a24d09
+exit=1
+test_http_error_response_is_closed_adapter (test_media_ops.MediaTests.test_http_error_response_is_closed_adapter) ... FAIL
+
+======================================================================
+FAIL: test_http_error_response_is_closed_adapter (test_media_ops.MediaTests.test_http_error_response_is_closed_adapter)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/defaultuser/Projects/paperwork-desktop/worker/tests/test_media_ops.py", line 125, in test_http_error_response_is_closed_adapter
+    self.assertTrue(stream.closed)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 1 test in 0.137s
+
+FAILED (failures=1)
+
+HTTP RESOURCE GREEN + SUITE
+command=['.venv-media/bin/python', '-W', 'error', '-m', 'unittest', 'discover', '-s', 'worker/tests', '-p', 'test_media_ops.py', '-v']
+worker/media_ops.py sha256=7b1e04ab1131225582313b9c390d7eba53b0983f5e4bf07db9926ab2c1c9de65
+worker/tests/test_media_ops.py sha256=4b8cc34f01f1f7c670dc53e204d588a1e97b4f41859ae9658617fea3a6a24d09
+exit=0
+test_existing_budget_and_empty_pdf_do_not_return_success_adapter (test_media_ops.MediaTests.test_existing_budget_and_empty_pdf_do_not_return_success_adapter) ... ok
+test_existing_font_coverage_rejects_missing_glyphs_adapter (test_media_ops.MediaTests.test_existing_font_coverage_rejects_missing_glyphs_adapter) ... ok
+test_existing_process_timeout_failure_diagnostics_are_private (test_media_ops.MediaTests.test_existing_process_timeout_failure_diagnostics_are_private) ... ok
+test_existing_transport_guards_caps_redirect_no_retry_adapter (test_media_ops.MediaTests.test_existing_transport_guards_caps_redirect_no_retry_adapter) ... ok
+test_existing_validation_bounds_and_output_confinement (test_media_ops.MediaTests.test_existing_validation_bounds_and_output_confinement) ... ok
+test_http_error_response_is_closed_adapter (test_media_ops.MediaTests.test_http_error_response_is_closed_adapter) ... ok
+test_image_real_pixels_resize_format_and_no_overwrite (test_media_ops.MediaTests.test_image_real_pixels_resize_format_and_no_overwrite) ... ok
+test_llama_cli_adapter_not_model_quality (test_media_ops.MediaTests.test_llama_cli_adapter_not_model_quality) ... ok
+test_openai_http_adapter_requires_explicit_consent_and_uses_env_key (test_media_ops.MediaTests.test_openai_http_adapter_requires_explicit_consent_and_uses_env_key) ... ok
+test_remote_transcription_http_adapter_consent_and_real_wav (test_media_ops.MediaTests.test_remote_transcription_http_adapter_consent_and_real_wav) ... ok
+test_summary_local_http_adapter_map_reduce_not_model_quality (test_media_ops.MediaTests.test_summary_local_http_adapter_map_reduce_not_model_quality) ... ok
+test_transcribe_missing_local_model_is_blocked_no_outputs (test_media_ops.MediaTests.test_transcribe_missing_local_model_is_blocked_no_outputs) ... ok
+test_translation_pdf_text_artifacts_http_adapter_not_model_quality (test_media_ops.MediaTests.test_translation_pdf_text_artifacts_http_adapter_not_model_quality) ... ok
+test_truncated_model_text_is_not_presented_as_complete_adapter (test_media_ops.MediaTests.test_truncated_model_text_is_not_presented_as_complete_adapter) ... ok
+test_video_real_vp9_opus_artifact (test_media_ops.MediaTests.test_video_real_vp9_opus_artifact) ... ok
+test_whisper_cli_adapter_real_wav_extraction_not_speech_quality (test_media_ops.MediaTests.test_whisper_cli_adapter_real_wav_extraction_not_speech_quality) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 6.875s
+
+OK
+
+DEPENDENCY / HOST LICENSE AUDIT
+('Pillow', '12.2.0', None, 'MIT-CMU')
+('pypdf', '6.13.3', None, 'BSD-3-Clause')
+('reportlab', '4.4.10', 'BSD license (see license.txt for details), Copyright (c) 2000-2025, ReportLab Inc.', None)
+('charset-normalizer', '3.5.2', 'MIT', None)
+Test-host FFmpeg ONLY; NOT redistributed.
+ffmpeg sha256=b29645560116ab4934c077ac1d2daf570078a0edd034c0b89654151463e200cf
+ffmpeg is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+ffmpeg is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ffmpeg.  If not, see <http://www.gnu.org/licenses/>.
+ffmpeg version n9.0.1-11-ge47273f4d9-20260831 Copyright (c) 2000-2026 the FFmpeg developers
+  built with gcc 15.2.0 (crosstool-NG 1.28.0.23_185f348)
+  configuration: --prefix=/ffbuild/prefix --pkg-config-flags=--static --pkg-config=pkg-config --cross-prefix=aarch64-ffbuild-linux-gnu- --arch=aarch64 --cpu=armv8-a --target-os=linux --enable-gpl --enable-version3 --disable-debug --enable-iconv --enable-zlib --enable-libxml2 --enable-libsoxr --enable-openssl --enable-libvmaf --enable-fontconfig --enable-libharfbuzz --enable-libfreetype --enable-libfribidi --enable-vulkan --enable-libvorbis --enable-libxcb --enable-xlib --enable-libpulse --enable-gmp --enable-lzma --enable-liblcevc-dec --enable-opencl --enable-amf --enable-libaom --enable-libaribb24 --enable-avisynth --enable-chromaprint --enable-libdav1d --disable-libdavs2 --enable-libdvdread --enable-libdvdnav --disable-libfdk-aac --enable-ffnvcodec --enable-cuda-llvm --enable-frei0r --enable-libgme --enable-libkvazaar --enable-libaribcaption --enable-libass --enable-libbluray --enable-libjxl --enable-libmp3lame --enable-libopus --enable-libplacebo --enable-librist --enable-libssh --enable-libtheora --enable-libvpx --enable-libwebp --enable-libzmq --enable-lv2 --disable-libvpl --enable-openal --enable-liboapv --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenh264 --enable-libopenjpeg --enable-libopenmpt --enable-librav1e --enable-librubberband --disable-schannel --enable-sdl2 --enable-libsnappy --enable-libsrt --enable-libsvtav1 --enable-libtwolame --enable-libuavs3d --enable-libdrm --disable-vaapi --enable-libvidstab --enable-libvvenc --disable-whisper --enable-libx264 --enable-libx265 --disable-libxavs2 --enable-libxvid --enable-libzimg --enable-libzvbi --extra-cflags=-DLIBTWOLAME_STATIC --extra-cxxflags= --extra-libs='-lgomp -ldl' --extra-ldflags=-pthread --extra-ldexeflags= --cc=aarch64-ffbuild-linux-gnu-gcc --cxx=aarch64-ffbuild-linux-gnu-g++ --ar=aarch64-ffbuild-linux-gnu-gcc-ar --ranlib=aarch64-ffbuild-linux-gnu-gcc-ranlib --nm=aarch64-ffbuild-linux-gnu-gcc-nm --extra-version=20260831
+  libavutil      61.  1.101 / 61.  1.101
+  libavcodec     63.  1.101 / 63.  1.101
+  libavformat    63.  1.101 / 63.  1.101
+  libavdevice    63.  1.101 / 63.  1.101
+  libavfilter    12.  1.101 / 12.  1.101
+  libswscale     10.  1.101 / 10.  1.101
+  libswresample   7.  1.101 /  7.  1.101
+
+AI executable discovery={'whisper-cli': None, 'llama-cli': None, 'ollama': None}
+No AI model downloaded; genuine model-quality/speech run BLOCKED on explicit model selection/installation.
+FINAL VERIFICATION 2026-10-18T12:43:00.102691+00:00
+host=Linux-6.12.38-4k-aarch64-with-glibc2.41
+PAPERWORK_TEST_FFMPEG=/home/defaultuser/.hermes/tools/ffmpeg-9.0.1-linux-arm64/bin/ffmpeg
+fixtures=generated Pillow RGB(80x40,50/60/70); lavfi testsrc2 160x120@10 + 440Hz sine 0.5s FFV1/PCM; stereo WAV 8kHz; ReportLab source PDF; labeled adapter fixtures
+command=['.venv-media/bin/python', '-W', 'error', '-m', 'unittest', 'discover', '-s', 'worker/tests', '-p', 'test_media_ops.py', '-v']
+worker/media_ops.py sha256=7b1e04ab1131225582313b9c390d7eba53b0983f5e4bf07db9926ab2c1c9de65
+worker/tests/test_media_ops.py sha256=4b8cc34f01f1f7c670dc53e204d588a1e97b4f41859ae9658617fea3a6a24d09
+worker/media-requirements.txt sha256=aecab1cb7ce81751d4d9d9ae160aeaf0d05d5978f60afddb7c9ce40096284386
+worker/MEDIA-OPTIONS.md sha256=daac521456b9a83b67e5b574c3a6852404e8b2bf1732904e737892bedec933a8
+exit=0
+test_existing_budget_and_empty_pdf_do_not_return_success_adapter (test_media_ops.MediaTests.test_existing_budget_and_empty_pdf_do_not_return_success_adapter) ... ok
+test_existing_font_coverage_rejects_missing_glyphs_adapter (test_media_ops.MediaTests.test_existing_font_coverage_rejects_missing_glyphs_adapter) ... ok
+test_existing_process_timeout_failure_diagnostics_are_private (test_media_ops.MediaTests.test_existing_process_timeout_failure_diagnostics_are_private) ... ok
+test_existing_transport_guards_caps_redirect_no_retry_adapter (test_media_ops.MediaTests.test_existing_transport_guards_caps_redirect_no_retry_adapter) ... ok
+test_existing_validation_bounds_and_output_confinement (test_media_ops.MediaTests.test_existing_validation_bounds_and_output_confinement) ... ok
+test_http_error_response_is_closed_adapter (test_media_ops.MediaTests.test_http_error_response_is_closed_adapter) ... ok
+test_image_real_pixels_resize_format_and_no_overwrite (test_media_ops.MediaTests.test_image_real_pixels_resize_format_and_no_overwrite) ... ok
+test_llama_cli_adapter_not_model_quality (test_media_ops.MediaTests.test_llama_cli_adapter_not_model_quality) ... ok
+test_openai_http_adapter_requires_explicit_consent_and_uses_env_key (test_media_ops.MediaTests.test_openai_http_adapter_requires_explicit_consent_and_uses_env_key) ... ok
+test_remote_transcription_http_adapter_consent_and_real_wav (test_media_ops.MediaTests.test_remote_transcription_http_adapter_consent_and_real_wav) ... ok
+test_summary_local_http_adapter_map_reduce_not_model_quality (test_media_ops.MediaTests.test_summary_local_http_adapter_map_reduce_not_model_quality) ... ok
+test_transcribe_missing_local_model_is_blocked_no_outputs (test_media_ops.MediaTests.test_transcribe_missing_local_model_is_blocked_no_outputs) ... ok
+test_translation_pdf_text_artifacts_http_adapter_not_model_quality (test_media_ops.MediaTests.test_translation_pdf_text_artifacts_http_adapter_not_model_quality) ... ok
+test_truncated_model_text_is_not_presented_as_complete_adapter (test_media_ops.MediaTests.test_truncated_model_text_is_not_presented_as_complete_adapter) ... ok
+test_video_real_vp9_opus_artifact (test_media_ops.MediaTests.test_video_real_vp9_opus_artifact) ... ok
+test_whisper_cli_adapter_real_wav_extraction_not_speech_quality (test_media_ops.MediaTests.test_whisper_cli_adapter_real_wav_extraction_not_speech_quality) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 8.123s
+
+OK

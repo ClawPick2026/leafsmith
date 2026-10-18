@@ -1,0 +1,30 @@
+{
+  "name": "paperwork-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Local-first desktop PDF, document and media tools.",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 1420",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4173",
+    "tauri": "tauri",
+    "test": "node --experimental-strip-types --test tests/*.test.ts"
+  },
+  "dependencies": {
+    "preact": "11.0.1",
+    "@tauri-apps/api": "2.12.4",
+    "pdf-lib": "1.17.1",
+    "pdfjs-dist": "6.4.299",
+    "qrcode-generator": "2.0.4"
+  },
+  "devDependencies": {
+    "vite": "8.3.4",
+    "@preact/preset-vite": "2.10.6",
+    "typescript": "7.0.2",
+    "tailwindcss": "4.3.3",
+    "@tailwindcss/vite": "4.3.3",
+    "@tauri-apps/cli": "2.12.3"
+  }
+}

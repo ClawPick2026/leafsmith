@@ -1,0 +1,131 @@
+name: Optional AI engine and model packs
+
+# No push/PR trigger, publishing token, registry edits or end-user auto-downloads.
+on:
+  workflow_dispatch:
+    inputs:
+      component:
+        description: Build/smoke this engine and its separately packaged model
+        type: choice
+        required: true
+        default: all
+        options: [all, whisper, llama]
+      allow_model_downloads:
+        description: Consent to CI fetching pinned weights (78 MB speech / 492 MB text); not end-user consent
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  contracts:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - name: Builder contract tests (no weight downloads or mocked inference)
+        run: python -W error::ResourceWarning -m unittest discover -s scripts/tests -p test_ai_components.py -v
+      - name: Validate explicit CI consent and choose native jobs
+        id: matrix
+        env:
+          COMPONENT: ${{ inputs.component }}
+          ALLOW_MODELS: ${{ inputs.allow_model_downloads }}
+        run: |
+          python - <<'PY'
+          import json, os
+          if os.environ['ALLOW_MODELS'] != 'true':
+              raise SystemExit('Re-dispatch with allow_model_downloads=true to consent to CI-only weight fetching.')
+          component = os.environ['COMPONENT']
+          if component not in {'all', 'whisper', 'llama'}:
+              raise SystemExit('Unknown component')
+          families = ['whisper', 'llama'] if component == 'all' else [component]
+          matrix = {'include': [dict(component=c, runner=r, target=t) for c in families for r,t in
+                    [('ubuntu-22.04','linux-x86_64'), ('windows-latest','windows-x86_64')]]}
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as out:
+              out.write('matrix=' + json.dumps(matrix) + '\n')
+          PY
+
+  native:
+    needs: contracts
+    name: ${{ matrix.component }} / ${{ matrix.target }} (real inference)
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.contracts.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - name: Native builder and worker smoke dependencies (runner only)
+        run: python -m pip install cmake==3.31.6 ninja==1.11.1.3 -r worker/media-requirements.txt
+      - name: Prepare Linux CPU compiler and FFmpeg (runner only, not distributed)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends build-essential binutils ffmpeg
+      - name: Prepare Windows x64 MSVC environment
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $installation = & $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (-not $installation) { throw 'No native MSVC x64 toolchain' }
+          Import-Module "$installation\Common7\Tools\Microsoft.VisualStudio.DevShell.dll"
+          Enter-VsDevShell -VsInstallPath $installation -SkipAutomaticLocation -DevCmdArguments '-arch=x64 -host_arch=x64'
+          'PATH','INCLUDE','LIB','LIBPATH','VCINSTALLDIR','VCToolsInstallDir','VCToolsVersion','WindowsSdkDir','WindowsSDKVersion','UniversalCRTSdkDir','UCRTVersion','VSCMD_ARG_TGT_ARCH','VSCMD_ARG_HOST_ARCH','VSCMD_VER' | ForEach-Object {
+            $value = [Environment]::GetEnvironmentVariable($_)
+            if ($value) { "$_=$value" >> $env:GITHUB_ENV }
+          }
+      - name: Prepare Windows FFmpeg for transcription fixture only
+        if: runner.os == 'Windows' && matrix.component == 'whisper'
+        shell: pwsh
+        run: |
+          choco install ffmpeg --version=7.1.1 --yes --no-progress --allow-downgrade
+          if ($LASTEXITCODE -ne 0) { throw 'Runner FFmpeg installation failed' }
+          $ffmpeg = Get-Command ffmpeg -ErrorAction Stop
+          "AI_SMOKE_FFMPEG=$($ffmpeg.Source)" >> $env:GITHUB_ENV
+      - name: Build pinned CPU source; pack engines and weights separately; run actual worker inference
+        env:
+          COMPONENT: ${{ matrix.component }}
+          TARGET: ${{ matrix.target }}
+          HF_HUB_OFFLINE: '1'
+          TRANSFORMERS_OFFLINE: '1'
+        shell: bash
+        run: |
+          args=(--component "$COMPONENT" --platform "$TARGET" --allow-model-downloads)
+          if [[ -n "${AI_SMOKE_FFMPEG:-}" ]]; then args+=(--ffmpeg "$AI_SMOKE_FFMPEG"); fi
+          python scripts/build_ai_components.py "${args[@]}"
+      - name: Preserve only successful, quality-gated distribution candidates
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ai-${{ matrix.component }}-${{ matrix.target }}
+          path: dist/ai-components/*
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0
+      - name: Native quality-gate summary
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as out:
+              for p in Path('dist/ai-components').glob('*.build.json'):
+                  record = json.loads(p.read_text(encoding='utf-8'))
+                  out.write('### ' + record['engine']['id'] + ' / ' + record['engine']['platform'] + '\n')
+                  out.write('Actual worker/native inference passed on this runner. Not interactive desktop validation.\n\n')
+                  out.write('```json\n' + json.dumps(record, indent=2) + '\n```\n')
+          PY

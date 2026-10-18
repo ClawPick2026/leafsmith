@@ -1,0 +1,7 @@
+*.pdf binary
+*.png binary
+*.ico binary
+*.webp binary
+*.jpg binary
+# Retained execution logs preserve exact command output, including whitespace.
+*.log -whitespace
