@@ -25,7 +25,7 @@ import time
 from pathlib import Path, PureWindowsPath
 from urllib.parse import urlsplit
 
-INSTALLER_URL = 'https://github.com/ClawPick2026/paperwork-desktop/releases/download/v0.1.0-rc.1/Paperwork_0.1.0_x64-setup.exe'
+INSTALLER_URL = 'https://github.com/ClawPick2026/leafsmith/releases/download/v0.1.0-rc.1/Leafsmith_0.1.0_x64-setup.exe'
 INSTALLER_SHA256 = '8d823fccb3cd29232a34146815b1ed0c6b809d63089c2b9056715ed75990b112'
 INSTALLER_SIZE = 34070948
 SOURCE_COMMIT = '5d14d6223241868b9f269b06aec22c50e96b1d35'
@@ -60,7 +60,7 @@ def validate_download_url(url, initial=False):
 
 
 def run_root(env):
-    return PureWindowsPath(env['RUNNER_TEMP']) / ('paperwork-windows-gui-' + env['GITHUB_RUN_ID'] + '-' + env['GITHUB_RUN_ATTEMPT'])
+    return PureWindowsPath(env['RUNNER_TEMP']) / ('leafsmith-windows-gui-' + env['GITHUB_RUN_ID'] + '-' + env['GITHUB_RUN_ATTEMPT'])
 
 
 def nsis_install_command(installer, destination):
@@ -103,7 +103,7 @@ def validate_contact(page_count, text, fields):
 def require_disposable_runner(env, platform):
     expected = {
         'GITHUB_ACTIONS': 'true', 'RUNNER_ENVIRONMENT': 'github-hosted',
-        'RUNNER_OS': 'Windows', 'GITHUB_REPOSITORY': 'ClawPick2026/paperwork-desktop',
+        'RUNNER_OS': 'Windows', 'GITHUB_REPOSITORY': 'ClawPick2026/leafsmith',
         'GITHUB_EVENT_NAME': 'workflow_dispatch', 'ImageOS': 'win22',
     }
     if platform != 'win32' or any(env.get(k) != v for k, v in expected.items()):
@@ -118,10 +118,10 @@ def require_disposable_runner(env, platform):
         raise RuntimeError('RUNNER_TEMP must be a local absolute Windows path.')
 
 
-WINDOW_TITLE = 'Paperwork Desktop'
-APP_IDENTIFIER = 'io.github.clawpick2026.paperwork'
-MARKER = 'Paperwork native GUI synthetic acceptance 2026'
-APP_EXE = 'paperwork-desktop.exe'  # src-tauri/Cargo.toml package/binary name
+WINDOW_TITLE = 'Leafsmith Desktop'
+APP_IDENTIFIER = 'io.github.clawpick2026.leafsmith'
+MARKER = 'Leafsmith native GUI synthetic acceptance 2026'
+APP_EXE = 'leafsmith.exe'  # src-tauri/Cargo.toml package/binary name
 
 
 def write_json(path, data):
@@ -195,7 +195,7 @@ class ReleaseRedirects(urllib.request.HTTPRedirectHandler):
 def download_installer(destination):
     validate_download_url(INSTALLER_URL, initial=True)
     opener = urllib.request.build_opener(ReleaseRedirects())
-    request = urllib.request.Request(INSTALLER_URL, headers={'User-Agent': 'Paperwork-native-GUI-acceptance'})
+    request = urllib.request.Request(INSTALLER_URL, headers={'User-Agent': 'Leafsmith-native-GUI-acceptance'})
     try:
         with opener.open(request, timeout=30) as response, destination.open('xb') as target:
             validate_download_url(response.geturl())
@@ -497,7 +497,7 @@ def orchestrate(root):
                  direct_worker_invocations=0, browser_preview_used=False, synthetic_data_only=True,
                  steps=[])
     app = None
-    installed = root / 'installed Paperwork'
+    installed = root / 'installed Leafsmith'
     executable = installed / APP_EXE
     uninstaller = installed / 'uninstall.exe'
 
@@ -529,7 +529,7 @@ def orchestrate(root):
                                                 Pillow=PIL.__version__, pypdf=pypdf.__version__)
         create_synthetic_pdf(evidence / 'synthetic-input.pdf')
         step('synthetic-input-created', sha256=hashlib.sha256((evidence / 'synthetic-input.pdf').read_bytes()).hexdigest())
-        installer = root / 'Paperwork_0.1.0_x64-setup.exe'
+        installer = root / 'Leafsmith_0.1.0_x64-setup.exe'
         download_installer(installer)
         step('installer-exact-hash-and-size-verified')
         command('silent-install', nsis_install_command(installer, installed), 180)

@@ -131,7 +131,7 @@ def main():
         parser.error("--linux-native requires native Linux")
     if args.linux_extra_library and not args.linux_native:
         parser.error("--linux-extra-library requires --linux-native")
-    output = ROOT / "build/worker/paperwork-worker/third-party-licenses"
+    output = ROOT / "build/worker/leafsmith-worker/third-party-licenses"
     # No stale notices from a previous build may satisfy the gate.
     if output.exists():
         shutil.rmtree(output)
@@ -154,14 +154,14 @@ def main():
             shutil.rmtree(source_output)
         linux = collect(output.parent, args.linux_native, output, source_output, python,
                         extra_libraries=extras,
-                        freezer_toc=ROOT / "build/pyinstaller/paperwork-worker/COLLECT-00.toc")
+                        freezer_toc=ROOT / "build/pyinstaller/leafsmith-worker/COLLECT-00.toc")
         (output / "linux-libraries.json").write_text(json.dumps(linux, indent=2), encoding="utf-8")
     for label, records in (("python", python), ("npm", npm), ("rust", rust)):
         (output / (label + "-packages.json")).write_text(json.dumps(records, indent=2), encoding="utf-8")
     if (ROOT / "LICENSE").is_file():
         copy_file(ROOT / "LICENSE", output / "application-MIT.txt")
     (output / "README.txt").write_text(
-        "Paperwork application code is MIT; this does NOT relicense dependencies.\n"
+        "Leafsmith application code is MIT; this does NOT relicense dependencies.\n"
         "Actual dependency notices are copied here. Python/npm/Rust inventories include build/test dependencies, "
         "not just runtime dependencies. Package metadata is not a substitute for license texts.\n"
         "PyInstaller's actual COPYING.txt includes the bootloader exception. Python's runtime license is included.\n"

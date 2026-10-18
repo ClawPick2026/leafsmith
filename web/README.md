@@ -1,16 +1,16 @@
-# Paperwork — browser edition
+# Leafsmith — browser edition
 
-The browser edition and [desktop app](../README.md) are maintained together in one Paperwork repository. Their feature sets and privacy boundaries remain distinct.
+The browser edition and [desktop app](../README.md) are maintained together in one Leafsmith repository. Their feature sets and privacy boundaries remain distinct.
 
 Sort, annotate, sign and transform documents without uploading them from your browser.
 
 **Status: working preview, not a production or security-audited PDF service.** This is the reduced browser-only edition selected for the project. It does not implement the full original feature wishlist. Lakebed itself is a public alpha.
 
-[Open Paperwork](https://paperwork.lakebed.app). The deployment is claimed and has no automatic expiry. The original preview URL also remains available.
+[Open Leafsmith](https://leafsmith.lakebed.app). The deployment is claimed and has no automatic expiry. The original preview URL also remains available.
 
 ## Main Window
 
-![Paperwork home with locally processed PDF and image tools](docs/screenshots/main.png)
+![Leafsmith home with locally processed PDF and image tools](docs/screenshots/main.png)
 
 ## What you can do
 
@@ -25,7 +25,7 @@ Sort, annotate, sign and transform documents without uploading them from your br
 
 ## First use
 
-1. Open the running Paperwork website in a JavaScript-enabled browser.
+1. Open the running Leafsmith website in a JavaScript-enabled browser.
 2. Select **Choose files**, or use **Try a sample** in an empty workspace.
 3. Choose a tool. The highlighted **ACTIVE** file is used for single-file tools; file order determines merge and image order.
 4. Adjust the settings and run the operation.
@@ -55,7 +55,7 @@ Unsupported operations are documented rather than represented by non-working but
 
 ## Privacy and safe handling
 
-Files and generated results remain in this tab's memory. Paperwork does not upload them to Lakebed or an AI provider, and does not save them between page loads. Download everything you want to keep **before refreshing, closing the tab or clearing the workspace**. A successful new run replaces the previous set of results; a failed run preserves previous downloads.
+Files and generated results remain in this tab's memory. Leafsmith does not upload them to Lakebed or an AI provider, and does not save them between page loads. Download everything you want to keep **before refreshing, closing the tab or clearing the workspace**. A successful new run replaces the previous set of results; a failed run preserves previous downloads.
 
 The website and its version-pinned processing libraries require an internet connection. Hosting/CDN services receive ordinary network metadata such as IP addresses. Third-party scripts execute in the page; this preview is not suitable for highly sensitive material without an independent security review.
 

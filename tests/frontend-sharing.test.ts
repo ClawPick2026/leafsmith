@@ -94,8 +94,8 @@ test('both platform shells mount one canonical workspace with injected platform 
     assert.equal(desktop.type, Workspace);
     assert.equal(browser.type, Workspace);
     assert.notEqual(desktop.props.engine, browser.props.engine, 'Platform adapters must stay separate');
-    assert.equal(desktop.props.platform.name, 'Paperwork Desktop');
-    assert.equal(browser.props.platform.name, 'paperwork');
+    assert.equal(desktop.props.platform.name, 'Leafsmith Desktop');
+    assert.equal(browser.props.platform.name, 'leafsmith');
     assert.equal(desktop.props.platform.initialQrText, 'https://example.com');
     assert.equal(browser.props.platform.initialQrText, 'https://lakebed.dev');
     assert.ok(desktop.props.platform.homeBottom, 'Desktop retains the NativeTools slot');

@@ -20,8 +20,8 @@ test('a saved choice wins over the system preference; otherwise the system prefe
 test('both themes define the same color tokens as CSS custom properties', () => {
   assert.deepEqual(Object.keys(palettes.dark).sort(), Object.keys(palettes.light).sort());
   const variables = themeVariables('dark');
-  assert.equal(variables['--pw-paper'], palettes.dark.paper);
-  assert.ok(Object.keys(variables).every(name => name.startsWith('--pw-')));
+  assert.equal(variables['--ls-paper'], palettes.dark.paper);
+  assert.ok(Object.keys(variables).every(name => name.startsWith('--ls-')));
 });
 
 test('the theme checks cover the shared workspace and both platform shells', () => {
@@ -30,8 +30,8 @@ test('the theme checks cover the shared workspace and both platform shells', () 
 
 test('every themed color class refers to a defined token', () => {
   for (const [path, source] of sources) {
-    for (const [, token] of source.matchAll(/--pw-([a-z0-9-]+)/g)) {
-      assert.ok(token in palettes.light, `${path} uses undefined token --pw-${token}`);
+    for (const [, token] of source.matchAll(/--ls-([a-z0-9-]+)/g)) {
+      assert.ok(token in palettes.light, `${path} uses undefined token --ls-${token}`);
     }
   }
 });

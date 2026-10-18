@@ -32,7 +32,7 @@ Pins are immutable audit inputs, not a guarantee of security or legal compliance
 The manually triggered `.github/workflows/components.yml` has read-only repository permissions and uploads Actions artifacts only. Its native jobs are independent and non-fail-fast. The coordinator owns all GitHub/release writes.
 
 ```sh
-gh workflow run components.yml --repo ClawPick2026/paperwork-desktop --ref main -f component=all
+gh workflow run components.yml --repo ClawPick2026/leafsmith --ref main -f component=all
 # component can also be ffmpeg, tesseract or libreoffice
 
 python scripts/build_component.py --component ffmpeg --platform linux-x86_64 --plan
@@ -61,7 +61,7 @@ Each successful job supplies:
 All smokes re-extract the actual ZIP into a path containing spaces, with only the registry entry point initially executable, matching the Rust installer. Wrappers restore required executable permissions and set app-local library/data/font paths. Subprocess environments discard runner library/data/tool overrides.
 
 - **FFmpeg:** inspect actual `-buildconf`, reject GPL/nonfree configuration, require disabled autodetection, generate VP9+Opus WebM and decode it. No x264/x265 encoding is provided.
-- **OCR:** render a real image with a native font and recognize `PAPERWORK TEST` with the pack's own trained data. Windows supports PNG/PNM/BMP; JPEG/TIFF/WebP codecs are deliberately not built. The application rasterizes PDF inputs to PNG.
+- **OCR:** render a real image with a native font and recognize `LEAFSMITH TEST` with the pack's own trained data. Windows supports PNG/PNM/BMP; JPEG/TIFF/WebP codecs are deliberately not built. The application rasterizes PDF inputs to PNG.
 - **Office:** create actual minimal OOXML DOCX, convert headlessly, and require a nonempty PDF with its PDF signature. Native/application-level layout/filter testing remains required; this is not a general-purpose Office installation.
 
 Windows audits normal/delay imports, requires AMD64 PE32+ conversion binaries and app-local or identified Windows OS dependencies. Linux Office parses ELF64 dynamic metadata without executing `ldd`, rejects missing app-local dependencies and unsafe search paths, permits only explicit baseline glibc/loader SONAMEs, and writes `ELF-DEPENDENCIES.json` beside the source/binary provenance. These checks supplement, not replace, native execution and dynamic-feature testing.
@@ -120,7 +120,7 @@ FFmpeg uses LGPL-2.1-or-later configuration with no GPL/nonfree/autodetected lib
 2. Review actual native build/smoke, notices/source artifacts and application-level/platform checks.
 3. Publish **both** approved engine ZIP and matching sources ZIP to an immutable versioned release.
 4. Independently download the published engine and verify its SHA-256/byte count against its manifest.
-5. Add the real URL and manifest fields to `registry.json`, using only `https://github.com/ClawPick2026/paperwork-desktop/releases/download/`. Do not add build metadata: Rust rejects unknown entry fields.
+5. Add the real URL and manifest fields to `registry.json`, using only `https://github.com/ClawPick2026/leafsmith/releases/download/`. Do not add build metadata: Rust rejects unknown entry fields.
 6. Rebuild the app and test consent/install/run. Never add pending URLs, made-up hashes, mutable `latest`, a source archive instead of an executable, or failed-smoke packs.
 
 ## Contract verification

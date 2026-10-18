@@ -1,0 +1,52 @@
+LEAFSMITH RENAME RED 2026-10-18T22:31:06+0000 — test files renamed, code not yet
+$ npm test
+ℹ tests 91
+ℹ pass 84
+ℹ fail 7
+$ .venv-package/bin/python -m pytest worker/tests scripts/tests -q -p no:cacheprovider
+FAILED scripts/tests/test_components.py::PackTests::test_office_smoke_uses_a_real_docx_package_not_html_renamed_as_office
+FAILED scripts/tests/test_freeze.py::test_license_collection_preserves_nested_pdfium_notice_text
+FAILED scripts/tests/test_freeze.py::test_freeze_removes_unused_restrictive_font_payload
+FAILED scripts/tests/test_freeze.py::test_resource_map_and_freezer_destination_agree
+FAILED scripts/tests/test_linux_licenses.py::GateTests::test_collect_reports_entire_dependency_license_failure_set_before_sources
+FAILED scripts/tests/test_linux_licenses.py::GateTests::test_collect_reports_notice_failures_with_policy_failures
+FAILED scripts/tests/test_linux_licenses.py::GateTests::test_libffi_keeps_full_notice_and_still_requires_exact_source
+FAILED scripts/tests/test_linux_licenses.py::GateTests::test_libuuid_keeps_full_notice_and_still_requires_exact_source
+FAILED scripts/tests/test_linux_licenses.py::GateTests::test_libuuid_utf8_notices_survive_cp1252_default_through_collection_and_postbundle
+FAILED scripts/tests/test_linux_licenses.py::GateTests::test_prebundle_inventory_records_staged_hash_and_wheel_notice
+FAILED scripts/tests/test_linux_licenses.py::WiringTests::test_license_report_linux_mode_collects_before_notice_manifest
+FAILED scripts/tests/test_linux_licenses.py::ExtractedPayloadTests::test_extracted_appimage_has_checked_debian_sources_not_just_an_inventory
+FAILED scripts/tests/test_publish_website.py::SuiteTests::test_browser_suite_targets_url_with_each_script_convention
+FAILED scripts/tests/test_release.py::FileTests::test_download_links_move_to_the_new_release_everywhere
+FAILED scripts/tests/test_release.py::FileTests::test_release_notes_pass_the_workflow_title_check_and_name_real_assets
+FAILED scripts/tests/test_release.py::FileTests::test_verify_assets_requires_matching_digests_urls_and_flags
+FAILED scripts/tests/test_release.py::ReleaseFlowTests::test_full_release_order
+FAILED scripts/tests/test_release.py::ReleaseFlowTests::test_links_only_publishes_an_existing_release
+FAILED scripts/tests/test_windows_gui.py::RunnerGuardTests::test_accepts_only_explicit_hosted_manual_windows_context
+FAILED scripts/tests/test_windows_gui.py::ArtifactHelperTests::test_run_root_and_nsis_destination_are_bounded_and_keep_spaces
+23 failed, 244 passed, 14 skipped, 422 subtests passed in 22.96s
+
+LEAFSMITH RENAME GREEN 2026-10-18T22:32:40+0000 — code, docs and AUR files renamed
+$ npm test
+ℹ tests 91
+ℹ pass 91
+ℹ fail 0
+$ npm run build
+exit=0
+$ .venv-package/bin/python -m pytest worker/tests scripts/tests -q -p no:cacheprovider
+FAILED scripts/tests/test_release.py::FileTests::test_download_links_move_to_the_new_release_everywhere
+1 failed, 263 passed, 14 skipped, 430 subtests passed in 21.87s
+
+DESKTOP BROWSER ACCEPTANCE 2026-10-18T22:40:13+0000 — frozen dist copy at http://127.0.0.1:4173
+signature check updated to read the Stamp annotation appearance (signature layer from 8091f1a); before: FAIL, after: PASS
+  "passed": 29,
+  "failed": 0,
+  "skipped": 4,
+
+WEB BROWSER ACCEPTANCE 2026-10-18T22:43:46+0000 — lakebed dev at http://127.0.0.1:3150
+e2e 16 passed; test_shell OK; discovery_http OK; seo_browser all PASS; review_regressions PASS; ui_polish OK (2 tests); theme_browser PASS; crop_preview 7 passed
+
+FINAL LOCAL SUITES 2026-10-18T22:45:09+0000
+ℹ tests 92
+ℹ pass 92
+ℹ fail 0

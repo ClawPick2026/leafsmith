@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { siteUrl, homeTitle, homeDescription, guides, guideIndex, scopeHeading, scopeParagraphs, structuredData } from '../shared/discovery.ts';
+import { siteUrl, homeTitle, homeDescription, guides, guideIndex, scopeHeading, scopeParagraphs, structuredData, movedTo } from '../shared/discovery.ts';
 import { renderSitemap, renderRobots } from '../server/discovery.ts';
 
 test('directory metadata is distinct from every guide', () => {
   assert.equal(guideIndex.path, '/tools');
-  assert.equal(guideIndex.title, 'PDF & Image Tool Guides — Paperwork');
+  assert.equal(guideIndex.title, 'PDF & Image Tool Guides — Leafsmith');
   assert.equal(guideIndex.heading, 'PDF and image tool guides');
   assert.ok(guideIndex.description.length > 30);
   assert.ok(!guides.some(g => g.title === guideIndex.title || g.description === guideIndex.description || g.path === guideIndex.path));
@@ -41,7 +41,7 @@ test('sitemap XML lists only the six canonical discovery URLs', () => {
 });
 
 test('robots allows every crawler and points at the canonical sitemap', () => {
-  assert.equal(renderRobots(), 'User-agent: *\nAllow: /\nSitemap: https://paperwork.lakebed.app/sitemap.xml\n');
+  assert.equal(renderRobots(), 'User-agent: *\nAllow: /\nSitemap: https://leafsmith.lakebed.app/sitemap.xml\n');
   assert.doesNotMatch(renderRobots(), /Disallow|<[^>]*>/);
 });
 
@@ -50,7 +50,7 @@ test('JSON-LD describes the free browser app and each guide breadcrumb without i
     const data = JSON.parse(JSON.stringify(structuredData(guide)));
     assert.equal(data['@context'], 'https://schema.org');
     const app = data['@graph'].find((node: Record<string, unknown>) => node['@type'] === 'WebApplication');
-    assert.equal(app.name, 'Paperwork');
+    assert.equal(app.name, 'Leafsmith');
     assert.equal(app.url, siteUrl + '/');
     assert.equal(app.description, homeDescription);
     assert.equal(app.applicationCategory, 'UtilitiesApplication');
@@ -65,7 +65,7 @@ test('JSON-LD describes the free browser app and each guide breadcrumb without i
       continue;
     }
     assert.deepEqual(breadcrumb.itemListElement, [
-      { '@type': 'ListItem', position: 1, name: 'Paperwork', item: siteUrl + '/' },
+      { '@type': 'ListItem', position: 1, name: 'Leafsmith', item: siteUrl + '/' },
       { '@type': 'ListItem', position: 2, name: 'Tool guides', item: siteUrl + '/tools' },
       { '@type': 'ListItem', position: 3, name: guide.heading, item: siteUrl + guide.path },
     ]);
@@ -80,8 +80,8 @@ test('image guide distinguishes A4 bounds from fixed A4 sheets', () => {
 });
 
 test('discovery catalog describes exactly four actionable browser-only guides', () => {
-  assert.equal(siteUrl, 'https://paperwork.lakebed.app');
-  assert.equal(homeTitle, 'Paperwork — Free PDF & Image Tools, No Uploads');
+  assert.equal(siteUrl, 'https://leafsmith.lakebed.app');
+  assert.equal(homeTitle, 'Leafsmith — Free PDF & Image Tools, No Uploads');
   assert.match(homeDescription, /free/i);
   assert.match(homeDescription, /no (?:account|uploads)/i);
   assert.deepEqual(guides.map(g => [g.path, g.toolId]), [
@@ -116,4 +116,14 @@ test('discovery catalog describes exactly four actionable browser-only guides', 
   assert.match(content('sign'), /not certificate-backed/);
   assert.match(content('sign'), /not identity verified/);
   assert.match(content('sign'), /invalidate existing certificate signatures/);
+});
+
+test('the pre-rename address sends visitors to the same page on the current one', () => {
+  assert.equal(siteUrl, 'https://leafsmith.lakebed.app');
+  assert.equal(movedTo('https://paperwork.lakebed.app/tools?tool=merge#steps'), 'https://leafsmith.lakebed.app/tools?tool=merge#steps');
+  assert.equal(movedTo('https://paperwork.lakebed.app/'), 'https://leafsmith.lakebed.app/');
+  for (const href of ['https://leafsmith.lakebed.app/tools', 'http://127.0.0.1:3030/', 'https://open-river-a7bbd59285.lakebed.app/',
+    'https://paperwork.lakebed.app.example.org/', 'https://example.org/?next=https://paperwork.lakebed.app/']) {
+    assert.equal(movedTo(href), null, href);
+  }
 });

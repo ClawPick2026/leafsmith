@@ -17,7 +17,7 @@ def dispatch(request):
         if op=='health':
             from pdf_ops import run
             from pypdf import PdfReader
-            with tempfile.TemporaryDirectory(prefix='paperwork-selftest-') as folder:
+            with tempfile.TemporaryDirectory(prefix='leafsmith-selftest-') as folder:
                 result=run({'operation':'form_template','inputs':[],'output_dir':folder,'options':{'template_id':'contact'},'engines':{}})
                 if not result.get('outputs'):raise RuntimeError('The worker did not generate a form.')
                 reader=PdfReader(result['outputs'][0]['path'])

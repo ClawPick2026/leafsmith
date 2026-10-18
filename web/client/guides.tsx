@@ -4,18 +4,18 @@ import { Icon, ThemeToggle, primary, muted } from './workspace.tsx';
 import { useTheme } from './theme.ts';
 import { usePageMetadata } from './discovery.ts';
 
-const card = 'mt-6 rounded-xl border border-(--pw-line) bg-(--pw-paper) p-5 sm:p-6';
+const card = 'mt-6 rounded-xl border border-(--ls-line) bg-(--ls-paper) p-5 sm:p-6';
 const heading2 = 'text-xl font-semibold tracking-tight';
-const link = 'text-(--pw-link) underline underline-offset-4';
+const link = 'text-(--ls-link) underline underline-offset-4';
 
 function Page({ children }: { children: ComponentChildren }) {
   const [theme, toggleTheme] = useTheme();
-  return <div className="min-h-screen bg-(--pw-page) text-(--pw-ink) selection:bg-(--pw-selection) [&_button:not(:disabled)]:cursor-pointer [&_a[href]]:cursor-pointer" style={{fontFamily:'Inter, ui-sans-serif, system-ui, sans-serif'}}>
-    <header className="flex h-20 items-center justify-between gap-4 border-b border-(--pw-line) bg-(--pw-paper) px-5 md:px-9"><a href="/" className="flex items-center gap-2.5 text-xl font-semibold tracking-tight"><span className="flex h-9 w-9 items-center justify-center rounded-lg bg-(--pw-brand) text-(--pw-on-brand)"><Icon name="pages" size={25}/></span>paperwork<span className="ml-1 hidden rounded border border-(--pw-line-strong) px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-widest text-(--pw-faint) sm:inline">browser edition</span></a><nav aria-label="Main navigation" className="flex items-center gap-5 text-sm"><a className={link} href="/tools">Tool guides</a><ThemeToggle theme={theme} onToggle={toggleTheme}/></nav></header>
+  return <div className="min-h-screen bg-(--ls-page) text-(--ls-ink) selection:bg-(--ls-selection) [&_button:not(:disabled)]:cursor-pointer [&_a[href]]:cursor-pointer" style={{fontFamily:'Inter, ui-sans-serif, system-ui, sans-serif'}}>
+    <header className="flex h-20 items-center justify-between gap-4 border-b border-(--ls-line) bg-(--ls-paper) px-5 md:px-9"><a href="/" className="flex items-center gap-2.5 text-xl font-semibold tracking-tight"><span className="flex h-9 w-9 items-center justify-center rounded-lg bg-(--ls-brand) text-(--ls-on-brand)"><Icon name="pages" size={25}/></span>leafsmith<span className="ml-1 hidden rounded border border-(--ls-line-strong) px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-widest text-(--ls-faint) sm:inline">browser edition</span></a><nav aria-label="Main navigation" className="flex items-center gap-5 text-sm"><a className={link} href="/tools">Tool guides</a><ThemeToggle theme={theme} onToggle={toggleTheme}/></nav></header>
     <main className="mx-auto max-w-3xl px-5 py-8 sm:px-8 md:py-12">{children}
       <section aria-labelledby="privacy" className={card}><h2 id="privacy" className={heading2}>{scopeHeading}</h2>{scopeParagraphs.map(text=><p key={text} className={muted+' mt-3'}>{text}</p>)}</section>
     </main>
-    <footer className="mx-auto max-w-3xl px-5 pb-10 text-sm text-(--pw-muted) sm:px-8"><a className={link} href="/">Open Paperwork</a> · <a className={link} href="/tools">All tool guides</a></footer>
+    <footer className="mx-auto max-w-3xl px-5 pb-10 text-sm text-(--ls-muted) sm:px-8"><a className={link} href="/">Open Leafsmith</a> · <a className={link} href="/tools">All tool guides</a></footer>
   </div>;
 }
 

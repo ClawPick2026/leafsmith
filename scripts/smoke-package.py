@@ -99,8 +99,8 @@ def headless_display_prefix(env, logs):
     2>&1, so the app's stderr goes to its own log and stdout stays protocol JSON."""
     if env.get("DISPLAY") or not shutil.which("xvfb-run"):
         return []
-    env["PAPERWORK_APP_STDERR"] = str(logs / "native-app.stderr.log")
-    return ["xvfb-run", "-a", "sh", "-c", 'exec "$@" 2>>"$PAPERWORK_APP_STDERR"', "sh"]
+    env["LEAFSMITH_APP_STDERR"] = str(logs / "native-app.stderr.log")
+    return ["xvfb-run", "-a", "sh", "-c", 'exec "$@" 2>>"$LEAFSMITH_APP_STDERR"', "sh"]
 
 
 def test_native(app, worker, logs, report, env, prefix=None):
@@ -116,7 +116,7 @@ def smoke(kind, path, logs, report):
         test_worker(path, logs, report)
         return
     # Install/extract is scoped to this fresh directory, removed on completion.
-    with tempfile.TemporaryDirectory(prefix="paperwork-package-", dir=logs) as scratch:
+    with tempfile.TemporaryDirectory(prefix="leafsmith-package-", dir=logs) as scratch:
         scratch = Path(scratch)
         if kind == "nsis":
             if os.name != "nt":
@@ -124,8 +124,8 @@ def smoke(kind, path, logs, report):
             destination = scratch / "installed"
             run([str(path), "/S", "/D=" + str(destination)], "nsis-install", logs, report,
                 env=clean_environment())
-            app = destination / "paperwork-desktop.exe"
-            worker = destination / "worker/paperwork-worker.exe"
+            app = destination / "leafsmith.exe"
+            worker = destination / "worker/leafsmith-worker.exe"
             if not app.is_file() or not worker.is_file():
                 raise ValueError("NSIS payload is missing expected native app or resource worker")
             test_native(app, worker, logs, report, clean_environment())
@@ -137,9 +137,9 @@ def smoke(kind, path, logs, report):
                 cwd=scratch, env=clean_environment())
             appdir = scratch / "squashfs-root"
             # Tauri bundles resources under usr/lib/<productName> (tauri.conf.json).
-            worker = appdir / "usr/lib/Paperwork/worker/paperwork-worker"
+            worker = appdir / "usr/lib/Leafsmith/worker/leafsmith-worker"
             if not worker.is_file():
-                found = [str(p.relative_to(appdir)) for p in appdir.rglob("paperwork-worker") if p.is_file()]
+                found = [str(p.relative_to(appdir)) for p in appdir.rglob("leafsmith-worker") if p.is_file()]
                 raise ValueError("Unexpected AppImage worker resource layout: " + repr(found))
             env = clean_environment()
             env["APPDIR"] = str(appdir)

@@ -17,7 +17,7 @@ impl JobCache {
         use fs2::FileExt;
         fs::create_dir_all(cache).map_err(|_|"The local job cache could not be created.")?;
         let lease=fs::OpenOptions::new().create(true).truncate(false).read(true).write(true).open(cache.join("job-cache.lock")).map_err(|_|"The job cache lock is unavailable.")?;
-        lease.try_lock_exclusive().map_err(|_|"Another Paperwork instance is using the local job cache. Close it before starting this instance.")?;
+        lease.try_lock_exclusive().map_err(|_|"Another Leafsmith instance is using the local job cache. Close it before starting this instance.")?;
         let root=cache.join("jobs");
         worker_process::remove_private_directory(&root).map_err(|_|"Previous job files could not be removed. Close any applications using cached outputs and retry.")?;
         private_directory(&root)?;
@@ -84,7 +84,7 @@ fn execute_worker(worker:&Path,request:&Value)->Result<Value,String> {
     worker_process::execute_worker(worker,request)
 }
 fn worker_path(app:&tauri::AppHandle)->Result<PathBuf,String>{
-    let name=if cfg!(windows){"worker/paperwork-worker.exe"}else{"worker/paperwork-worker"};
+    let name=if cfg!(windows){"worker/leafsmith-worker.exe"}else{"worker/leafsmith-worker"};
     app.path().resolve(name,tauri::path::BaseDirectory::Resource).map_err(|_|"The app resource directory is unavailable.".into())
 }
 struct RunningGuard<'a>(&'a AtomicBool);
@@ -123,7 +123,7 @@ fn translation_font(operation:&str,font:&Path)->Result<String,String>{
 
 #[tauri::command]
 async fn run_native_job(app:tauri::AppHandle,state:State<'_,NativeState>,request:JobRequest)->Result<JobResult,String>{
-    if !paperwork_security::is_supported_operation(&request.operation){return Err("This operation is not supported.".into());}
+    if !leafsmith_security::is_supported_operation(&request.operation){return Err("This operation is not supported.".into());}
     if request.input_ids.len()>64 || !request.options.is_object() || serde_json::to_vec(&request.options).map_err(|_|"Invalid job options.")?.len()>32*1024{return Err("The operation options exceed the request limits.".into());}
     if state.running.swap(true,Ordering::AcqRel){return Err("A native processing job is already running.".into());}
     let _running=RunningGuard(&state.running);
@@ -206,7 +206,7 @@ mod tests {
 
     #[test]
     fn job_cache_removes_stale_outputs_and_locks_against_other_instances() {
-        let base=std::env::temp_dir().join(format!("paperwork-cache-test-{}",Uuid::new_v4()));
+        let base=std::env::temp_dir().join(format!("leafsmith-cache-test-{}",Uuid::new_v4()));
         fs::create_dir_all(base.join("jobs/stale")).unwrap();
         fs::write(base.join("jobs/stale/decrypted.txt"),b"test-only-private-output").unwrap();
         let cache=JobCache::open(&base).unwrap();
@@ -266,7 +266,7 @@ fn main(){
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![select_inputs,run_native_job,save_output,component_status,install_component])
-        .build(tauri::generate_context!()).expect("Unable to start Paperwork Desktop");
+        .build(tauri::generate_context!()).expect("Unable to start Leafsmith Desktop");
     if self_testing {
         let result=self_test(app.handle());
         cleanup_application(app.handle());

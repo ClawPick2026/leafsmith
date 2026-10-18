@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   published-rc-native-gui:
-    if: github.repository == 'ClawPick2026/paperwork-desktop' && github.event_name == 'workflow_dispatch'
+    if: github.repository == 'ClawPick2026/leafsmith' && github.event_name == 'workflow_dispatch'
     runs-on: windows-2022
     timeout-minutes: 20
     env:
@@ -30,7 +30,7 @@ jobs:
           $ErrorActionPreference = 'Stop'
           if (-not $IsWindows -or $env:GITHUB_ACTIONS -cne 'true' -or
               $env:RUNNER_ENVIRONMENT -cne 'github-hosted' -or $env:RUNNER_OS -cne 'Windows' -or
-              $env:GITHUB_REPOSITORY -cne 'ClawPick2026/paperwork-desktop' -or
+              $env:GITHUB_REPOSITORY -cne 'ClawPick2026/leafsmith' -or
               $env:GITHUB_EVENT_NAME -cne 'workflow_dispatch' -or $env:ImageOS -cne 'win22') {
             throw 'Refusing non-manual/non-hosted/non-Windows-2022 execution.'
           }
@@ -44,20 +44,20 @@ jobs:
       - name: Install CI-only automation dependencies (not an end-user requirement)
         shell: pwsh
         run: |
-          python -m venv "$env:RUNNER_TEMP/paperwork-gui-venv"
+          python -m venv "$env:RUNNER_TEMP/leafsmith-gui-venv"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          & "$env:RUNNER_TEMP/paperwork-gui-venv/Scripts/python.exe" -m pip install --disable-pip-version-check --no-cache-dir pywinauto==0.6.9 pywin32==311 comtypes==1.4.13 six==1.17.0 Pillow==11.3.0 pypdf==6.1.1
+          & "$env:RUNNER_TEMP/leafsmith-gui-venv/Scripts/python.exe" -m pip install --disable-pip-version-check --no-cache-dir pywinauto==0.6.9 pywin32==311 comtypes==1.4.13 six==1.17.0 Pillow==11.3.0 pypdf==6.1.1
           exit $LASTEXITCODE
       - name: Portable unit tests — NOT native GUI evidence
         shell: pwsh
         run: |
-          & "$env:RUNNER_TEMP/paperwork-gui-venv/Scripts/python.exe" -m unittest discover -s scripts/tests -p test_windows_gui.py -v 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP/windows-gui-unit.log"
+          & "$env:RUNNER_TEMP/leafsmith-gui-venv/Scripts/python.exe" -m unittest discover -s scripts/tests -p test_windows_gui.py -v 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP/windows-gui-unit.log"
           $status = $LASTEXITCODE
           exit $status
       - name: Actual installed app GUI, system picker/save, disk readback, close and uninstall
         shell: pwsh
         run: |
-          & "$env:RUNNER_TEMP/paperwork-gui-venv/Scripts/python.exe" scripts/smoke_windows_gui.py 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP/windows-gui-command.log"
+          & "$env:RUNNER_TEMP/leafsmith-gui-venv/Scripts/python.exe" scripts/smoke_windows_gui.py 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP/windows-gui-command.log"
           $status = $LASTEXITCODE
           "Native acceptance process exit status: $status" | Add-Content "$env:RUNNER_TEMP/windows-gui-command.log"
           exit $status
@@ -67,7 +67,7 @@ jobs:
         with:
           name: windows-native-gui-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
-            ${{ runner.temp }}/paperwork-windows-gui-${{ github.run_id }}-${{ github.run_attempt }}/evidence/
+            ${{ runner.temp }}/leafsmith-windows-gui-${{ github.run_id }}-${{ github.run_attempt }}/evidence/
             ${{ runner.temp }}/windows-gui-unit.log
             ${{ runner.temp }}/windows-gui-command.log
           if-no-files-found: error

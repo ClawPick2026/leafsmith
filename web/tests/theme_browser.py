@@ -52,7 +52,7 @@ with sync_playwright() as p:
     toggle.click()
     assert_theme(page, 'dark')
     expect(toggle).to_have_attribute('title', 'Switch to light mode')
-    assert page.evaluate("localStorage.getItem('paperwork-theme')") == 'dark'
+    assert page.evaluate("localStorage.getItem('leafsmith-theme')") == 'dark'
     page.screenshot(path=str(ARTIFACTS / f'{TARGET}-dark.png'))
     print('PASS toggle switches a light-system page to dark and stores only the choice')
 
@@ -85,7 +85,7 @@ with sync_playwright() as p:
     page.on('pageerror', lambda error: errors.append(str(error)))
     page.goto(BASE, wait_until='networkidle')
     assert_theme(page, 'dark')
-    assert page.evaluate("localStorage.getItem('paperwork-theme')") is None
+    assert page.evaluate("localStorage.getItem('leafsmith-theme')") is None
     overflow = page.evaluate('document.documentElement.scrollWidth - document.documentElement.clientWidth')
     assert overflow <= 0, f'header overflows a 390 px viewport by {overflow}px'
     page.screenshot(path=str(ARTIFACTS / f'{TARGET}-dark-mobile.png'))

@@ -1,7 +1,7 @@
-# Paperwork project rules
+# Leafsmith project rules
 
 - This capsule is a browser-only edition. Process documents only in tab memory; do not add document uploads, persistence, server processing or AI calls without explicit owner approval.
-- Keep UI copy objective: omit promotional subtitles and subjective language in tool descriptions. Enabled buttons and download links use the pointing-hand cursor. Verify with `PAPERWORK_URL=URL ../.test-venv/bin/python tests/ui_polish.py` from web/.
+- Keep UI copy objective: omit promotional subtitles and subjective language in tool descriptions. Enabled buttons and download links use the pointing-hand cursor. Verify with `LEAFSMITH_URL=URL ../.test-venv/bin/python tests/ui_polish.py` from web/.
 - Keep supported tools and unsupported wishlist features honest in `shared/catalog.ts` and README. Existing-text editing, Office conversion, OCR, encryption/unlock, watermark removal, AI and audio/video processing are not included.
 - Do not install app packages. Third-party browser scripts use the explicit version-pinned CDN URLs in `client/engine.ts`; the PDF.js parser must keep `isEvalSupported: false`.
 - Input limits: 8 files, 25 MiB per file, 50 MiB combined, 200 pages per PDF, 30 pages per batch download. Enforce limits when adopting a generated result, not only when selecting a file.

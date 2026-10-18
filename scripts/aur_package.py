@@ -43,7 +43,7 @@ INSTALLED_WORKER = Path(f"/{BUNDLE}usr/lib/{PRODUCT}/worker/{APP}-worker")
 LOCAL_SOURCES = (f"{APP}.sh", f"{APP}.desktop")
 PACKAGE_FILES = ("PKGBUILD", ".SRCINFO", *LOCAL_SOURCES)
 MAINTAINER = re.compile(r"\w[\w .'-]* <[\w.+@ -]+>")
-REPOSITORY = "ClawPick2026/paperwork-desktop"
+REPOSITORY = "ClawPick2026/leafsmith"
 SUMS_ASSET = "SHA256SUMS-linux-x86_64.txt"
 # Tags published by the Desktop packages workflow: v1.2.3 or v1.2.3-rc.4.
 TAG = re.compile(r"v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-(alpha|beta|rc)\.(0|[1-9][0-9]*))?")

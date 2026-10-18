@@ -111,7 +111,7 @@ def test_headless_display_keeps_app_stderr_out_of_protocol_stdout(tmp_path, monk
     fake_xvfb = bin_dir / "xvfb-run"
     fake_xvfb.write_text('#!/bin/sh\n[ "$1" = "-a" ] && shift\n"$@" 2>&1\n')
     app = tmp_path / "AppRun"
-    app.write_text('#!/bin/sh\necho "(paperwork-desktop:1): dbind-WARNING **: AT-SPI" >&2\necho \'{"ok":true}\'\n')
+    app.write_text('#!/bin/sh\necho "(leafsmith:1): dbind-WARNING **: AT-SPI" >&2\necho \'{"ok":true}\'\n')
     for path in (fake_xvfb, app):
         path.chmod(0o755)
     monkeypatch.setenv("PATH", str(bin_dir) + os.pathsep + os.environ.get("PATH", ""))

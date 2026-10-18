@@ -22,7 +22,7 @@ def test_release_tags_map_to_pkgver_that_sorts_prereleases_before_final():
 
 
 APPIMAGE_SHA = "16b0ebe4484820754224d1850a847990626e4c9e7a35cb7b5ac5b31c638761ca"
-DOWNLOADS = "https://github.com/ClawPick2026/paperwork-desktop/releases/download/"
+DOWNLOADS = "https://github.com/ClawPick2026/leafsmith/releases/download/"
 
 
 def github_release(tag="v0.1.0-rc.2", digest="sha256:" + APPIMAGE_SHA, name="Leafsmith_0.1.0_amd64.AppImage", **extra):
@@ -34,7 +34,7 @@ def github_release(tag="v0.1.0-rc.2", digest="sha256:" + APPIMAGE_SHA, name="Lea
     if name:
         assets.append({"name": name, "browser_download_url": DOWNLOADS + tag + "/" + name, "size": 139901432, "digest": digest})
     return {"tag_name": tag, "draft": False, "prerelease": "-" in tag,
-            "html_url": "https://github.com/ClawPick2026/paperwork-desktop/releases/tag/" + tag, "assets": assets, **extra}
+            "html_url": "https://github.com/ClawPick2026/leafsmith/releases/tag/" + tag, "assets": assets, **extra}
 
 
 SUMS = f"{APPIMAGE_SHA}  Leafsmith_0.1.0_amd64.AppImage\n{'1' * 64}  Leafsmith-linux-corresponding-sources.zip\n"
@@ -43,7 +43,7 @@ SUMS = f"{APPIMAGE_SHA}  Leafsmith_0.1.0_amd64.AppImage\n{'1' * 64}  Leafsmith-l
 def test_release_artifact_pins_the_appimage_only_when_checksum_sources_agree():
     assert aur["release_artifact"](github_release(), SUMS) == {
         "tag": "v0.1.0-rc.2", "pkgver": "0.1.0rc2", "prerelease": True,
-        "release_url": "https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.2",
+        "release_url": "https://github.com/ClawPick2026/leafsmith/releases/tag/v0.1.0-rc.2",
         "appimage": "Leafsmith_0.1.0_amd64.AppImage", "sha256": APPIMAGE_SHA, "size": 139901432}
     # Assets uploaded before GitHub recorded digests rely on the checked list alone.
     assert aur["release_artifact"](github_release(digest=None), SUMS)["sha256"] == APPIMAGE_SHA

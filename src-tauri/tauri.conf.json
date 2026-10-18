@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Paperwork",
+  "productName": "Leafsmith",
   "version": "0.1.0",
-  "identifier": "io.github.clawpick2026.paperwork",
+  "identifier": "io.github.clawpick2026.leafsmith",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Paperwork Desktop",
+        "title": "Leafsmith Desktop",
         "width": 1280,
         "height": 900,
         "minWidth": 720,
@@ -31,7 +31,7 @@
       "appimage"
     ],
     "resources": {
-      "../build/worker/paperwork-worker/": "worker/"
+      "../build/worker/leafsmith-worker/": "worker/"
     },
     "icon": [
       "icons/icon.png",

@@ -1,0 +1,10 @@
+LEGACY HOST REDIRECT RED 2026-10-18T22:34:17+0000
+SyntaxError: The requested module '../shared/discovery.ts' does not provide an export named 'movedTo'
+ℹ tests 1
+ℹ pass 0
+ℹ fail 1
+
+LEGACY HOST REDIRECT GREEN 2026-10-18T22:34:25+0000
+ℹ tests 8
+ℹ pass 8
+ℹ fail 0

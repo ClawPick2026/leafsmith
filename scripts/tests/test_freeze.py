@@ -38,13 +38,13 @@ def test_license_collection_preserves_nested_pdfium_notice_text(tmp_path, monkey
         distributions.append(Distribution(name, relative))
     monkeypatch.setattr(md, "distributions", lambda: distributions)
     execute_with_root("license-report.py", tmp_path, monkeypatch)
-    output = tmp_path / "build/worker/paperwork-worker/third-party-licenses"
+    output = tmp_path / "build/worker/leafsmith-worker/third-party-licenses"
     found = list(output.rglob("pdfium.txt"))
     assert found and found[0].read_text() == "Actual notice fixture for pypdfium2 bootloader exception"
 
 
 def test_freeze_removes_unused_restrictive_font_payload(tmp_path, monkeypatch):
-    fonts = tmp_path / "build/worker/paperwork-worker/_internal/reportlab/fonts"
+    fonts = tmp_path / "build/worker/leafsmith-worker/_internal/reportlab/fonts"
     fonts.mkdir(parents=True)
     (fonts / "DarkGardenMK.pfb").write_bytes(b"unused font fixture")
     (fonts / "hb-test.ttf").write_bytes(b"unused test font fixture")
@@ -139,9 +139,9 @@ def test_resource_map_and_freezer_destination_agree():
     namespace = runpy.run_path(str(ROOT / "scripts/freeze-worker.py"))
     command = namespace["build_command"](ROOT)
     config = json.loads((ROOT / "src-tauri/tauri.conf.json").read_text())
-    assert config["bundle"]["resources"]["../build/worker/paperwork-worker/"] == "worker/"
+    assert config["bundle"]["resources"]["../build/worker/leafsmith-worker/"] == "worker/"
     assert command[command.index("--distpath") + 1] == str(ROOT / "build/worker")
-    assert command[command.index("--name") + 1] == "paperwork-worker"
+    assert command[command.index("--name") + 1] == "leafsmith-worker"
     assert "--onedir" in command
 
 

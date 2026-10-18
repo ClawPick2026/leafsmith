@@ -561,7 +561,7 @@ def _remove_watermark(path, directory, options):
 
 def _target(directory, suffix):
     # Unique names, exclusive reservation: never overwrite inputs or past results.
-    fd, name = tempfile.mkstemp(prefix='paperwork-', suffix=suffix, dir=directory)
+    fd, name = tempfile.mkstemp(prefix='leafsmith-', suffix=suffix, dir=directory)
     os.close(fd)
     path=Path(name)
     allocated=_ALLOCATED.get()

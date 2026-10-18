@@ -10,7 +10,7 @@ async function realLibrary(name: 'pdf-lib' | 'qrcode-generator') {
   const url = name === 'pdf-lib'
     ? 'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js'
     : 'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js';
-  const path = join(tmpdir(), `paperwork-${name}.js`);
+  const path = join(tmpdir(), `leafsmith-${name}.js`);
   let source: string;
   try { source = await readFile(path, 'utf8'); }
   catch { const response = await fetch(url); assert.equal(response.status, 200); source = await response.text(); await writeFile(path, source); }

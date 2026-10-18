@@ -68,7 +68,7 @@ async function makeDemoPdf(): Promise<Uint8Array> {
   const font = await doc.embedFont(lib.StandardFonts.Helvetica);
   for (let i = 1; i <= 3; i++) {
     const page = doc.addPage([595.28, 841.89]);
-    page.drawText('Paperwork sample - your browser, your files.', { x: 54, y: 760, size: 20, font });
+    page.drawText('Leafsmith sample - your browser, your files.', { x: 54, y: 760, size: 20, font });
     page.drawText(`Page ${i}`, { x: 54, y: 722, size: 14, font });
     page.drawText('A local sample for splitting, rotating, annotating and filling.', { x: 54, y: 680, size: 12, font });
   }

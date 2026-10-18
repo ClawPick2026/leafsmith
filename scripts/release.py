@@ -39,10 +39,10 @@ import time
 import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
-REPO = "ClawPick2026/paperwork-desktop"
+REPO = "ClawPick2026/leafsmith"
 RELEASE_URL = f"https://github.com/{REPO}/releases/tag/"
 DOWNLOAD_URL = f"https://github.com/{REPO}/releases/download/"
-ASSETS = {"Windows": "Paperwork_{base}_x64-setup.exe", "Linux": "Paperwork_{base}_amd64.AppImage"}
+ASSETS = {"Windows": "Leafsmith_{base}_x64-setup.exe", "Linux": "Leafsmith_{base}_amd64.AppImage"}
 SUMS = ("SHA256SUMS-windows-x86_64.txt", "SHA256SUMS-linux-x86_64.txt")
 LINK_FILES = ("README.md", "web/shared/desktop.ts", "web/tests/desktop_download.py")
 _VERSION = re.compile(r"v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-rc\.([1-9]\d*))?")
@@ -163,17 +163,17 @@ def release_notes(version: Version, previous: str | None, commits: list[str]) ->
     base = version.base
     changes = [c for c in commits if not c.startswith("chore(release):")
                and not re.fullmatch(r"docs: publish v\S+ download links", c)]
-    lines = [f"# Paperwork {version.label} — Windows and Linux" + (" preview" if rc else ""), ""]
+    lines = [f"# Leafsmith {version.label} — Windows and Linux" + (" preview" if rc else ""), ""]
     if rc:
         lines += ["**Release candidate for testing, not the finished release.**", ""]
     lines += [
         "## Downloads", "",
-        f"- `Paperwork_{base}_x64-setup.exe`: Windows x86_64 NSIS installer.",
-        f"- `Paperwork_{base}_amd64.AppImage`: Linux x86_64. Built on Ubuntu 22.04; it needs glibc 2.35 or later. "
+        f"- `Leafsmith_{base}_x64-setup.exe`: Windows x86_64 NSIS installer.",
+        f"- `Leafsmith_{base}_amd64.AppImage`: Linux x86_64. Built on Ubuntu 22.04; it needs glibc 2.35 or later. "
         "Make it executable (`chmod +x`) and run it.",
-        "- `Paperwork-linux-corresponding-sources.zip`: the exact Ubuntu source packages for the Linux libraries in the "
+        "- `Leafsmith-linux-corresponding-sources.zip`: the exact Ubuntu source packages for the Linux libraries in the "
         "AppImage's dependency set. Keep it with the AppImage if you redistribute it.",
-        "- `Paperwork-windows-x86_64-third-party-notices.zip`, `Paperwork-linux-x86_64-third-party-notices.zip`: "
+        "- `Leafsmith-windows-x86_64-third-party-notices.zip`, `Leafsmith-linux-x86_64-third-party-notices.zip`: "
         "the license notices that also ship inside each package.",
         "- `SHA256SUMS-windows-x86_64.txt`, `SHA256SUMS-linux-x86_64.txt`: verify downloads before running them.", "",
         "**Both packages are unsigned.** Windows SmartScreen may show an unrecognized-publisher warning. "
@@ -240,14 +240,17 @@ def update_links(root: Path, version: Version, info: dict) -> list[Path]:
     replacements = [(re.escape(old.tag) + r"(?![\w.])", version.tag),
                     (re.escape(f"'{old}'"), f"'{version}'"),
                     (re.escape(f"[{old.label}]("), f"[{version.label}](")]
-    for platform, pattern in ASSETS.items():
-        block = re.search(r"platform: '" + platform + r"',.*?sha256: '([0-9a-f]{64})',\s*bytes: (\d+)", desktop, re.S)
+    for platform in ASSETS:
+        # Take the published file name from its link: it can predate the current
+        # ASSETS pattern (releases up to v0.1.0-rc.2 were named Paperwork_*).
+        block = re.search(r"platform: '" + platform + r"',.*?url: '[^']*/([^'/]+)',.*?sha256: '([0-9a-f]{64})',\s*bytes: (\d+)",
+                          desktop, re.S)
         if not block:
             raise ReleaseError(f"Cannot find the {platform} package in web/shared/desktop.ts.")
         new = info[platform]
-        replacements += [(re.escape(pattern.format(base=old.base)), new["name"]),
-                         (block.group(1), new["sha256"]),
-                         (r"(platform: '" + platform + r"',.*?bytes: )" + block.group(2), r"\g<1>" + str(new["bytes"]))]
+        replacements += [(re.escape(block.group(1)), new["name"]),
+                         (block.group(2), new["sha256"]),
+                         (r"(platform: '" + platform + r"',.*?bytes: )" + block.group(3), r"\g<1>" + str(new["bytes"]))]
     changed = []
     for name in LINK_FILES:
         path = root / name
@@ -349,7 +352,7 @@ def release(options: dict, runner, root: Path = ROOT) -> dict:
     if not options["no_wait"] and not _wait_ci(runner, sha, "main"):
         raise ReleaseError(f"The main build for {sha[:12]} failed, so {new.tag} was not tagged. Fix main, "
                            f"then rerun: python3 scripts/release.py --version {new}")
-    _check(runner, ["git", "tag", "-a", new.tag, "-m", f"Paperwork {new.label}", sha], "git tag failed.")
+    _check(runner, ["git", "tag", "-a", new.tag, "-m", f"Leafsmith {new.label}", sha], "git tag failed.")
     _check(runner, ["git", "push", "origin", new.tag], f"Pushing {new.tag} failed; push it manually.")
     if options["no_wait"]:
         record["stopped"] = f"Tag pushed. When the release exists, run: python3 scripts/release.py --links-only {new.tag}"
@@ -407,7 +410,7 @@ class Runner:
 
 
 def main(argv=None) -> int:
-    parser = argparse.ArgumentParser(description="Release a new Paperwork desktop version.")
+    parser = argparse.ArgumentParser(description="Release a new Leafsmith desktop version.")
     parser.add_argument("bump", nargs="?", choices=["major", "minor", "patch", "rc", "final"])
     parser.add_argument("--rc", action="store_true", help="start a release candidate of the bumped version")
     parser.add_argument("--version", help="explicit version, e.g. 0.2.0 or 0.2.0-rc.1")

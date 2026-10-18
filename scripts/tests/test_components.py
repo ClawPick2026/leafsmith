@@ -909,7 +909,7 @@ class PackTests(unittest.TestCase):
             with zipfile.ZipFile(source) as archive:
                 self.assertIn("[Content_Types].xml", archive.namelist())
                 self.assertIn("word/document.xml", archive.namelist())
-                self.assertIn(b"Paperwork conversion smoke", archive.read("word/document.xml"))
+                self.assertIn(b"Leafsmith conversion smoke", archive.read("word/document.xml"))
 
 
 if __name__ == "__main__":

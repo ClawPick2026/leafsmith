@@ -1,5 +1,5 @@
 [package]
-name = "paperwork-desktop"
+name = "leafsmith"
 version = "0.1.0"
 description = "Local-first document and media tools"
 authors = ["ClawPick2026"]
@@ -19,7 +19,7 @@ uuid = { version = "1", features = ["v4"] }
 sha2 = "0.10"
 reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
 zip = { version = "2", default-features = false, features = ["deflate"] }
-paperwork-security = { path = "../crates/native-security" }
+leafsmith-security = { path = "../crates/native-security" }
 
 [target.'cfg(unix)'.dependencies]
 libc = "0.2"

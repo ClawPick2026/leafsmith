@@ -28,3 +28,11 @@ Real runs:
 - publish --allow-uncommitted: exit 0. Deployed dep_yefw3xsfKf5oAixk; live HTML client.js?v=sha256:082f67d21764fe2de1579d027c242a1bb76e1f784eb225f3fdd390f63983848b equals the build and the downloaded client.js hash; 8 live suites exit 0. Record: tests/artifacts/publish/2026-10-18T212613Z.json (ignored). Deployed from HEAD 37d7c62 plus uncommitted web/ changes.
 - release.py rc --dry-run in the dirty checkout: refused (uncommitted changes), exit 1.
 - release.py dry runs in a throwaway local clone: rc -> v0.1.0-rc.3, final -> v0.1.0, minor --rc -> v0.2.0-rc.1, patch -> v0.1.1, major -> v1.0.0 (skip warning shown). No real release, tag, push or CI run.
+
+OLD-ASSET-NAME LINKS RED 2026-10-18T22:33:40+0000 (paperwork-e4, rename to Leafsmith)
+E                   AssertionError: 'Paperwork_0.1.0_x64-setup.exe' unexpectedly found in "# Leafsmith\n\nLocal-first PDF, document, image and media tools for [your browser](https://leafsmith.lakebed.
+FAILED scripts/tests/test_release.py::FileTests::test_download_links_move_to_the_new_release_everywhere
+1 failed, 13 passed in 0.29s
+
+OLD-ASSET-NAME LINKS GREEN 2026-10-18T22:33:50+0000 (paperwork-e4)
+14 passed in 0.30s

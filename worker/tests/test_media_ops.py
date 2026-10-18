@@ -55,8 +55,8 @@ class AdapterServer:
         self.server.server_close()
         self.thread.join()
 
-FFMPEG = os.environ.get("PAPERWORK_TEST_FFMPEG") or shutil.which("ffmpeg")
-FFPROBE = os.environ.get("PAPERWORK_TEST_FFPROBE") or (str(Path(FFMPEG).with_name("ffprobe")) if FFMPEG else None)
+FFMPEG = os.environ.get("LEAFSMITH_TEST_FFMPEG") or shutil.which("ffmpeg")
+FFPROBE = os.environ.get("LEAFSMITH_TEST_FFPROBE") or (str(Path(FFMPEG).with_name("ffprobe")) if FFMPEG else None)
 
 from PIL import Image
 

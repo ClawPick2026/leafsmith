@@ -9,13 +9,22 @@ export type Guide = {
   limitations: string[];
   faq: { question: string; answer: string }[];
 };
-export const siteUrl = 'https://paperwork.lakebed.app';
-export const homeTitle = 'Paperwork — Free PDF & Image Tools, No Uploads';
+export const siteUrl = 'https://leafsmith.lakebed.app';
+// Before the rename to Leafsmith the site was paperwork.lakebed.app. That host
+// still serves this deploy so old links work; the client moves visitors on.
+const previousHosts = ['paperwork.lakebed.app'];
+
+/** The same page on siteUrl when `href` is on a previous host, otherwise null. */
+export function movedTo(href: string): string | null {
+  const url = new URL(href);
+  return previousHosts.includes(url.hostname) ? siteUrl + url.pathname + url.search + url.hash : null;
+}
+export const homeTitle = 'Leafsmith — Free PDF & Image Tools, No Uploads';
 export const homeDescription = 'Free browser tools to merge, split and sign PDFs or convert PNG and JPEG images to PDF. No account or uploads; files are processed in tab memory.';
 
 export const guideIndex = {
   path: '/tools',
-  title: 'PDF & Image Tool Guides — Paperwork',
+  title: 'PDF & Image Tool Guides — Leafsmith',
   description: 'Instructions for merging and splitting PDFs, converting images to PDF and drawing electronic signatures. Free browser tools with no account or document uploads.',
   heading: 'PDF and image tool guides',
   intro: 'Choose a guide for steps, input limits and output checks.',
@@ -32,7 +41,7 @@ export const scopeParagraphs = [
 /** schema.org graph for discovery pages: the free web app, plus a breadcrumb on guides. */
 export function structuredData(guide?: Guide) {
   const graph: Record<string, unknown>[] = [{
-    '@type': 'WebApplication', name: 'Paperwork', url: siteUrl + '/',
+    '@type': 'WebApplication', name: 'Leafsmith', url: siteUrl + '/',
     description: homeDescription, applicationCategory: 'UtilitiesApplication',
     operatingSystem: 'Any (web browser)',
     browserRequirements: 'JavaScript required; internet access needed to load processing libraries.',
@@ -42,7 +51,7 @@ export function structuredData(guide?: Guide) {
   if (guide) graph.push({
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Paperwork', item: siteUrl + '/' },
+      { '@type': 'ListItem', position: 1, name: 'Leafsmith', item: siteUrl + '/' },
       { '@type': 'ListItem', position: 2, name: 'Tool guides', item: siteUrl + guideIndex.path },
       { '@type': 'ListItem', position: 3, name: guide.heading, item: siteUrl + guide.path },
     ],
@@ -53,7 +62,7 @@ export function structuredData(guide?: Guide) {
 export const guides: Guide[] = [
   {
     path: '/merge-pdf', toolId: 'merge',
-    title: 'Merge PDFs in File Order, No Uploads — Paperwork',
+    title: 'Merge PDFs in File Order, No Uploads — Leafsmith',
     description: 'Combine two to eight PDFs in your browser. Set the file order, merge up to 200 pages and download one PDF without uploading your documents.',
     heading: 'Merge PDFs in the order you choose',
     intro: 'Combine separate PDF documents into one downloadable file. The workspace list determines the order of entire documents; it does not interleave their pages.',
@@ -75,7 +84,7 @@ export const guides: Guide[] = [
   },
   {
     path: '/split-pdf', toolId: 'split',
-    title: 'Split a PDF or Extract Selected Pages — Paperwork',
+    title: 'Split a PDF or Extract Selected Pages — Leafsmith',
     description: 'Extract a page range into one PDF or save separate page files. Select pages locally, with up to 30 individual downloads per batch and no uploads.',
     heading: 'Split a PDF or keep only selected pages',
     intro: 'Work on the active PDF to produce one file containing a selection, or one file per selected page. Your source on disk is not changed.',
@@ -96,7 +105,7 @@ export const guides: Guide[] = [
   },
   {
     path: '/images-to-pdf', toolId: 'images-pdf',
-    title: 'Convert PNG and JPEG Images to PDF — Paperwork',
+    title: 'Convert PNG and JPEG Images to PDF — Leafsmith',
     description: 'Turn PNG and JPEG images into a PDF in your browser. Arrange up to eight images, fit each within A4 bounds and download without uploading files.',
     heading: 'Put PNG and JPEG images into one PDF',
     intro: 'Create a PDF from photos or scanned page images. Each image becomes one page, scaled down if necessary to fit within A4 bounds, using the workspace file order.',
@@ -117,7 +126,7 @@ export const guides: Guide[] = [
   },
   {
     path: '/sign-pdf', toolId: 'sign',
-    title: 'Draw and Place an Electronic Signature on PDF — Paperwork',
+    title: 'Draw and Place an Electronic Signature on PDF — Leafsmith',
     description: 'Draw a signature, set its page and position, and download a signed PDF locally. A drawn electronic signature, not certificate signing or identity verification.',
     heading: 'Draw a signature and place it on a PDF',
     intro: 'Add your drawn signature as an image on a chosen PDF page. This creates a visible electronic signature, not a verified digital certificate.',

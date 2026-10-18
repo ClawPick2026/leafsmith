@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / 'tests' / 'artifacts' / 'crop-preview'
 ART.mkdir(parents=True, exist_ok=True)
 BASE = sys.argv[1] if len(sys.argv) > 1 else 'http://127.0.0.1:3141'
-HOME = re.compile(r'^Paperwork (Desktop )?home$')
+HOME = re.compile(r'^Leafsmith (Desktop )?home$')
 
 
 def fixtures():

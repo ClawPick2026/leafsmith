@@ -5,10 +5,10 @@ The AUR package installs the contents of the published Linux AppImage under
 and license files. It runs the extracted `AppRun`, so FUSE is not needed. The
 `-bin` suffix marks a package of release binaries.
 
-**Waiting for the rename.** The app is being renamed from Paperwork to
-Leafsmith, and only releases built under the new name are packaged. Until the
-first one exists, runs on `main` end with a notice and publish nothing. That
-release must have this layout, matching `_appname`, `_product` and `_worker` in
+**Leafsmith releases only.** The app was called Paperwork until v0.1.0-rc.2,
+and only releases built under the name Leafsmith are packaged. Until the first
+one exists, runs on `main` end with a notice and publish nothing. The package
+expects this layout, matching `_appname`, `_product` and `_worker` in
 `PKGBUILD.in` and the constants at the top of `scripts/aur_package.py`:
 
 - asset `Leafsmith_<version>_amd64.AppImage` (Tauri `productName` `Leafsmith`);
@@ -17,8 +17,8 @@ release must have this layout, matching `_appname`, `_product` and `_worker` in
 - the frozen worker `usr/lib/Leafsmith/worker/leafsmith-worker`, with
   `third-party-licenses/application-MIT.txt` beside it.
 
-If the GitHub repository is renamed, update `REPOSITORY` in the script and
-`url` in the template.
+If the GitHub repository is renamed again, update `REPOSITORY` in the script
+and `url` in the template.
 
 AUR receives only the recipe: `PKGBUILD`, `.SRCINFO`, `leafsmith.sh` and
 `leafsmith.desktop`. `makepkg` downloads the AppImage from the GitHub release
@@ -104,11 +104,11 @@ workflow to `main`: that push runs it and publishes the newest release.
    Then store the private key as its secret and delete the local copy:
 
    ```sh
-   repo=repos/ClawPick2026/paperwork-desktop
+   repo=repos/ClawPick2026/leafsmith
    printf '%s' '{"deployment_branch_policy":{"protected_branches":false,"custom_branch_policies":true}}' |
      gh api -X PUT "$repo/environments/aur" --input -
    gh api -X POST "$repo/environments/aur/deployment-branch-policies" -f name=main -f type=branch
-   gh secret set AUR_SSH_PRIVATE_KEY --env aur --repo ClawPick2026/paperwork-desktop < "$dir/aur"
+   gh secret set AUR_SSH_PRIVATE_KEY --env aur --repo ClawPick2026/leafsmith < "$dir/aur"
    rm -r "$dir"
    ```
 
@@ -117,7 +117,7 @@ workflow to `main`: that push runs it and publishes the newest release.
    fine:
 
    ```sh
-   gh variable set AUR_MAINTAINER --repo ClawPick2026/paperwork-desktop --body 'Your Name <you at example dot org>'
+   gh variable set AUR_MAINTAINER --repo ClawPick2026/leafsmith --body 'Your Name <you at example dot org>'
    ```
 
 5. Optional: under **Settings → Environments → aur**, require a reviewer
@@ -131,7 +131,8 @@ To replace the key, register the new public key on AUR first, then rerun step 3.
 Current key, created on 2026-10-19 and registered on AUR (steps 1 to 4 are done;
 `AUR_MAINTAINER` is `Firstpick <firstpick1992@proton.me>`):
 `ED25519 SHA256:XPgMB6a9YYGtdIaYlxzMS17hJnfJ6c5S6urwnV8eI+4`, comment
-`ClawPick2026/paperwork-desktop GitHub Actions AUR publishing`.
+`ClawPick2026/paperwork-desktop GitHub Actions AUR publishing` (the repository's
+name when the key was made).
 
 ## Local checks
 

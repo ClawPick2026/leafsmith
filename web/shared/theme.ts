@@ -1,7 +1,7 @@
 /** Color tokens for the website and desktop UI. Light values are the original paper/green/terracotta palette. */
 export type Theme = 'light' | 'dark';
 
-export const themeStorageKey = 'paperwork-theme';
+export const themeStorageKey = 'leafsmith-theme';
 
 const light = {
   page: '#f8f9f4', paper: '#fffefa', field: '#ffffff', sunken: '#eef1e7', hover: '#f3f4ee', selected: '#e9ede3',
@@ -45,7 +45,7 @@ export function nextTheme(theme: Theme): Theme {
   return theme === 'dark' ? 'light' : 'dark';
 }
 
-/** Custom properties referenced by classes such as `bg-(--pw-paper)`. */
+/** Custom properties referenced by classes such as `bg-(--ls-paper)`. */
 export function themeVariables(theme: Theme): Record<string, string> {
-  return Object.fromEntries(Object.entries(palettes[theme]).map(([token, value]) => [`--pw-${token}`, value]));
+  return Object.fromEntries(Object.entries(palettes[theme]).map(([token, value]) => [`--ls-${token}`, value]));
 }

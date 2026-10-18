@@ -28,7 +28,7 @@ export function applyMetadata({ path, title, description, structuredData }: Page
   };
   meta('name', 'description', description);
   meta('property', 'og:type', 'website');
-  meta('property', 'og:site_name', 'Paperwork');
+  meta('property', 'og:site_name', 'Leafsmith');
   meta('property', 'og:title', title);
   meta('property', 'og:description', description);
   meta('property', 'og:url', siteUrl + path);

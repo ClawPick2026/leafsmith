@@ -12,7 +12,7 @@ from playwright.sync_api import sync_playwright, expect
 ROOT = Path(__file__).resolve().parents[1]
 BASE = sys.argv[1].rstrip('/')
 MODE = sys.argv[2] if len(sys.argv) > 2 else 'all'
-PUBLIC = 'https://paperwork.lakebed.app'
+PUBLIC = 'https://leafsmith.lakebed.app'
 SHARED = (ROOT / 'shared/discovery.ts').read_text()
 HOME_DESCRIPTION = re.search(r"export const homeDescription = '([^']+)';", SHARED).group(1)
 settings = json.loads((ROOT / 'tests/browser-env.json').read_text())
@@ -31,7 +31,7 @@ with sync_playwright() as p:
     page.on('pageerror', lambda error: errors.append(str(error)))
     page.goto(BASE, wait_until='networkidle')
     if MODE in ('metadata', 'all'):
-        expect(page).to_have_title('Paperwork — Free PDF & Image Tools, No Uploads')
+        expect(page).to_have_title('Leafsmith — Free PDF & Image Tools, No Uploads')
         expect(page.locator('meta[name="description"]')).to_have_attribute('content', HOME_DESCRIPTION)
         expect(page.locator('link[rel="canonical"]')).to_have_attribute('href', PUBLIC + '/')
         expect(page.locator('meta[property="og:title"]')).to_have_attribute('content', page.title())
@@ -51,7 +51,7 @@ with sync_playwright() as p:
         # The homepage visit above started a guest session, as for a returning visitor.
         page.goto(BASE + '/tools', wait_until='networkidle')
         expect(page.get_by_role('heading', level=1)).to_have_text('PDF and image tool guides')
-        expect(page).to_have_title('PDF & Image Tool Guides — Paperwork')
+        expect(page).to_have_title('PDF & Image Tool Guides — Leafsmith')
         expect(page.locator('link[rel="canonical"]')).to_have_attribute('href', PUBLIC + '/tools')
         for path in ['/merge-pdf', '/split-pdf', '/images-to-pdf', '/sign-pdf']:
             expect(page.get_by_role('main').locator(f'a[href="{path}"]')).to_have_count(1)
@@ -65,7 +65,7 @@ with sync_playwright() as p:
             expect(page.get_by_role('heading', level=1)).to_have_count(1)
             expect(page.locator('link[rel="canonical"]')).to_have_attribute('href', f'{PUBLIC}/{slug}')
             expect(page.locator('meta[property="og:url"]')).to_have_attribute('content', f'{PUBLIC}/{slug}')
-            assert page.title().endswith(' — Paperwork') and page.title() != 'Paperwork — Free PDF & Image Tools, No Uploads', page.title()
+            assert page.title().endswith(' — Leafsmith') and page.title() != 'Leafsmith — Free PDF & Image Tools, No Uploads', page.title()
             description = page.locator('meta[name="description"]').get_attribute('content')
             assert description and description != HOME_DESCRIPTION, description
             data = json.loads(page.locator('script[type="application/ld+json"]').text_content())

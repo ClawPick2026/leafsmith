@@ -12,12 +12,12 @@ A workflow cannot execute uncommitted local source. Once `build.yml` is present
 on GitHub's default branch, either its `push` run starts automatically or run:
 
 ```sh
-gh workflow run build.yml --repo ClawPick2026/paperwork-desktop --ref main
-gh run list --repo ClawPick2026/paperwork-desktop --workflow build.yml --limit 5
+gh workflow run build.yml --repo ClawPick2026/leafsmith --ref main
+gh run list --repo ClawPick2026/leafsmith --workflow build.yml --limit 5
 # Use the actual run ID returned above; wait and preserve its exit status.
-gh run watch RUN_ID --repo ClawPick2026/paperwork-desktop --exit-status
-gh run view RUN_ID --repo ClawPick2026/paperwork-desktop --log-failed
-gh run download RUN_ID --repo ClawPick2026/paperwork-desktop --dir artifacts/ci-RUN_ID
+gh run watch RUN_ID --repo ClawPick2026/leafsmith --exit-status
+gh run view RUN_ID --repo ClawPick2026/leafsmith --log-failed
+gh run download RUN_ID --repo ClawPick2026/leafsmith --dir artifacts/ci-RUN_ID
 ```
 
 For a non-main ref, dispatch it explicitly after the workflow has first reached
@@ -55,14 +55,14 @@ Standalone package artifacts upload only after build and smoke succeed.
 `python scripts/freeze-worker.py` creates:
 
 ```text
-build/worker/paperwork-worker/
-  paperwork-worker[.exe]
+build/worker/leafsmith-worker/
+  leafsmith-worker[.exe]
   _internal/                    # Python runtime, extension modules, PDFium/data
   third-party-licenses/         # added by license-report.py before Tauri bundling
 ```
 
 The Tauri resource mapping is exactly
-`../build/worker/paperwork-worker/` -> `worker/`. Keep the **whole directory**,
+`../build/worker/leafsmith-worker/` -> `worker/`. Keep the **whole directory**,
 including `_internal`, not just the worker executable. A regression test checks
 that the freezer destination and Tauri mapping agree. Optional components are
 installed separately with consent and do not become implicit core requirements.
@@ -80,7 +80,7 @@ The embedded interpreter is used; end users need not install Python.
 ```sh
 # Run after freezing and collecting notices; use .exe on Windows.
 python scripts/smoke-package.py --kind worker \
-  --path build/worker/paperwork-worker/paperwork-worker --logs build/logs/frozen-smoke
+  --path build/worker/leafsmith-worker/leafsmith-worker --logs build/logs/frozen-smoke
 
 # Substitute the actual package path or a glob matching exactly one file.
 python scripts/smoke-package.py --kind nsis \
@@ -92,7 +92,7 @@ python scripts/smoke-package.py --kind appimage \
 ```
 
 * Windows: silent `/S` installation into a fresh temporary `/D=` directory, then
-  execute its `paperwork-desktop.exe --worker-self-test` with captured process
+  execute its `leafsmith.exe --worker-self-test` with captured process
   pipes and checked status. No existing installation or uninstaller is used.
 * Linux: `--appimage-extract` (no FUSE requirement), set `APPDIR`, then execute
   `AppRun --worker-self-test`, under Xvfb if available without a display.
@@ -100,8 +100,8 @@ python scripts/smoke-package.py --kind appimage \
   the **packaged resource worker** again without an external Python on PATH and
   verify SHA-256 hashes of all bundled notice resources.
 
-Native self-test resource lookup expects Windows `worker/paperwork-worker.exe`
-next to the app, or Linux `usr/lib/Paperwork/worker/paperwork-worker` in
+Native self-test resource lookup expects Windows `worker/leafsmith-worker.exe`
+next to the app, or Linux `usr/lib/Leafsmith/worker/leafsmith-worker` in
 the AppImage. An unexpected layout fails explicitly; it is not papered over by
 running a worker from the source checkout.
 
@@ -125,7 +125,7 @@ the build. Rust crates without separate notice files retain their README terms
 where available and declared license metadata; inventories are not legal advice
 or a substitute for reviewing upstream obligations.
 
-`application-MIT.txt` applies to Paperwork code **only**. Third-party components
+`application-MIT.txt` applies to Leafsmith code **only**. Third-party components
 keep their own terms. Inventories deliberately include build/test tools from the
 packaging environment; they do not assert that every installed tool ships in
 the runtime. A notice manifest records the exact resource-file SHA-256 values.
@@ -141,7 +141,7 @@ The Linux CI path additionally runs:
 # Build the exact release binary once; it is inventoried, then bundled as-is.
 npm run tauri -- build --target x86_64-unknown-linux-gnu --no-bundle
 python scripts/license-report.py --require-rust \
-  --linux-native src-tauri/target/x86_64-unknown-linux-gnu/release/paperwork-desktop \
+  --linux-native src-tauri/target/x86_64-unknown-linux-gnu/release/leafsmith \
   --linux-extra-library '/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/*/loaders/*.so' \
   --linux-extra-library '/usr/lib/x86_64-linux-gnu/gtk-3.0/*/immodules/*.so' \
   --linux-extra-library '/usr/lib/x86_64-linux-gnu/gio/modules/*.so' \
@@ -151,9 +151,9 @@ python scripts/license-report.py --require-rust \
 npm run tauri -- bundle --target x86_64-unknown-linux-gnu --bundles appimage
 python scripts/audit_linux_libraries.py \
   --appimage 'src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/appimage/*.AppImage' \
-  --inventory build/worker/paperwork-worker/third-party-licenses/linux-libraries.json \
+  --inventory build/worker/leafsmith-worker/third-party-licenses/linux-libraries.json \
   --sources build/linux-corresponding-sources \
-  --source-archive artifacts/Paperwork-linux-corresponding-sources.zip \
+  --source-archive artifacts/Leafsmith-linux-corresponding-sources.zip \
   --logs build/logs/linux-library-audit
 ```
 
@@ -220,7 +220,7 @@ python scripts/audit_linux_libraries.py \
   WebKitGTK from its default AppImage; the audit does not assume it ships.
   RPATH/stripping changes are permitted: retain actual postbundle hashes alongside
   prebundle hashes rather than demanding byte identity with system originals.
-* Produce `Paperwork-linux-corresponding-sources.zip`, then read it back and
+* Produce `Leafsmith-linux-corresponding-sources.zip`, then read it back and
   verify every archived file's hash. It contains the exact source files, source
   inventory, prebundle library inventory and postbundle audit bound to the
   AppImage's SHA-256. The external report records the source ZIP's SHA-256.
@@ -245,15 +245,15 @@ are legal advice or a substitute for reviewing redistribution obligations.
 
 Artifacts:
 
-* `Paperwork-windows-x86_64` / `Paperwork-linux-x86_64`: verified package,
-  `Paperwork-<target>-third-party-notices.zip` (the notices also shipped inside
+* `Leafsmith-windows-x86_64` / `Leafsmith-linux-x86_64`: verified package,
+  `Leafsmith-<target>-third-party-notices.zip` (the notices also shipped inside
   the package) and platform `SHA256SUMS` file. The Linux artifact **also
-  contains** `Paperwork-linux-corresponding-sources.zip`; its checksum is in the
+  contains** `Leafsmith-linux-corresponding-sources.zip`; its checksum is in the
   same sums file. A release must carry this exact ZIP beside the matching
   AppImage and retain source availability with the binary (including mirrors).
   Expiring, access-controlled Actions artifacts alone are not public source
   delivery.
-* `Paperwork-evidence-<target>`: toolchains, frontend/Rust/Python logs and JUnit,
+* `Leafsmith-evidence-<target>`: toolchains, frontend/Rust/Python logs and JUnit,
   freeze logs, smoke `report.json`, raw stdout/stderr and exact process exit
   codes, actual notices/inventories, PyInstaller warnings, generated Cargo locks,
   source download logs and Linux postbundle library/hash/source audit report.
@@ -281,8 +281,8 @@ Manual steps:
    as a pre-release.
 
 ```sh
-git tag -a v0.1.0-rc.2 -m "Paperwork 0.1.0 RC2" && git push origin v0.1.0-rc.2
-gh run watch RUN_ID --repo ClawPick2026/paperwork-desktop --exit-status
+git tag -a v0.1.0-rc.2 -m "Leafsmith 0.1.0 RC2" && git push origin v0.1.0-rc.2
+gh run watch RUN_ID --repo ClawPick2026/leafsmith --exit-status
 ```
 
 The tag run first checks the tag and release notes, so a mistake fails in

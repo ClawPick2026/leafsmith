@@ -6,5 +6,5 @@ test('native model selection has its own file-picker flow and opaque model grant
  assert.match(source,/Select local model file/);
  assert.match(source,/model_file_id/);
  assert.match(source,/setModelFile/);
- assert.doesNotMatch(source,/__PAPERWORK_TEST_NATIVE__|localStorage|sessionStorage/);
+ assert.doesNotMatch(source,/__LEAFSMITH_TEST_NATIVE__|localStorage|sessionStorage/);
 });

@@ -13,7 +13,7 @@ export default capsule({
   queries: {},
   mutations: {},
   endpoints: {
-    status: endpoint({ method: 'GET', path: '/api/status', readOnly: true }, () => text('Paperwork: browser-only processing; no document storage.')),
+    status: endpoint({ method: 'GET', path: '/api/status', readOnly: true }, () => text('Leafsmith: browser-only processing; no document storage.')),
     robots: endpoint({ method: 'GET', path: '/robots.txt', readOnly: true }, () => text(renderRobots())),
     sitemap: endpoint({ method: 'GET', path: '/sitemap.xml', readOnly: true }, () =>
       text(renderSitemap(), { headers: { 'Content-Type': 'application/xml; charset=utf-8' } })),

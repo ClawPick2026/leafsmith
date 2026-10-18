@@ -49,7 +49,7 @@ class FakeRunner:
             artifact.write_text("{}")
             return 0, BUILD_OUTPUT
         if "deploy" in argv:
-            return 0, "Deployed dep_yefw3xsfKf5oAixk\nclaimToken tok_SECRETvalue123\nhttps://paperwork.lakebed.app\n"
+            return 0, "Deployed dep_yefw3xsfKf5oAixk\nclaimToken tok_SECRETvalue123\nhttps://leafsmith.lakebed.app\n"
         return 0, ""
 
     def fetch(self, url):
@@ -129,14 +129,14 @@ class PreflightTests(unittest.TestCase):
 class SuiteTests(unittest.TestCase):
     def test_browser_suite_targets_url_with_each_script_convention(self):
         steps = {name: (argv, env) for name, argv, env in publish.browser_suite("https://x.test", "/py")}
-        self.assertEqual(steps["discovery_http"], (["/py", "web/tests/discovery_http.py"], {"PAPERWORK_URL": "https://x.test"}))
+        self.assertEqual(steps["discovery_http"], (["/py", "web/tests/discovery_http.py"], {"LEAFSMITH_URL": "https://x.test"}))
         self.assertEqual(steps["seo_browser"][0], ["/py", "web/tests/seo_browser.py", "https://x.test", "all"])
         self.assertEqual(steps["e2e"][0], ["/py", "web/tests/e2e.py", "https://x.test"])
         self.assertEqual(steps["review_regressions"][0], ["/py", "web/tests/review_regressions.py", "https://x.test"])
         self.assertEqual(steps["theme_browser"][0], ["/py", "web/tests/theme_browser.py", "https://x.test", "web"])
         self.assertEqual(steps["crop_preview"][0], ["/py", "web/tests/crop_preview.py", "https://x.test"])
-        self.assertEqual(steps["ui_polish"][1], {"PAPERWORK_URL": "https://x.test"})
-        self.assertEqual(steps["test_shell"][1], {"PAPERWORK_URL": "https://x.test"})
+        self.assertEqual(steps["ui_polish"][1], {"LEAFSMITH_URL": "https://x.test"})
+        self.assertEqual(steps["test_shell"][1], {"LEAFSMITH_URL": "https://x.test"})
         self.assertNotIn("desktop_download", steps)
         with_downloads = [name for name, _, _ in publish.browser_suite("https://x.test", "/py", downloads=True)]
         self.assertIn("desktop_download", with_downloads)
@@ -158,9 +158,9 @@ class PublishFlowTests(unittest.TestCase):
             self.assertEqual(order, sorted(order))
             deploy = seen.index("npx --yes lakebed@0.0.40 deploy web")
             local = [i for i, (argv, env) in enumerate(runner.commands)
-                     if "http://127.0.0.1:43123" in argv or env.get("PAPERWORK_URL") == "http://127.0.0.1:43123"]
+                     if "http://127.0.0.1:43123" in argv or env.get("LEAFSMITH_URL") == "http://127.0.0.1:43123"]
             live = [i for i, (argv, env) in enumerate(runner.commands)
-                    if publish.PUBLIC_URL in argv or env.get("PAPERWORK_URL") == publish.PUBLIC_URL]
+                    if publish.PUBLIC_URL in argv or env.get("LEAFSMITH_URL") == publish.PUBLIC_URL]
             self.assertTrue(local and max(local) < deploy)
             self.assertTrue(any(i > deploy for i in live), "live suite must run after deploy")
             self.assertEqual(record["client"], NEW)

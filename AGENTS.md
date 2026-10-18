@@ -1,7 +1,7 @@
-# Paperwork — web and desktop monorepo
+# Leafsmith — web and desktop monorepo
 
 ## Authority and scope
-- User approved one repository for the Lakebed website and installable app, under MIT. The canonical checkout is ~/Projects/paperwork. Desktop build/worker/native paths remain at the root; the website capsule is web/. Preserve its deployment identity and public download URLs; only the coordinator may update download links after actual release assets exist.
+- User approved one repository for the Lakebed website and installable app, under MIT. The canonical checkout is ~/Projects/paperwork. Desktop build/worker/native paths remain at the root; the website capsule is web/. Preserve its deployment identity (Lakebed deploy dep_yefw3xsfKf5oAixk at leafsmith.lakebed.app; paperwork.lakebed.app stays attached and forwards) and public download URLs; only the coordinator may update download links after actual release assets exist. On 2026-10-19 the user renamed the product Paperwork -> Leafsmith (GitHub repo ClawPick2026/leafsmith, app id io.github.clawpick2026.leafsmith); releases up to v0.1.0-rc.2 keep the old name.
 - User decisions: local processing by default; local AI models plus optional user-configured API providers; core app plus optional versioned processing/model downloads with explicit consent. Never send documents externally without per-operation consent. Never install tools globally or require administrator access as an implementation shortcut.
 - First package targets: Windows x86_64 and Linux x86_64. The development host is Linux ARM64 with no Rust/C toolchain. CI build results are not equivalent to native interactive Windows/Linux desktop testing.
 - App code MIT; dependencies and models retain their licenses. No AGPL components or unredistributable FFmpeg builds. Preserve third-party notices and source-offer obligations. No invented license claims.

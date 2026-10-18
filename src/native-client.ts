@@ -3,7 +3,7 @@ import type { NativeFile, NativeResult, ComponentStatus } from './native-model.t
 export type Invoke = <T>(command: string, args?: Record<string, unknown>) => Promise<T>;
 export function createNativeClient(invoke: Invoke, available: () => boolean) {
   async function call<T>(command: string, args?: Record<string, unknown>): Promise<T> {
-    if (!available()) throw new Error('Native tools require the installed Paperwork Desktop app. Browser tools still work in this preview.');
+    if (!available()) throw new Error('Native tools require the installed Leafsmith Desktop app. Browser tools still work in this preview.');
     return invoke<T>(command, args);
   }
   return {

@@ -2,11 +2,11 @@
 
 Run with Playwright, pypdf, reportlab and Pillow installed:
   .test-venv/bin/python tests/browser_e2e.py http://127.0.0.1:1420
-Optional PAPERWORK_BROWSER_ENV points to a JSON executable_path/library_path/
+Optional LEAFSMITH_BROWSER_ENV points to a JSON executable_path/library_path/
 launch_args config (defaults to web/tests/browser-env.json if present).
 Only test-local browser environment is changed. For stable release acceptance,
 serve a frozen copy of dist rather than an actively edited Vite/HMR session;
-PAPERWORK_SERVED_BUILD records that served directory's asset hashes. Capture
+LEAFSMITH_SERVED_BUILD records that served directory's asset hashes. Capture
 stdout with `set -o pipefail; ... | tee tests/artifacts/browser/run-output.txt`.
 All fixtures/downloads/screenshots are retained under the ignored
 tests/artifacts/browser; report: tests/artifacts/browser-verification.json.
@@ -34,9 +34,9 @@ ART = ROOT / 'tests/artifacts/browser'
 ART.mkdir(parents=True, exist_ok=True)
 BASE = sys.argv[1] if len(sys.argv) > 1 else 'http://127.0.0.1:1420'
 REPORT = ROOT / 'tests/artifacts/browser-verification.json'
-CONFIG = Path(os.environ.get('PAPERWORK_BROWSER_ENV', str(ROOT / 'web/tests/browser-env.json')))
+CONFIG = Path(os.environ.get('LEAFSMITH_BROWSER_ENV', str(ROOT / 'web/tests/browser-env.json')))
 STARTED = datetime.now(timezone.utc).isoformat()
-SERVED_BUILD = Path(os.environ['PAPERWORK_SERVED_BUILD']).resolve() if os.environ.get('PAPERWORK_SERVED_BUILD') else None
+SERVED_BUILD = Path(os.environ['LEAFSMITH_SERVED_BUILD']).resolve() if os.environ.get('LEAFSMITH_SERVED_BUILD') else None
 BUILD_MANIFEST = [
     {'path': str(p.relative_to(SERVED_BUILD)), 'source_uri': p.as_uri(),
      'bytes': p.stat().st_size, 'sha256': hashlib.sha256(p.read_bytes()).hexdigest()}
@@ -127,6 +127,17 @@ def image_objects(reader, page_index=0):
     return [o.get_object() for o in objects.values() if o.get_object().get('/Subtype') == '/Image']
 
 
+def signature_images(reader, page_index=0):
+    """Signatures are top-most Stamp annotations; the image is in the appearance stream."""
+    images = []
+    for annot in reader.pages[page_index].get('/Annots', []):
+        annot = annot.get_object()
+        if annot.get('/Subtype') == '/Stamp':
+            xobjects = annot['/AP']['/N'].get_object().get('/Resources', {}).get('/XObject', {})
+            images += [o.get_object() for o in xobjects.values() if o.get_object().get('/Subtype') == '/Image']
+    return images
+
+
 def shell(page):
     expect(page.get_by_role('heading', name='Your documents. Your device.')).to_be_visible()
     expect(page.locator('[data-testid^="tool-"]')).to_have_count(12)
@@ -181,9 +192,9 @@ def split(page):
 
 def annotation(page):
     load(page, ['source.pdf'], 'annotate')
-    page.get_by_label('New text', exact=True).fill('Reviewed by Paperwork')
+    page.get_by_label('New text', exact=True).fill('Reviewed by Leafsmith')
     r = PdfReader(download(page, 'annotated-text.pdf'))
-    assert 'Reviewed by Paperwork' in ' '.join(r.pages[0].extract_text().split())
+    assert 'Reviewed by Leafsmith' in ' '.join(r.pages[0].extract_text().split())
     assert 'Original Alpha' in r.pages[0].extract_text()
     assert r.get_fields()['name']['/V'] == 'Ada'
 
@@ -272,7 +283,7 @@ def image_convert(page):
 
 def qr(page):
     page.get_by_test_id('tool-qr').click()
-    page.get_by_label('Link or text').fill('https://example.com/paperwork')
+    page.get_by_label('Link or text').fill('https://example.com/leafsmith')
     svg = ElementTree.fromstring(download(page, 'qr.svg').read_text())
     assert svg.tag.endswith('svg')
     assert any(e.tag.endswith(('path', 'rect')) for e in svg.iter())
@@ -296,14 +307,14 @@ def signature(page):
     load(page, ['source.pdf'], 'sign')
     draw(page)
     r = PdfReader(download(page, 'signed.pdf'))
-    assert any((obj['/Width'], obj['/Height']) == (520, 170) for obj in image_objects(r))
+    assert any((obj['/Width'], obj['/Height']) == (520, 170) for obj in signature_images(r))
     assert 'Original Alpha' in r.pages[0].extract_text()
 
 
 def stale_signature(page):
     load(page, ['source.pdf'], 'sign')
     draw(page)
-    page.get_by_role('button', name='Paperwork Desktop home').click()
+    page.get_by_role('button', name='Leafsmith Desktop home').click()
     page.get_by_test_id('tool-sign').click()
     page.get_by_test_id('run-tool').click()
     expect(page.get_by_role('alert')).to_contain_text('Draw a signature first')
@@ -328,7 +339,7 @@ def sample(page):
     expect(page.get_by_test_id('run-tool')).to_be_enabled(timeout=45000)
     r = PdfReader(download(page, 'demo-organized.pdf'))
     assert len(r.pages) > 0 and r.pages[0].extract_text().strip()
-    page.get_by_role('button', name='Paperwork Desktop home').click()
+    page.get_by_role('button', name='Leafsmith Desktop home').click()
     expect(page.get_by_role('button', name='Try a sample', exact=True)).to_have_count(0)
 
 
@@ -363,7 +374,7 @@ def scope(page):
 
 def native_preview(page):
     native = page.get_by_role('region', name='Native tools', exact=True)
-    expect(native).to_contain_text('Native features require the installed Paperwork Desktop app')
+    expect(native).to_contain_text('Native features require the installed Leafsmith Desktop app')
     ids = native.locator('[data-testid^="native-"]').evaluate_all('els=>els.map(e=>e.dataset.testid)')
     assert len(ids) == 17
     native.evaluate('(e)=>window.scrollTo({top:window.scrollY+e.getBoundingClientRect().top-96,behavior:"instant"})')

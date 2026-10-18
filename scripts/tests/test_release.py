@@ -20,7 +20,7 @@ V = release.parse_version
 FILES = ["package.json", "package-lock.json", "src-tauri/Cargo.toml", "src-tauri/tauri.conf.json",
          "web/shared/desktop.ts", "web/tests/desktop_download.py", "README.md"]
 EXE_SHA, APP_SHA = "a" * 64, "b" * 64
-DOWNLOAD = "https://github.com/ClawPick2026/paperwork-desktop/releases/download/"
+DOWNLOAD = "https://github.com/ClawPick2026/leafsmith/releases/download/"
 
 
 def copy_repo():
@@ -37,8 +37,8 @@ def copy_repo():
 
 def github_release(tag="v0.1.0-rc.3", base="0.1.0", prerelease=True, **override):
     assets = [
-        {"name": f"Paperwork_{base}_x64-setup.exe", "size": 34000001, "digest": "sha256:" + EXE_SHA},
-        {"name": f"Paperwork_{base}_amd64.AppImage", "size": 139000002, "digest": "sha256:" + APP_SHA},
+        {"name": f"Leafsmith_{base}_x64-setup.exe", "size": 34000001, "digest": "sha256:" + EXE_SHA},
+        {"name": f"Leafsmith_{base}_amd64.AppImage", "size": 139000002, "digest": "sha256:" + APP_SHA},
         {"name": "SHA256SUMS-windows-x86_64.txt", "size": 100, "digest": "sha256:" + "c" * 64},
         {"name": "SHA256SUMS-linux-x86_64.txt", "size": 100, "digest": "sha256:" + "d" * 64},
     ]
@@ -50,7 +50,7 @@ def github_release(tag="v0.1.0-rc.3", base="0.1.0", prerelease=True, **override)
 
 
 def sums(base="0.1.0"):
-    return f"{EXE_SHA}  Paperwork_{base}_x64-setup.exe\n{APP_SHA}  Paperwork_{base}_amd64.AppImage\n"
+    return f"{EXE_SHA}  Leafsmith_{base}_x64-setup.exe\n{APP_SHA}  Leafsmith_{base}_amd64.AppImage\n"
 
 
 class VersionTests(unittest.TestCase):
@@ -117,19 +117,19 @@ class FileTests(unittest.TestCase):
 
     def test_release_notes_pass_the_workflow_title_check_and_name_real_assets(self):
         notes = release.release_notes(V("0.2.0-rc.1"), "v0.1.0", ["feat: crop tools", "chore(release): v0.1.0"])
-        self.assertTrue(notes.startswith("# Paperwork 0.2.0 RC1"))
-        for text in ("Paperwork_0.2.0_x64-setup.exe", "Paperwork_0.2.0_amd64.AppImage", "unsigned",
+        self.assertTrue(notes.startswith("# Leafsmith 0.2.0 RC1"))
+        for text in ("Leafsmith_0.2.0_x64-setup.exe", "Leafsmith_0.2.0_amd64.AppImage", "unsigned",
                      "feat: crop tools", "## Not tested", "Changes since v0.1.0"):
             self.assertIn(text, notes)
         self.assertNotIn("chore(release)", notes)
         final = release.release_notes(V("0.2.0"), "v0.2.0-rc.1", [])
-        self.assertTrue(final.startswith("# Paperwork 0.2.0 — Windows and Linux\n"))
+        self.assertTrue(final.startswith("# Leafsmith 0.2.0 — Windows and Linux\n"))
         self.assertNotIn("preview", final.splitlines()[0].lower())
 
     def test_verify_assets_requires_matching_digests_urls_and_flags(self):
         info = release.verify_assets(V("0.1.0-rc.3"), github_release(), sums())
-        self.assertEqual(info["Windows"], {"name": "Paperwork_0.1.0_x64-setup.exe", "sha256": EXE_SHA, "bytes": 34000001,
-                                           "url": DOWNLOAD + "v0.1.0-rc.3/Paperwork_0.1.0_x64-setup.exe"})
+        self.assertEqual(info["Windows"], {"name": "Leafsmith_0.1.0_x64-setup.exe", "sha256": EXE_SHA, "bytes": 34000001,
+                                           "url": DOWNLOAD + "v0.1.0-rc.3/Leafsmith_0.1.0_x64-setup.exe"})
         self.assertEqual(info["Linux"]["sha256"], APP_SHA)
         broken = {
             "missing": (github_release(assets=github_release()["assets"][1:]), sums()),
@@ -147,7 +147,11 @@ class FileTests(unittest.TestCase):
     def test_download_links_move_to_the_new_release_everywhere(self):
         tmp, root = copy_repo()
         with tmp:
-            old_tag = "v" + re.search(r"version: '([^']+)'", (root / "web/shared/desktop.ts").read_text()).group(1)
+            current = (root / "web/shared/desktop.ts").read_text()
+            old_tag = "v" + re.search(r"version: '([^']+)'", current).group(1)
+            # The published links may still name assets from before the Paperwork -> Leafsmith rename.
+            old_assets = re.findall(r"url: '[^']*/([^'/]+)'", current)
+            self.assertEqual(len(old_assets), 2)
             info = release.verify_assets(V("9.0.0"), github_release("v9.0.0", "9.0.0", prerelease=False), sums("9.0.0"))
             changed = release.update_links(root, V("9.0.0"), info)
             self.assertEqual(sorted(str(p.relative_to(root)) for p in changed),
@@ -155,17 +159,18 @@ class FileTests(unittest.TestCase):
             for name in ("README.md", "web/shared/desktop.ts", "web/tests/desktop_download.py"):
                 text = (root / name).read_text()
                 self.assertNotIn(old_tag, text, name)
-                self.assertNotIn("Paperwork_" + V(old_tag).base + "_", text, name)
+                for asset in old_assets:
+                    self.assertNotIn(asset, text, name)
             desktop = (root / "web/shared/desktop.ts").read_text()
             self.assertIn("version: '9.0.0'", desktop)
             self.assertIn(f"sha256: '{EXE_SHA}'", desktop)
             self.assertIn("bytes: 139000002", desktop)
-            self.assertIn(DOWNLOAD + "v9.0.0/Paperwork_9.0.0_amd64.AppImage", desktop)
+            self.assertIn(DOWNLOAD + "v9.0.0/Leafsmith_9.0.0_amd64.AppImage", desktop)
             test = (root / "web/tests/desktop_download.py").read_text()
-            self.assertIn(f"'Paperwork_9.0.0_x64-setup.exe', '{EXE_SHA}'", test)
+            self.assertIn(f"'Leafsmith_9.0.0_x64-setup.exe', '{EXE_SHA}'", test)
             self.assertIn("'9.0.0'", test)
             readme = (root / "README.md").read_text()
-            self.assertIn("[9.0.0](https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v9.0.0)", readme)
+            self.assertIn("[9.0.0](https://github.com/ClawPick2026/leafsmith/releases/tag/v9.0.0)", readme)
 
 
 class FakeRunner:
@@ -243,13 +248,13 @@ class ReleaseFlowTests(unittest.TestCase):
                 return next(i for i, c in enumerate(seen) if c.startswith(prefix))
             steps = [first("npm test"), first("git commit -m chore(release): v0.2.0-rc.1"), first("git push origin main"),
                      first("gh run watch 11"), first("git tag -a v0.2.0-rc.1"), first("git push origin v0.2.0-rc.1"),
-                     first("gh run watch 22"), first("gh api repos/ClawPick2026/paperwork-desktop/releases/tags/v0.2.0-rc.1"),
+                     first("gh run watch 22"), first("gh api repos/ClawPick2026/leafsmith/releases/tags/v0.2.0-rc.1"),
                      first("git commit -m docs: publish v0.2.0-rc.1 download links"),
                      max(i for i, c in enumerate(seen) if c == "git push origin main"),
                      first("python3 scripts/publish_website.py --verify-downloads")]
             self.assertEqual(steps, sorted(steps))
             self.assertEqual(json.loads((root / "package.json").read_text())["version"], "0.2.0")
-            self.assertTrue((root / "docs/releases/v0.2.0-rc.1.md").read_text().startswith("# Paperwork 0.2.0 RC1"))
+            self.assertTrue((root / "docs/releases/v0.2.0-rc.1.md").read_text().startswith("# Leafsmith 0.2.0 RC1"))
             self.assertIn("version: '0.2.0-rc.1'", (root / "web/shared/desktop.ts").read_text())
             self.assertEqual(len(runner.prompts), 1)
 

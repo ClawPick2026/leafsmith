@@ -3,7 +3,7 @@ import json,os,unittest
 from pathlib import Path
 from playwright.sync_api import sync_playwright,expect
 ROOT=Path(__file__).resolve().parents[1]
-BASE=os.environ.get('PAPERWORK_URL','https://paperwork.lakebed.app')
+BASE=os.environ.get('LEAFSMITH_URL','https://leafsmith.lakebed.app')
 
 class CursorTests(unittest.TestCase):
  @classmethod
@@ -29,8 +29,8 @@ class CursorTests(unittest.TestCase):
   expect(self.page.get_by_test_id('run-tool')).to_be_enabled(timeout=45000)
   self.assert_pointer_controls()
   for tool in ids:
-   self.page.get_by_role('button',name='Paperwork home').click();self.page.get_by_test_id(tool).click();self.assert_pointer_controls()
-  self.page.get_by_role('button',name='Paperwork home').click();self.page.get_by_test_id('tool-qr').click();self.page.get_by_test_id('run-tool').click()
+   self.page.get_by_role('button',name='Leafsmith home').click();self.page.get_by_test_id(tool).click();self.assert_pointer_controls()
+  self.page.get_by_role('button',name='Leafsmith home').click();self.page.get_by_test_id('tool-qr').click();self.page.get_by_test_id('run-tool').click()
   expect(self.page.get_by_test_id('download-result')).to_have_count(1,timeout=45000);self.assert_pointer_controls()
   self.page.get_by_role('button',name='Scope & privacy',exact=True).click();self.assert_pointer_controls()
 
@@ -41,7 +41,7 @@ class CursorTests(unittest.TestCase):
    for phrase in phrases:self.assertNotIn(phrase.casefold(),body.casefold())
   assert_objective()
   self.page.get_by_role('button',name='Scope & privacy',exact=True).click();assert_objective()
-  self.page.get_by_role('button',name='Paperwork home').click();self.page.get_by_test_id('tool-qr').click();self.page.get_by_test_id('run-tool').click()
+  self.page.get_by_role('button',name='Leafsmith home').click();self.page.get_by_test_id('tool-qr').click();self.page.get_by_test_id('run-tool').click()
   expect(self.page.get_by_test_id('download-result')).to_have_count(1,timeout=45000);assert_objective()
 
 if __name__=='__main__':unittest.main()

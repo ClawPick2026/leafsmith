@@ -212,7 +212,7 @@ def _translation(source, directory, options, engines):
         raise ValueError("Install/select a licensed TrueType font as engines.pdf_font")
     # Name by file digest to avoid cross-job font collisions in embedding callers.
     import hashlib
-    font_name = "Paperwork-" + hashlib.sha256(Path(font_path).read_bytes()).hexdigest()[:16]
+    font_name = "Leafsmith-" + hashlib.sha256(Path(font_path).read_bytes()).hexdigest()[:16]
     font = TTFont(font_name, font_path)
     missing = {ord(c) for c in translated if not c.isspace() and ord(c) not in font.face.charToGlyph}
     if missing:
@@ -275,7 +275,7 @@ def _remote_speech(wav, temporary, options, cloud, timeout):
         raise ValueError("Select a transcription provider model with options.model")
     if wav.stat().st_size > 25 * 1024 * 1024:
         raise ValueError("Extracted audio exceeds 25 MiB upload bound; split the input or reduce max_duration")
-    boundary = "paperwork-" + uuid.uuid4().hex
+    boundary = "leafsmith-" + uuid.uuid4().hex
     body = bytearray()
     for name, value in (("model", model), ("response_format", "verbose_json")):
         body.extend(f'--{boundary}\r\nContent-Disposition: form-data; name="{name}"\r\n\r\n{value}\r\n'.encode())

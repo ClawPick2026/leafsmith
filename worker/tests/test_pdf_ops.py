@@ -175,13 +175,13 @@ def test_ocr_failed_executable_never_returns_success(tmp_path, source):
 @pytest.mark.parametrize('operation',['ocr_pdf','ocr_image'])
 def test_optional_real_ocr(tmp_path, operation):
     import os
-    engine=os.environ.get('PAPERWORK_TESSERACT')
+    engine=os.environ.get('LEAFSMITH_TESSERACT')
     if not engine: pytest.skip('Tesseract absent; real OCR not verified on this host')
     from PIL import Image, ImageDraw, ImageFont
     image=Image.new('RGB',(1400,320),'white')
     draw=ImageDraw.Draw(image)
     font=ImageFont.load_default(size=70)
-    draw.text((60,90),'PAPERWORK OCR 12345',font=font,fill='black')
+    draw.text((60,90),'LEAFSMITH OCR 12345',font=font,fill='black')
     p=tmp_path/'scan.png'; image.save(p)
     if operation=='ocr_pdf':
         p=tmp_path/'scan.pdf'; image.save(p,format='PDF',resolution=150)
@@ -189,8 +189,8 @@ def test_optional_real_ocr(tmp_path, operation):
     assert len(r['outputs'])==2
     pdf=next(Path(o['path']) for o in r['outputs'] if o['mime']=='application/pdf')
     txt=next(Path(o['path']) for o in r['outputs'] if o['mime']=='text/plain')
-    assert 'PAPERWORK' in PdfReader(pdf).pages[0].extract_text().upper()
-    assert 'PAPERWORK' in txt.read_text().upper()
+    assert 'LEAFSMITH' in PdfReader(pdf).pages[0].extract_text().upper()
+    assert 'LEAFSMITH' in txt.read_text().upper()
 
 
 def test_invalid_options_and_paths_rejected_without_outputs(tmp_path, source):
@@ -201,14 +201,14 @@ def test_invalid_options_and_paths_rejected_without_outputs(tmp_path, source):
     with pytest.raises(ValueError,match='page'):
         run(tmp_path,'inspect_pdf',[source],page=0)
     out=tmp_path/'out'
-    assert not list(out.glob('paperwork-*'))
+    assert not list(out.glob('leafsmith-*'))
 
 
 def test_missing_engine_leaves_no_output_files(tmp_path):
     from docx import Document
     p=tmp_path/'sample.docx'; Document().save(p)
     with pytest.raises(ValueError): run(tmp_path,'convert_to_pdf',[p])
-    assert not list((tmp_path/'out').glob('paperwork-*'))
+    assert not list((tmp_path/'out').glob('leafsmith-*'))
 
 
 def test_office_engine_receives_locked_down_job_profile(tmp_path):
@@ -250,7 +250,7 @@ def test_edit_preserves_font_and_rejects_clipping_text(tmp_path, source):
 @pytest.mark.parametrize('format',['docx','xlsx','pptx','odt','ods','odp'])
 def test_optional_real_office_import(tmp_path, format):
     import os, zipfile
-    engine=os.environ.get('PAPERWORK_LIBREOFFICE')
+    engine=os.environ.get('LEAFSMITH_LIBREOFFICE')
     if not engine: pytest.skip('LibreOffice absent; real Office import not verified on this host')
     p=tmp_path/('office.'+format)
     if format=='docx':

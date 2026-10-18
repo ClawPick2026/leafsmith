@@ -1,6 +1,6 @@
 # Optional local AI packs — build and release gates
 
-**Release status:** Whisper CPU engine and tiny-English model packs have passed real native transcription on Windows and Linux x86_64, and are [published with verified hashes and matching sources](https://github.com/ClawPick2026/paperwork-desktop/releases/tag/components-v0.1.0). The previous 0.5B text model failed the real native translation factuality gate on both platforms. The replacement **1.5B Q2_K is a pinned candidate only: native inference and release approval are pending**. The llama.cpp/text-model packs must not be advertised as available until their own gates pass. The general OCR/Office/FFmpeg pipeline is independent.
+**Release status:** Whisper CPU engine and tiny-English model packs have passed real native transcription on Windows and Linux x86_64, and are [published with verified hashes and matching sources](https://github.com/ClawPick2026/leafsmith/releases/tag/components-v0.1.0). The previous 0.5B text model failed the real native translation factuality gate on both platforms. The replacement **1.5B Q2_K is a pinned candidate only: native inference and release approval are pending**. The llama.cpp/text-model packs must not be advertised as available until their own gates pass. The general OCR/Office/FFmpeg pipeline is independent.
 
 ## Independent downloads and consent
 
@@ -59,7 +59,7 @@ Publication and exact published-asset readback are still required before promoti
 only. The coordinator can trigger it once the workflow is present on GitHub:
 
 ```sh
-gh workflow run ai-components.yml --repo ClawPick2026/paperwork-desktop --ref main \
+gh workflow run ai-components.yml --repo ClawPick2026/leafsmith --ref main \
   -f component=all -f allow_model_downloads=true
 # component: all, whisper, llama
 ```

@@ -50,7 +50,7 @@ jobs:
           runs=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/build.yml/runs?head_sha=$GITHUB_SHA&status=success&per_page=20" --jq '.workflow_runs[].id')
           for run in $runs; do
             names=" $(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run/artifacts?per_page=100" --jq '[.artifacts[] | select(.expired | not) | .name] | join(" ")') "
-            if [[ "$names" == *" Paperwork-linux-x86_64 "* && "$names" == *" Paperwork-windows-x86_64 "* ]]; then
+            if [[ "$names" == *" Leafsmith-linux-x86_64 "* && "$names" == *" Leafsmith-windows-x86_64 "* ]]; then
               echo "run_id=$run" >> "$GITHUB_OUTPUT"
               echo "Publishing verified packages from run $run"
               exit 0
@@ -118,7 +118,7 @@ jobs:
             'deb-src http://archive.ubuntu.com/ubuntu jammy main restricted universe multiverse' \
             'deb-src http://archive.ubuntu.com/ubuntu jammy-updates main restricted universe multiverse' \
             'deb-src http://security.ubuntu.com/ubuntu jammy-security main restricted universe multiverse' \
-            | sudo tee /etc/apt/sources.list.d/paperwork-ci-deb-src.list
+            | sudo tee /etc/apt/sources.list.d/leafsmith-ci-deb-src.list
           sudo apt-get update
       - name: Linux native build and headless smoke dependencies
         if: runner.os == 'Linux'
@@ -184,7 +184,7 @@ jobs:
           set -o pipefail
           extra=()
           if [[ "$RUNNER_OS" == Linux ]]; then
-            extra+=(--linux-native "src-tauri/target/${{ matrix.rust_target }}/release/paperwork-desktop")
+            extra+=(--linux-native "src-tauri/target/${{ matrix.rust_target }}/release/leafsmith")
             # Explicit dlopen loader roots: inventory a superset before bundling;
             # the postbundle audit still checks what Tauri actually shipped.
             extra+=(--linux-extra-library '/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/*/loaders/*.so')
@@ -199,7 +199,7 @@ jobs:
           python scripts/license-report.py --require-rust "${extra[@]}" 2>&1 | tee build/logs/licenses.log
       - name: Verify frozen worker and license resources without Python on PATH
         run: |
-          if [[ "$RUNNER_OS" == Windows ]]; then worker=build/worker/paperwork-worker/paperwork-worker.exe; else worker=build/worker/paperwork-worker/paperwork-worker; fi
+          if [[ "$RUNNER_OS" == Windows ]]; then worker=build/worker/leafsmith-worker/leafsmith-worker.exe; else worker=build/worker/leafsmith-worker/leafsmith-worker; fi
           python scripts/smoke-package.py --kind worker --path "$worker" --logs build/logs/frozen-smoke
       - name: Build native package
         env:
@@ -224,9 +224,9 @@ jobs:
           set -o pipefail
           python scripts/audit_linux_libraries.py \
             --appimage 'src-tauri/target/${{ matrix.rust_target }}/release/bundle/appimage/*.AppImage' \
-            --inventory build/worker/paperwork-worker/third-party-licenses/linux-libraries.json \
+            --inventory build/worker/leafsmith-worker/third-party-licenses/linux-libraries.json \
             --sources build/linux-corresponding-sources \
-            --source-archive artifacts/Paperwork-linux-corresponding-sources.zip \
+            --source-archive artifacts/Leafsmith-linux-corresponding-sources.zip \
             --logs build/logs/linux-library-audit 2>&1 | tee build/logs/linux-library-audit.log
       - name: Collect verified package, notices and SHA-256
         shell: python
@@ -242,9 +242,9 @@ jobs:
           for path in files:
               shutil.copyfile(path, out / path.name)
           # The same notices ship inside the package; this copy is readable before installing.
-          notices = Path('build/worker/paperwork-worker/third-party-licenses')
+          notices = Path('build/worker/leafsmith-worker/third-party-licenses')
           assert (notices / 'manifest.json').is_file(), 'Missing packaged notice manifest'
-          shutil.make_archive(str(out / 'Paperwork-${{ matrix.target }}-third-party-notices'), 'zip', notices)
+          shutil.make_archive(str(out / 'Leafsmith-${{ matrix.target }}-third-party-notices'), 'zip', notices)
           sources = list(out.glob('*-corresponding-sources.zip'))
           assert bundle != 'appimage' or len(sources) == 1, 'Missing verified Linux source ZIP'
           release = [out / p.name for p in files] + sorted(out.glob('*-third-party-notices.zip')) + sources
@@ -256,7 +256,7 @@ jobs:
       - name: Upload verified standalone package
         uses: actions/upload-artifact@v4
         with:
-          name: Paperwork-${{ matrix.target }}
+          name: Leafsmith-${{ matrix.target }}
           path: artifacts/
           compression-level: 0  # AppImage/source tarballs are already compressed.
           if-no-files-found: error
@@ -265,13 +265,13 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Paperwork-evidence-${{ matrix.target }}
+          name: Leafsmith-evidence-${{ matrix.target }}
           path: |
             build/logs/
             build/linux-corresponding-sources/*/download.log
             build/linux-corresponding-sources/source-inventory.json
-            build/worker/paperwork-worker/third-party-licenses/
-            build/pyinstaller/paperwork-worker/warn-paperwork-worker.txt
+            build/worker/leafsmith-worker/third-party-licenses/
+            build/pyinstaller/leafsmith-worker/warn-leafsmith-worker.txt
             src-tauri/Cargo.lock
             crates/native-security/Cargo.lock
           if-no-files-found: warn
@@ -293,13 +293,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
-          name: Paperwork-linux-x86_64
+          name: Leafsmith-linux-x86_64
           path: release
           run-id: ${{ env.BUILD_RUN }}
           github-token: ${{ github.token }}
       - uses: actions/download-artifact@v4
         with:
-          name: Paperwork-windows-x86_64
+          name: Leafsmith-windows-x86_64
           path: release
           run-id: ${{ env.BUILD_RUN }}
           github-token: ${{ github.token }}

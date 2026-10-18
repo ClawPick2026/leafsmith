@@ -4,8 +4,8 @@ import unittest
 import urllib.request
 import xml.etree.ElementTree as ET
 
-BASE = os.environ.get('PAPERWORK_URL', 'http://127.0.0.1:3150').rstrip('/')
-PUBLIC = 'https://paperwork.lakebed.app'
+BASE = os.environ.get('LEAFSMITH_URL', 'http://127.0.0.1:3150').rstrip('/')
+PUBLIC = 'https://leafsmith.lakebed.app'
 GUIDES = {'/merge-pdf': 'merge', '/split-pdf': 'split', '/images-to-pdf': 'images-pdf', '/sign-pdf': 'sign'}
 # Headers a browser sends when a URL is typed, bookmarked or opened from another application.
 DIRECT_NAVIGATION = {'Accept': 'text/html', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-Dest': 'document', 'Sec-Fetch-Site': 'none'}
@@ -21,7 +21,7 @@ class DiscoveryHTTP(unittest.TestCase):
         status, headers, body = fetch('/')
         self.assertEqual(status, 200)
         self.assertIn('text/html', headers.get('Content-Type', ''))
-        self.assertIn('<title>Paperwork — Free PDF &amp; Image Tools, No Uploads</title>', body)
+        self.assertIn('<title>Leafsmith — Free PDF &amp; Image Tools, No Uploads</title>', body)
 
     def test_crawler_files_list_every_canonical_discovery_url(self):
         status, headers, robots = fetch('/robots.txt')

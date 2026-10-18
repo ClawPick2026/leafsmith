@@ -33,7 +33,7 @@ def validate_health(stdout: str) -> dict:
 def build_command(root: Path = ROOT) -> list[str]:
     return [
         sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "--onedir",
-        "--name", "paperwork-worker", "--distpath", str(root / "build/worker"),
+        "--name", "leafsmith-worker", "--distpath", str(root / "build/worker"),
         "--workpath", str(root / "build/pyinstaller"), "--specpath", str(root / "build"),
         "--paths", str(root / "worker"), "--hidden-import", "pdf_ops",
         # The worker is a batch JSON protocol, never an interactive Python REPL.
@@ -51,9 +51,9 @@ def build_command(root: Path = ROOT) -> list[str]:
 
 def main() -> None:
     subprocess.run(build_command(), cwd=ROOT, check=True)
-    bundle = ROOT / "build/worker/paperwork-worker"
-    worker = bundle / ("paperwork-worker.exe" if os.name == "nt" else "paperwork-worker")
-    # Not used by Paperwork; avoid redistributing GPL/test-font payloads at all.
+    bundle = ROOT / "build/worker/leafsmith-worker"
+    worker = bundle / ("leafsmith-worker.exe" if os.name == "nt" else "leafsmith-worker")
+    # Not used by Leafsmith; avoid redistributing GPL/test-font payloads at all.
     for pattern in ("DarkGarden*", "hb-test.ttf"):
         for path in (bundle / "_internal/reportlab/fonts").glob(pattern):
             if path.is_file():

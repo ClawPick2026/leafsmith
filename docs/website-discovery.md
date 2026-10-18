@@ -1,6 +1,6 @@
 # Website search discovery
 
-The browser edition uses `https://paperwork.lakebed.app` as its canonical public origin. This is intentionally separate from the desktop application's title and metadata.
+The browser edition uses `https://leafsmith.lakebed.app` as its canonical public origin. This is intentionally separate from the desktop application's title and metadata.
 
 ## Public pages
 
@@ -31,7 +31,7 @@ npm test
 npm run build
 npm run web:build
 npx --yes lakebed@0.0.40 dev web --host 127.0.0.1 --port 3150
-PAPERWORK_URL=http://127.0.0.1:3150 PYTHON web/tests/discovery_http.py
+LEAFSMITH_URL=http://127.0.0.1:3150 PYTHON web/tests/discovery_http.py
 PYTHON web/tests/seo_browser.py http://127.0.0.1:3150 all
 PYTHON web/tests/e2e.py http://127.0.0.1:3150
 PYTHON web/tests/review_regressions.py http://127.0.0.1:3150

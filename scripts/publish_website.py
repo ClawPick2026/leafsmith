@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Publish web/ to the existing Lakebed deploy behind https://paperwork.lakebed.app.
+"""Publish web/ to the existing Lakebed deploy behind https://leafsmith.lakebed.app.
 
 This updates the browser edition only. It never creates a desktop release, tag
 or GitHub release, and it never commits or pushes.
@@ -37,7 +37,7 @@ import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
 DEPLOY_ID = "dep_yefw3xsfKf5oAixk"
-PUBLIC_URL = "https://paperwork.lakebed.app"
+PUBLIC_URL = "https://leafsmith.lakebed.app"
 LAKEBED = ["npx", "--yes", "lakebed@0.0.40"]
 ARTIFACT_LIMIT = 1024 * 1024  # Lakebed's artifact size limit
 WAIT_SECONDS, WAIT_INTERVAL = 300, 5
@@ -75,7 +75,7 @@ def check_identity(root: Path) -> None:
         raise PublishError(f"Cannot read {path}; it pins the live deploy {DEPLOY_ID}.") from None
     if deploy_id != DEPLOY_ID:
         raise PublishError(f"web/lakebed.json names {deploy_id!r}, not the live deploy {DEPLOY_ID}. "
-                           "Publishing would not update paperwork.lakebed.app.")
+                           "Publishing would not update leafsmith.lakebed.app.")
 
 
 def preflight(branch: str, behind: int, dirty: list[str], allow_uncommitted: bool) -> list[str]:
@@ -99,8 +99,8 @@ def check_artifact(path: Path) -> int:
 
 
 def browser_suite(url: str, python: str, downloads: bool = False) -> list[tuple[str, list[str], dict]]:
-    """Each web/tests script takes its target URL either as an argument or as PAPERWORK_URL."""
-    env = {"PAPERWORK_URL": url}
+    """Each web/tests script takes its target URL either as an argument or as LEAFSMITH_URL."""
+    env = {"LEAFSMITH_URL": url}
     steps = [
         ("discovery_http", [python, "web/tests/discovery_http.py"], env),
         ("test_shell", [python, "web/tests/test_shell.py"], env),
@@ -219,7 +219,7 @@ class Runner:
             timer.cancel()
 
     def fetch(self, url):
-        request = urllib.request.Request(url, headers={"User-Agent": "paperwork-publish-check", "Cache-Control": "no-cache"})
+        request = urllib.request.Request(url, headers={"User-Agent": "leafsmith-publish-check", "Cache-Control": "no-cache"})
         try:
             with urllib.request.urlopen(request, timeout=30) as response:
                 return response.read(2 * 1024 * 1024).decode("utf-8", "replace")
@@ -232,7 +232,7 @@ class Runner:
     @contextlib.contextmanager
     def serve_web(self):
         """A fresh dev server on a copy of web/, so no stale bundle or repo .lakebed state is involved."""
-        with tempfile.TemporaryDirectory(prefix="paperwork-publish-") as tmp:
+        with tempfile.TemporaryDirectory(prefix="leafsmith-publish-") as tmp:
             copy = Path(tmp) / "web"
             shutil.copytree(self.root / "web", copy, ignore=shutil.ignore_patterns(".lakebed", "tests", "docs"))
             with socket.socket() as probe:
@@ -271,7 +271,7 @@ def _kill(process):
 
 
 def main(argv=None) -> int:
-    parser = argparse.ArgumentParser(description="Publish web/ to paperwork.lakebed.app (website only, no desktop release).")
+    parser = argparse.ArgumentParser(description="Publish web/ to leafsmith.lakebed.app (website only, no desktop release).")
     parser.add_argument("--dry-run", action="store_true", help="run every check but do not deploy")
     parser.add_argument("--allow-uncommitted", action="store_true", help="deploy uncommitted web/ changes")
     parser.add_argument("--skip-local-browser", action="store_true", help="skip browser acceptance on a local dev server")

@@ -23,7 +23,7 @@ SPEC.loader.exec_module(smoke)
 
 HOSTED = {
     'GITHUB_ACTIONS': 'true', 'RUNNER_ENVIRONMENT': 'github-hosted',
-    'RUNNER_OS': 'Windows', 'GITHUB_REPOSITORY': 'ClawPick2026/paperwork-desktop',
+    'RUNNER_OS': 'Windows', 'GITHUB_REPOSITORY': 'ClawPick2026/leafsmith',
     'GITHUB_EVENT_NAME': 'workflow_dispatch', 'GITHUB_RUN_ID': '123',
     'GITHUB_RUN_ATTEMPT': '1', 'RUNNER_TEMP': r'C:\runner\temp', 'ImageOS': 'win22',
 }
@@ -81,7 +81,7 @@ class DownloadTests(unittest.TestCase):
         smoke.validate_download_url(smoke.INSTALLER_URL, initial=True)
         smoke.validate_download_url('https://release-assets.githubusercontent.com/github-production-release-asset/1/fixture?sig=not-secret')
         for url in (
-            'http://github.com/ClawPick2026/paperwork-desktop/releases/download/v0.1.0-rc.1/Paperwork_0.1.0_x64-setup.exe',
+            'http://github.com/ClawPick2026/leafsmith/releases/download/v0.1.0-rc.1/Leafsmith_0.1.0_x64-setup.exe',
             'https://github.com/another/repo/releases/download/a/b.exe',
             smoke.INSTALLER_URL + '?x=1',
             'https://github.com@evil.example/file.exe',
@@ -101,9 +101,9 @@ class ArtifactHelperTests(unittest.TestCase):
         self.assertEqual(smoke.rectangle_values(rect), [-8, -8, 1288, 908])
 
     def test_run_root_and_nsis_destination_are_bounded_and_keep_spaces(self):
-        self.assertEqual(str(smoke.run_root(HOSTED)), r'C:\runner\temp\paperwork-windows-gui-123-1')
-        command = smoke.nsis_install_command(r'C:\runner\temp\setup.exe', r'C:\runner\temp\installed Paperwork')
-        self.assertTrue(command.endswith(r' /D=C:\runner\temp\installed Paperwork'))
+        self.assertEqual(str(smoke.run_root(HOSTED)), r'C:\runner\temp\leafsmith-windows-gui-123-1')
+        command = smoke.nsis_install_command(r'C:\runner\temp\setup.exe', r'C:\runner\temp\installed Leafsmith')
+        self.assertTrue(command.endswith(r' /D=C:\runner\temp\installed Leafsmith'))
         self.assertIn('/S', command)
         for invalid in (r'C:\runner\..\temp', r'\\server\share', 'relative', 'C:\\', r'C:\temp\name:stream'):
             env = dict(HOSTED, RUNNER_TEMP=invalid)

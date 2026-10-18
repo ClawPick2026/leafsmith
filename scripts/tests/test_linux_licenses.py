@@ -292,7 +292,7 @@ class SourceTests(unittest.TestCase):
 
     def test_actual_libffi_copyright_distinguishes_runtime_from_gpl_documentation(self):
         # Unmodified libffi8:amd64 3.4.2-4 copyright from packaging CI
-        # 39135464089, artifacts/first-package-linux/build/worker/paperwork-worker/
+        # 39135464089, artifacts/first-package-linux/build/worker/leafsmith-worker/
         # third-party-licenses/linux/debian/libffi8_amd64-3.4.2-4/copyright.
         import hashlib
         fixture = Path(__file__).with_name("fixtures") / "libffi-copyright.txt"
@@ -335,7 +335,7 @@ class SourceTests(unittest.TestCase):
     def test_actual_libuuid_copyright_distinguishes_bsd_runtime_from_gpl_utilities(self):
         # Unmodified libuuid1:amd64 2.37.2-4ubuntu3.6 copyright from CI
         # 39143386304, artifacts/linux-without-readline-evidence/build/worker/
-        # paperwork-worker/third-party-licenses/linux/debian/
+        # leafsmith-worker/third-party-licenses/linux/debian/
         # libuuid1_amd64-2.37.2-4ubuntu3.6/copyright. Also byte-identical to
         # debian/copyright in the matching Ubuntu source archive.
         import hashlib
@@ -681,7 +681,7 @@ class GateTests(unittest.TestCase):
             internal.mkdir(parents=True)
             for name in ('libbadgpl.so.1', 'libbadagpl.so.1'):
                 (internal / name).write_bytes(b'synthetic native dependency')
-            (worker / 'paperwork-worker').write_bytes(b'synthetic bootloader')
+            (worker / 'leafsmith-worker').write_bytes(b'synthetic bootloader')
             native = root / 'native'
             native.write_bytes(b'synthetic host')
             output = worker / 'third-party-licenses'
@@ -730,7 +730,7 @@ class GateTests(unittest.TestCase):
             internal.mkdir(parents=True)
             for name in ('libnonotice.so.1', 'libbadgpl.so.1'):
                 (internal / name).write_bytes(b'synthetic native dependency')
-            (worker / 'paperwork-worker').write_bytes(b'synthetic bootloader')
+            (worker / 'leafsmith-worker').write_bytes(b'synthetic bootloader')
             native = root / 'native'
             native.write_bytes(b'synthetic host')
             output = worker / 'third-party-licenses'
@@ -789,7 +789,7 @@ class GateTests(unittest.TestCase):
             staged = worker / "_internal/pkg/native.so"
             staged.parent.mkdir(parents=True)
             staged.write_bytes(b"real staged fixture, not original")
-            (worker / "paperwork-worker").write_bytes(b"bootloader fixture")
+            (worker / "leafsmith-worker").write_bytes(b"bootloader fixture")
             native = root / "native"
             native.write_bytes(b"native executable fixture")
             output = worker / "third-party-licenses"
@@ -824,7 +824,7 @@ class GateTests(unittest.TestCase):
             staged = worker / "_internal/libffi.so.8"
             staged.parent.mkdir(parents=True)
             staged.write_bytes(b"synthetic runtime library; not release evidence")
-            (worker / "paperwork-worker").write_bytes(b"synthetic bootloader")
+            (worker / "leafsmith-worker").write_bytes(b"synthetic bootloader")
             native = root / "native"
             native.write_bytes(b"synthetic executable")
             output = worker / "third-party-licenses"
@@ -873,7 +873,7 @@ class GateTests(unittest.TestCase):
             staged = worker / "_internal/libuuid.so.1"
             staged.parent.mkdir(parents=True)
             staged.write_bytes(b"synthetic runtime library; not release evidence")
-            (worker / "paperwork-worker").write_bytes(b"synthetic bootloader")
+            (worker / "leafsmith-worker").write_bytes(b"synthetic bootloader")
             native = root / "native"
             native.write_bytes(b"synthetic executable")
             output = worker / "third-party-licenses"
@@ -968,7 +968,7 @@ class GateTests(unittest.TestCase):
             staged = worker / "_internal/libuuid.so.1"
             staged.parent.mkdir(parents=True)
             staged.write_bytes(b"synthetic runtime library; not release evidence")
-            (worker / "paperwork-worker").write_bytes(b"synthetic bootloader")
+            (worker / "leafsmith-worker").write_bytes(b"synthetic bootloader")
             native = root / "native"
             native.write_bytes(b"synthetic executable")
             output = worker / "third-party-licenses"
@@ -1154,7 +1154,7 @@ class WiringTests(unittest.TestCase):
         module = runpy.run_path(str(report_script))
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder).resolve()
-            output = root / "build/worker/paperwork-worker/third-party-licenses"
+            output = root / "build/worker/leafsmith-worker/third-party-licenses"
             main = module["main"]
             def collect_linux(*args, **kwargs):
                 self.assertTrue((output / "python-runtime/LICENSE.txt").is_file())
@@ -1230,11 +1230,11 @@ class ExtractedPayloadTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder).resolve()
             payload = root / "fixture-appdir"
-            worker = payload / "usr/lib/Paperwork/worker"  # Tauri: usr/lib/<productName>
+            worker = payload / "usr/lib/Leafsmith/worker"  # Tauri: usr/lib/<productName>
             library = worker / "_internal/libexample.so.1"
             library.parent.mkdir(parents=True)
             library.write_bytes(b"RPATH-rewritten fixture library")
-            (worker / "paperwork-worker").write_bytes(b"fixture worker executable")
+            (worker / "leafsmith-worker").write_bytes(b"fixture worker executable")
             notices = worker / "third-party-licenses"
             notices.mkdir()
             (notices / "copyright").write_text("LGPL license fixture")

@@ -25,14 +25,14 @@ with sync_playwright() as p:
   assert page.get_by_test_id('download-result').get_attribute('href')==url
  check('failed operation preserves previous download',retained)
  def sample(page):
-  load(page,'source.pdf','organize');page.get_by_role('button',name='Paperwork home').click()
+  load(page,'source.pdf','organize');page.get_by_role('button',name='Leafsmith home').click()
   sample=page.get_by_role('button',name='Try a sample',exact=True)
   assert sample.count()==0 or not sample.is_enabled(),'Sample must not silently replace an occupied workspace'
  check('sample cannot replace occupied workspace silently',sample)
  def stale_signature(page):
   load(page,'source.pdf','sign');c=page.get_by_label('Draw signature');box=c.bounding_box()
   page.mouse.move(box['x']+20,box['y']+40);page.mouse.down();page.mouse.move(box['x']+80,box['y']+80);page.mouse.up();page.wait_for_timeout(300)
-  page.get_by_role('button',name='Paperwork home').click();page.get_by_test_id('tool-sign').click();page.get_by_test_id('run-tool').click()
+  page.get_by_role('button',name='Leafsmith home').click();page.get_by_test_id('tool-sign').click();page.get_by_test_id('run-tool').click()
   expect(page.get_by_role('alert')).to_contain_text('Draw a signature first')
  check('blank signature canvas never stamps stale signature',stale_signature)
  def rejected(page):

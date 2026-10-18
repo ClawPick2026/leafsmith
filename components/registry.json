@@ -10,7 +10,7 @@
       "executable": "bin/whisper-cli",
       "sha256": "361b3438ac108d38985648f484ffc3d88b1968718b1e85de52b2cd0111f5929e",
       "downloadBytes": 1962713,
-      "url": "https://github.com/ClawPick2026/paperwork-desktop/releases/download/components-v0.1.0/whisper-1.7.6-cpu-r1-linux-x86_64.zip"
+      "url": "https://github.com/ClawPick2026/leafsmith/releases/download/components-v0.1.0/whisper-1.7.6-cpu-r1-linux-x86_64.zip"
     },
     {
       "id": "whisper",
@@ -21,7 +21,7 @@
       "executable": "bin/whisper-cli.exe",
       "sha256": "c5ad642de24969915b13a62ba749f22a621602671a802004e2f7560365223b1c",
       "downloadBytes": 1907988,
-      "url": "https://github.com/ClawPick2026/paperwork-desktop/releases/download/components-v0.1.0/whisper-1.7.6-cpu-r1-windows-x86_64.zip"
+      "url": "https://github.com/ClawPick2026/leafsmith/releases/download/components-v0.1.0/whisper-1.7.6-cpu-r1-windows-x86_64.zip"
     },
     {
       "id": "whisper_model",
@@ -32,7 +32,7 @@
       "executable": "models/ggml-tiny.en.bin",
       "sha256": "42ffd7b04c25b656995ae103a985928ea076d8a0478b83244227f6267be7995e",
       "downloadBytes": 70520038,
-      "url": "https://github.com/ClawPick2026/paperwork-desktop/releases/download/components-v0.1.0/whisper_model-tiny-en-5359861c-r1-linux-x86_64.zip"
+      "url": "https://github.com/ClawPick2026/leafsmith/releases/download/components-v0.1.0/whisper_model-tiny-en-5359861c-r1-linux-x86_64.zip"
     },
     {
       "id": "whisper_model",
@@ -43,7 +43,7 @@
       "executable": "models/ggml-tiny.en.bin",
       "sha256": "8163f5cc6504692688c0abe4c5d72d41fc24e035475e33c1dfd9e75b36bd5e04",
       "downloadBytes": 70521133,
-      "url": "https://github.com/ClawPick2026/paperwork-desktop/releases/download/components-v0.1.0/whisper_model-tiny-en-5359861c-r1-windows-x86_64.zip"
+      "url": "https://github.com/ClawPick2026/leafsmith/releases/download/components-v0.1.0/whisper_model-tiny-en-5359861c-r1-windows-x86_64.zip"
     }
   ]
 }

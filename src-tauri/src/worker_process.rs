@@ -87,7 +87,7 @@ pub(crate) fn shutdown_workers() {
 
 pub(crate) fn execute_worker(worker: &Path, request: &Value) -> Result<Value, String> {
     if !worker.is_file() {
-        return Err("The packaged processing worker is missing. Reinstall Paperwork from a verified release.".into());
+        return Err("The packaged processing worker is missing. Reinstall Leafsmith from a verified release.".into());
     }
     let temporary = PrivateTemp::new(request)?;
     let mut command = Command::new(worker);
@@ -306,7 +306,7 @@ mod tests {
     impl Fixture {
         fn new() -> Self {
             let path = std::env::temp_dir().join(format!(
-                "paperwork-worker-test-{}-{}",
+                "leafsmith-worker-test-{}-{}",
                 std::process::id(), NEXT_FIXTURE.fetch_add(1, Ordering::Relaxed)
             ));
             crate::private_directory(&path).unwrap();
@@ -315,8 +315,8 @@ mod tests {
         fn command(&self, mode: &str) -> Command {
             let mut command = Command::new(std::env::current_exe().unwrap());
             command.args(["--ignored", "--exact", "worker_process::tests::dummy_worker", "--nocapture"])
-                .env("PAPERWORK_TEST_WORKER", mode)
-                .env("PAPERWORK_TEST_FIXTURE", &self.0);
+                .env("LEAFSMITH_TEST_WORKER", mode)
+                .env("LEAFSMITH_TEST_FIXTURE", &self.0);
             command
         }
         fn descendant(&self) -> u32 {
@@ -333,17 +333,17 @@ mod tests {
     #[test]
     #[ignore = "subprocess fixture; launched by lifecycle regression tests"]
     fn dummy_worker() {
-        let mode = std::env::var("PAPERWORK_TEST_WORKER").expect("fixture-only entry point");
+        let mode = std::env::var("LEAFSMITH_TEST_WORKER").expect("fixture-only entry point");
         if mode == "leaf" || mode == "no-read" {
             thread::sleep(Duration::from_secs(15));
             std::process::exit(0);
         }
-        let fixture = Fixture(PathBuf::from(std::env::var_os("PAPERWORK_TEST_FIXTURE").unwrap()));
+        let fixture = Fixture(PathBuf::from(std::env::var_os("LEAFSMITH_TEST_FIXTURE").unwrap()));
         let mut request = String::new();
         std::io::stdin().read_to_string(&mut request).unwrap();
         if mode == "environment" {
             let environment: std::collections::HashMap<String, String> = std::env::vars()
-                .filter(|(key, _)| matches!(key.as_str(), "TMPDIR" | "TEMP" | "GITHUB_TOKEN" | "PAPERWORK_API_KEY" | "PYTHONPATH"))
+                .filter(|(key, _)| matches!(key.as_str(), "TMPDIR" | "TEMP" | "GITHUB_TOKEN" | "LEAFSMITH_API_KEY" | "PYTHONPATH"))
                 .collect();
             fs::write(fixture.0.join("environment.json"), serde_json::to_vec(&environment).unwrap()).unwrap();
             std::process::exit(0);
@@ -464,10 +464,10 @@ mod tests {
         let fixture = Fixture::new();
         let mut command = fixture.command("environment");
         command.env("GITHUB_TOKEN", "test-only-ambient-secret")
-            .env("PAPERWORK_API_KEY", "test-only-ambient-key").env("PYTHONPATH", "test-only-injection");
+            .env("LEAFSMITH_API_KEY", "test-only-ambient-key").env("PYTHONPATH", "test-only-injection");
         configure_environment(&mut command, &fixture.0);
         // Fixture control is not part of the production environment allowlist.
-        command.env("PAPERWORK_TEST_WORKER", "environment").env("PAPERWORK_TEST_FIXTURE", &fixture.0);
+        command.env("LEAFSMITH_TEST_WORKER", "environment").env("LEAFSMITH_TEST_FIXTURE", &fixture.0);
 
         let result = execute_command(&mut command, &json!({}), &WorkerRegistry::default(),
             Duration::from_secs(6), REPORT_LIMIT);
@@ -478,7 +478,7 @@ mod tests {
         assert_eq!(env["TMPDIR"], fixture.0.to_string_lossy().as_ref());
         assert_eq!(env["TEMP"], fixture.0.to_string_lossy().as_ref());
         assert!(env.get("GITHUB_TOKEN").is_none());
-        assert!(env.get("PAPERWORK_API_KEY").is_none());
+        assert!(env.get("LEAFSMITH_API_KEY").is_none());
         assert!(env.get("PYTHONPATH").is_none());
     }
 

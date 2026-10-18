@@ -48,7 +48,7 @@ with sync_playwright() as p:
     page.set_default_timeout(30000)
     page.goto(BASE,wait_until='networkidle')
     def home():
-        page.get_by_role('button',name='Paperwork home').click()
+        page.get_by_role('button',name='Leafsmith home').click()
     def clear():
         home()
         if page.get_by_role('button',name='Clear workspace',exact=True).count():page.get_by_role('button',name='Clear workspace',exact=True).click()
@@ -101,9 +101,9 @@ with sync_playwright() as p:
             assert len(r.pages)==1 and ['Beta','Gamma'][i] in r.pages[0].extract_text()
     record('split selection into independent one-page downloads',split)
     def annotate():
-        load(['source.pdf'],'annotate');page.get_by_label('New text',exact=True).fill('Reviewed by Paperwork')
+        load(['source.pdf'],'annotate');page.get_by_label('New text',exact=True).fill('Reviewed by Leafsmith')
         result=PdfReader(run('annotated.pdf'))
-        assert 'Reviewed by Paperwork' in ' '.join(result.pages[0].extract_text().split())
+        assert 'Reviewed by Leafsmith' in ' '.join(result.pages[0].extract_text().split())
         assert result.get_fields()['name']['/V']=='Ada'
     record('add text overlay while preserving supported forms',annotate)
     def fill():
@@ -136,7 +136,7 @@ with sync_playwright() as p:
         image=Image.open(run('combined.png'));assert image.size==(240,280)
     record('image resize/compress and vertical combination',image_studio)
     def qr():
-        clear();page.get_by_test_id('tool-qr').click();page.get_by_label('Link or text').fill('https://example.com/paperwork')
+        clear();page.get_by_test_id('tool-qr').click();page.get_by_label('Link or text').fill('https://example.com/leafsmith')
         content=run('qr.svg').read_text();assert '<svg' in content and ('<path' in content or '<rect' in content)
         expect(page.get_by_role('img',name='Generated QR code')).to_be_visible()
     record('QR SVG generation and preview',qr)

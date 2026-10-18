@@ -17,7 +17,7 @@ class CloudCredentialSecurityTests(unittest.TestCase):
                 "api_key": "explicit-job-fixture-key", **overrides}
 
     def test_explicit_job_key_is_used_without_reading_ambient_credentials(self):
-        with patch.dict(os.environ, {"PAPERWORK_API_KEY": "private-ambient-paperwork-fixture",
+        with patch.dict(os.environ, {"LEAFSMITH_API_KEY": "private-ambient-leafsmith-fixture",
                                      "GITHUB_TOKEN": "private-ambient-github-fixture"}):
             with patch.object(os.environ, "get", wraps=os.environ.get) as environment_get:
                 endpoint, headers = media._cloud_config(self.options())
@@ -27,9 +27,9 @@ class CloudCredentialSecurityTests(unittest.TestCase):
 
     def test_api_key_env_selector_is_rejected_even_with_explicit_job_key(self):
         with patch.dict(os.environ, {"GITHUB_TOKEN": "private-ambient-github-fixture",
-                                     "PAPERWORK_API_KEY": "private-ambient-paperwork-fixture"}):
+                                     "LEAFSMITH_API_KEY": "private-ambient-leafsmith-fixture"}):
             with patch.object(os.environ, "get", wraps=os.environ.get) as environment_get:
-                for selector in ("GITHUB_TOKEN", "PAPERWORK_API_KEY", "", None, 17, "private-selector-fixture"):
+                for selector in ("GITHUB_TOKEN", "LEAFSMITH_API_KEY", "", None, 17, "private-selector-fixture"):
                     with self.subTest(selector=selector):
                         with self.assertRaisesRegex(ValueError, "api_key_env") as error:
                             media._cloud_config(self.options(api_key_env=selector))
@@ -40,7 +40,7 @@ class CloudCredentialSecurityTests(unittest.TestCase):
     def test_missing_job_key_rejects_ambient_keys_with_actionable_private_error(self):
         options = self.options()
         del options["api_key"]
-        with patch.dict(os.environ, {"PAPERWORK_API_KEY": "private-ambient-paperwork-fixture",
+        with patch.dict(os.environ, {"LEAFSMITH_API_KEY": "private-ambient-leafsmith-fixture",
                                      "GITHUB_TOKEN": "private-ambient-github-fixture"}):
             with patch.object(os.environ, "get", wraps=os.environ.get) as environment_get:
                 with self.assertRaises(ValueError) as error:

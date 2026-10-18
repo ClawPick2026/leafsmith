@@ -1020,7 +1020,7 @@ def office_fixture(directory):
     with zipfile.ZipFile(source, "w") as archive:
         archive.writestr("[Content_Types].xml", '<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>')
         archive.writestr("_rels/.rels", '<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>')
-        archive.writestr("word/document.xml", '<?xml version="1.0"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>Paperwork conversion smoke</w:t></w:r></w:p><w:sectPr/></w:body></w:document>')
+        archive.writestr("word/document.xml", '<?xml version="1.0"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>Leafsmith conversion smoke</w:t></w:r></w:p><w:sectPr/></w:body></w:document>')
     return source
 
 
@@ -1054,11 +1054,11 @@ def smoke(component, executable, directory):
         from PIL import Image, ImageDraw, ImageFont
         image = Image.new("RGB", (1000, 180), "white")
         font = ImageFont.truetype(str(ocr_smoke_font(windows=os.name == "nt")), 76)
-        ImageDraw.Draw(image).text((25, 35), "PAPERWORK TEST", fill="black", font=font)
+        ImageDraw.Draw(image).text((25, 35), "LEAFSMITH TEST", fill="black", font=font)
         source = directory / "ocr.png"
         image.save(source)
         text = subprocess.check_output([str(executable), str(source), "stdout", "-l", "eng", "--psm", "7"], env=environment, text=True, timeout=120)
-        if "PAPERWORK TEST" not in text.upper():
+        if "LEAFSMITH TEST" not in text.upper():
             raise ValueError(f"Real OCR smoke did not recognize the fixture: {text!r}")
     else:
         source = office_fixture(directory)

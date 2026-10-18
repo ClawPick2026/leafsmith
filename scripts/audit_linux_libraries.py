@@ -594,7 +594,7 @@ def freezer_origins(toc):
 
 def collect(worker, native, output, source_output, python_records, distributions=None, extra_libraries=(), freezer_toc=None):
     worker, native, output, source_output = map(lambda p: Path(p).resolve(), (worker, native, output, source_output))
-    if not native.is_file() or not (worker / "paperwork-worker").is_file():
+    if not native.is_file() or not (worker / "leafsmith-worker").is_file():
         raise ValueError("Build native executable and freeze worker before Linux license collection")
     shipped = shared_libraries(worker)
     if not shipped:
@@ -610,7 +610,7 @@ def collect(worker, native, output, source_output, python_records, distributions
     extras = [Path(p).resolve() for p in extra_libraries]
     # Native binary plus every worker extension: ldd includes transitive deps.
     # GTK/GIO loader modules are explicit extra roots, not assumed shipped.
-    dependencies = linked_libraries([native, worker / "paperwork-worker", *shipped, *extras])
+    dependencies = linked_libraries([native, worker / "leafsmith-worker", *shipped, *extras])
     staged_set = {p.resolve() for p in shipped}
     superset = sorted(set(dependencies + extras) - staged_set)
     libraries = []
@@ -691,7 +691,7 @@ def collect(worker, native, output, source_output, python_records, distributions
     sources = fetch_sources(sources_needed, source_output)
     inventory = {"schema": 1, "platform": sys.platform, "libraries": libraries, "sources": sources,
                  "scope": "Actual frozen-worker libraries plus native/worker ldd closure and explicit loader modules; superset is not a claim that all dependencies ship.",
-                 "binaries": [{"name": "paperwork-worker", "sha256": sha256(worker / "paperwork-worker"),
+                 "binaries": [{"name": "leafsmith-worker", "sha256": sha256(worker / "leafsmith-worker"),
                                "notices": bootloader_notices, "policy": "pyinstaller-bootloader-exception"},
                               {"name": native.name, "sha256": sha256(native), "policy": "application-and-rust-notices"}]}
     (source_output / "source-inventory.json").write_text(json.dumps(sources, indent=2), encoding="utf-8")
@@ -804,8 +804,8 @@ def audit_appimage(pattern, inventory_path, source_output, logs):
         result.check_returncode()
         root = Path(folder) / "squashfs-root"
         # Tauri bundles resources under usr/lib/<productName> (tauri.conf.json).
-        worker = root / "usr/lib/Paperwork/worker"
-        if not (worker / "paperwork-worker").is_file():
+        worker = root / "usr/lib/Leafsmith/worker"
+        if not (worker / "leafsmith-worker").is_file():
             raise ValueError("Unexpected AppImage worker resource layout")
         notices = worker / "third-party-licenses"
         verify_notice_manifest(notices)

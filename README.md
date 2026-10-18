@@ -1,16 +1,18 @@
-# Paperwork
+# Leafsmith
 
-Local-first PDF, document, image and media tools for [your browser](https://paperwork.lakebed.app) and desktop.
+Local-first PDF, document, image and media tools for [your browser](https://leafsmith.lakebed.app) and desktop.
 
-The [browser edition](web/README.md) runs in your browser with a reduced feature set. The desktop edition adds native document and media tools. Both editions are maintained together; the existing GitHub URL and published downloads remain unchanged.
+The [browser edition](web/README.md) runs in your browser with a reduced feature set. The desktop edition adds native document and media tools. Both editions are maintained together.
+
+Leafsmith was called Paperwork up to 0.1.0 RC2: that release's files still carry the old name, and the website moved from paperwork.lakebed.app, which now forwards to leafsmith.lakebed.app. Settings and optional components installed by Paperwork are not carried over.
 
 ## Desktop edition
 
-**Release status:** [0.1.0 RC2](https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.2) publishes a Windows x86_64 installer and a Linux x86_64 AppImage. On both platforms the packaged app passed native host/worker checks and 22 packaged document-operation checks, after silent installation on Windows and AppImage extraction under Xvfb on Ubuntu 22.04. Both packages are unsigned. Interactive use, other Linux distributions and the optional engine/model packs have not been tested with this release. This is not the finished release.
+**Release status:** [0.1.0 RC2](https://github.com/ClawPick2026/leafsmith/releases/tag/v0.1.0-rc.2) publishes a Windows x86_64 installer and a Linux x86_64 AppImage. On both platforms the packaged app passed native host/worker checks and 22 packaged document-operation checks, after silent installation on Windows and AppImage extraction under Xvfb on Ubuntu 22.04. Both packages are unsigned. Interactive use, other Linux distributions and the optional engine/model packs have not been tested with this release. This is not the finished release.
 
 ## Main Window
 
-![Paperwork Desktop main interface with PDF tools and file workspace](docs/screenshots/desktop-home.png)
+![Leafsmith Desktop main interface with PDF tools and file workspace](docs/screenshots/desktop-home.png)
 
 The desktop interface captured during real-browser verification. This image does not establish packaged-app or installer compatibility.
 
@@ -43,7 +45,7 @@ Native files are selected separately from the built-in workspace. Required engin
 
 ## First use
 
-Download the [Windows preview installer](https://github.com/ClawPick2026/paperwork-desktop/releases/download/v0.1.0-rc.2/Paperwork_0.1.0_x64-setup.exe) or the [Linux AppImage](https://github.com/ClawPick2026/paperwork-desktop/releases/download/v0.1.0-rc.2/Paperwork_0.1.0_amd64.AppImage). Read the [release notes, SHA-256 checksums and precise test scope](https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.2) first: Windows may show an unrecognized-publisher warning, and the AppImage needs glibc 2.35 or later and must be made executable (`chmod +x`) before running. Use copies of non-sensitive documents during preview testing. The [browser edition](https://paperwork.lakebed.app) remains available with its explicitly reduced feature set.
+Download the [Windows preview installer](https://github.com/ClawPick2026/leafsmith/releases/download/v0.1.0-rc.2/Paperwork_0.1.0_x64-setup.exe) or the [Linux AppImage](https://github.com/ClawPick2026/leafsmith/releases/download/v0.1.0-rc.2/Paperwork_0.1.0_amd64.AppImage). Read the [release notes, SHA-256 checksums and precise test scope](https://github.com/ClawPick2026/leafsmith/releases/tag/v0.1.0-rc.2) first: Windows may show an unrecognized-publisher warning, and the AppImage needs glibc 2.35 or later and must be made executable (`chmod +x`) before running. Use copies of non-sensitive documents during preview testing. The [browser edition](https://leafsmith.lakebed.app) remains available with its explicitly reduced feature set.
 
 For the built-in workspace, choose **Try a sample**, open **Organize PDF**, select an operation and download the resulting document. For your own work, use **Choose files** and retain the originals.
 
@@ -75,6 +77,6 @@ The first release targets **Windows x86_64** and **Linux x86_64**. ARM64 and mac
 
 ## License and support
 
-Paperwork's application code is [MIT licensed](LICENSE). Libraries, processing engines, fonts and AI models retain their own licenses; the application license does not relicense those components.
+Leafsmith's application code is [MIT licensed](LICENSE). Libraries, processing engines, fonts and AI models retain their own licenses; the application license does not relicense those components.
 
-Report reproducible problems through [GitHub Issues](https://github.com/ClawPick2026/paperwork-desktop/issues). Do not attach private documents, passwords or API keys.
+Report reproducible problems through [GitHub Issues](https://github.com/ClawPick2026/leafsmith/issues). Do not attach private documents, passwords or API keys.

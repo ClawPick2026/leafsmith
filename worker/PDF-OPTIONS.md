@@ -58,7 +58,7 @@ Generated fixtures use ReportLab/Pillow and are independently read with pypdf,
 PDFium, Pillow, python-docx, openpyxl and python-pptx. RED/GREEN source/test hashes,
 commands and exit statuses are retained in `pdf-evidence.log`. Engine failure probes
 are orchestration coverage, **not successful Office/OCR conversion evidence**.
-Optional actual engine tests require PAPERWORK_TESSERACT and PAPERWORK_LIBREOFFICE
+Optional actual engine tests require LEAFSMITH_TESSERACT and LEAFSMITH_LIBREOFFICE
 absolute executable paths. This host has neither engine: successful OCR and Office
 imports remain unverified, not silently passed.
 

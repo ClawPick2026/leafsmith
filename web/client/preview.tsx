@@ -71,16 +71,16 @@ export function RegionSelector({ value, onChange, mode, label, min = 0.02 }: { v
    <div className="absolute right-0 bg-black/45" style={{ top: pct(value.y), height: pct(value.height), width: pct(1 - value.x - value.width) }}/>
   </div>}
   {value && <div tabIndex={0} role="group" aria-label={label} data-testid="selection-box" onKeyDown={key}
-   className={'absolute border-2 border-(--pw-brand) shadow-[0_0_0_1px_rgba(255,255,255,0.85)] outline-none focus-visible:ring-2 focus-visible:ring-(--pw-accent) ' + (mode === 'place' ? 'bg-(--pw-brand)/15' : '')}
+   className={'absolute border-2 border-(--ls-brand) shadow-[0_0_0_1px_rgba(255,255,255,0.85)] outline-none focus-visible:ring-2 focus-visible:ring-(--ls-accent) ' + (mode === 'place' ? 'bg-(--ls-brand)/15' : '')}
    style={{ left: pct(value.x), top: pct(value.y), width: pct(value.width), height: pct(value.height), cursor: 'move' }}>
-   {handles.map(([handle, left, top, cursor]) => <span key={handle} data-handle={handle} aria-hidden="true" className="absolute h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-sm border-2 border-(--pw-brand) bg-white" style={{ left: `${left}%`, top: `${top}%`, cursor }}/>)}
+   {handles.map(([handle, left, top, cursor]) => <span key={handle} data-handle={handle} aria-hidden="true" className="absolute h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-sm border-2 border-(--ls-brand) bg-white" style={{ left: `${left}%`, top: `${top}%`, cursor }}/>)}
   </div>}
  </div>;
 }
 
 type Previewable = { name: string; bytes: Uint8Array; mime: string; url: string; page?: number };
 const TEXT_LIMIT = 20_000;
-const caption = 'mt-2 text-center text-[11px] text-(--pw-subtle)';
+const caption = 'mt-2 text-center text-[11px] text-(--ls-subtle)';
 
 /** Collapsible preview rendered from the generated file itself. */
 export function ResultPreview({ engine, result, defaultOpen }: { engine: Engine; result: Previewable; defaultOpen: boolean }) {
@@ -89,7 +89,7 @@ export function ResultPreview({ engine, result, defaultOpen }: { engine: Engine;
  if (!kind) return null;
  return <div className="w-full">
   <button type="button" className="text-xs underline underline-offset-4" aria-expanded={open} onClick={() => setOpen(!open)}>{open ? 'Hide preview' : 'Show preview'}</button>
-  {open && <div className="mt-3 rounded-lg border border-(--pw-line) bg-(--pw-sunken) p-3" data-testid="result-preview">
+  {open && <div className="mt-3 rounded-lg border border-(--ls-line) bg-(--ls-sunken) p-3" data-testid="result-preview">
    {kind === 'pdf' ? <PdfPreview engine={engine} result={result}/> : kind === 'image' ? <ImagePreview result={result}/> : <TextPreview bytes={result.bytes}/>}
   </div>}
  </div>;
@@ -124,12 +124,12 @@ function PdfPreview({ engine, result }: { engine: Engine; result: Previewable })
  const count = info?.pageCount ?? 0;
  return <>
   {count > 1 && <div className="mb-3 flex items-center justify-center gap-3 text-xs">
-   <button type="button" className="rounded border border-(--pw-line-strong) bg-(--pw-paper) px-2 py-1 disabled:opacity-40" aria-label="Previous result page" disabled={page <= 1} onClick={() => setPage(page - 1)}>‹</button>
+   <button type="button" className="rounded border border-(--ls-line-strong) bg-(--ls-paper) px-2 py-1 disabled:opacity-40" aria-label="Previous result page" disabled={page <= 1} onClick={() => setPage(page - 1)}>‹</button>
    <span>Page {page} of {count}</span>
-   <button type="button" className="rounded border border-(--pw-line-strong) bg-(--pw-paper) px-2 py-1 disabled:opacity-40" aria-label="Next result page" disabled={page >= count} onClick={() => setPage(page + 1)}>›</button>
+   <button type="button" className="rounded border border-(--ls-line-strong) bg-(--ls-paper) px-2 py-1 disabled:opacity-40" aria-label="Next result page" disabled={page >= count} onClick={() => setPage(page + 1)}>›</button>
   </div>}
   <div ref={host} className="min-h-24"/>
-  {error ? <p className="mt-2 text-xs text-(--pw-accent)">Preview unavailable: {error}</p> : <p className={caption}>Rendered from {result.name}</p>}
+  {error ? <p className="mt-2 text-xs text-(--ls-accent)">Preview unavailable: {error}</p> : <p className={caption}>Rendered from {result.name}</p>}
  </>;
 }
 
@@ -144,7 +144,7 @@ function ImagePreview({ result }: { result: Previewable }) {
 function TextPreview({ bytes }: { bytes: Uint8Array }) {
  const text = new TextDecoder().decode(bytes);
  return <>
-  <pre className="max-h-96 overflow-auto whitespace-pre-wrap break-words rounded bg-(--pw-paper) p-3 text-xs leading-5" data-testid="text-preview">{text.slice(0, TEXT_LIMIT)}</pre>
+  <pre className="max-h-96 overflow-auto whitespace-pre-wrap break-words rounded bg-(--ls-paper) p-3 text-xs leading-5" data-testid="text-preview">{text.slice(0, TEXT_LIMIT)}</pre>
   {text.length > TEXT_LIMIT && <p className={caption}>Showing the first {TEXT_LIMIT.toLocaleString('en')} of {text.length.toLocaleString('en')} characters. The download contains all of the text.</p>}
  </>;
 }
