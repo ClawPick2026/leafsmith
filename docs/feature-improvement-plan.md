@@ -581,7 +581,7 @@ Small, independent fixes in the shared workspace (`web/client/engine-core.ts`,
 - **PDF → images (browser):** add JPEG and WebP and a higher DPI option within the
   existing 16-megapixel canvas limit; expose native `dpi`/`quality` (Q2).
 - **QR codes:** PNG export as well as SVG, and a choice of error-correction level
-  (currently fixed at `M`).
+  (currently fixed at `M`). Covered by work item QR1 in `docs/qr-code-plan.md`.
 - **Signatures:** trim transparent margins of drawn signatures; typed signature in a
   chosen font (after T4).
 
