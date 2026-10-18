@@ -1,6 +1,6 @@
 # Optional local AI packs — build and release gates
 
-**Release status:** Whisper CPU engine and tiny-English model packs have passed real native transcription on Windows and Linux x86_64, and are [published with verified hashes and matching sources](https://github.com/ClawPick2026/paperwork-desktop/releases/tag/components-v0.1.0). The llama.cpp/text-model packs are still under native validation and must not be treated as available until their own checks pass. The general OCR/Office/FFmpeg pipeline is independent.
+**Release status:** Whisper CPU engine and tiny-English model packs have passed real native transcription on Windows and Linux x86_64, and are [published with verified hashes and matching sources](https://github.com/ClawPick2026/paperwork-desktop/releases/tag/components-v0.1.0). The previous 0.5B text model failed the real native translation factuality gate on both platforms. The replacement **1.5B Q2_K is a pinned candidate only: native inference and release approval are pending**. The llama.cpp/text-model packs must not be advertised as available until their own gates pass. The general OCR/Office/FFmpeg pipeline is independent.
 
 ## Independent downloads and consent
 
@@ -9,7 +9,7 @@
 | `whisper` | `bin/whisper-cli` (`.exe` on Windows) | whisper.cpp MIT engine, bundled third-party notices |
 | `whisper_model` | `models/ggml-tiny.en.bin` | OpenAI Whisper tiny **English-only**, MIT, converted by whisper.cpp upstream |
 | `llama` | `bin/llama-cli` (`.exe` on Windows) | llama.cpp MIT engine, bundled third-party notices |
-| `llama_model` | `models/qwen2.5-0.5b-instruct-q4_k_m.gguf` | Official Qwen2.5-0.5B-Instruct GGUF, Q4_K_M, Apache-2.0 |
+| `llama_model` | `models/qwen2.5-1.5b-instruct-q2_k.gguf` | Candidate: official Qwen2.5-1.5B-Instruct GGUF, Q2_K, Apache-2.0 |
 
 Weights are separate ZIP assets, never hidden in engine ZIPs. Installing an engine
 must not install its weights automatically. Native application consent must show
@@ -23,6 +23,34 @@ weight downloads, not end-user installation or external document processing. No
 models are downloaded by `--plan` or the unit suite. Native inference uses only
 local model paths; CURL, server, RPC, GPU and system-GGML integration are disabled.
 These packs do not supply a model-download client or start a service.
+
+## Text candidate decision — quality approval pending
+
+The recovered native diagnostics under
+`artifacts/llama-real-diagnostics/ai-diagnostics-llama-<platform>/llama-<platform>/smoke`
+show the same genuine 0.5B failure on Windows and Linux x86_64: the summary
+preserved Alice, five and Friday, but translation returned
+`Bonjour, mon nom est Alice. Le rendez-vous est mardi. [end of text]`.
+The input says Friday; `mardi` means Tuesday. This was nonempty, on-task model
+output with a factual error, not an interactive-CLI or empty-output failure.
+The unchanged gate correctly rejects it. Never replace the model's answer with
+hardcoded `vendredi`, change the fixture, or reduce required facts to pass.
+
+The next candidate is **Qwen2.5-1.5B-Instruct Q2_K**, version
+`qwen2.5-1.5b-q2k-91cad511-r1`. Its official card identifies 1.54B parameters
+and a 32,768-token context.[2] The official API resolved the revision below;
+Q2_K is 752,880,160 raw bytes, whereas Q3_K_M (924,455,968) and Q4_K_M
+(1,117,320,736) exceed the unchanged 750 MiB raw-download cap.[1]
+Greater parameter capacity with more aggressive quantization is a candidate
+tradeoff, **not evidence of better translation**. The official model card and
+the actual pinned license both specify Apache-2.0.[2][3]
+
+This change preserves the llama.cpp source pin, build flags, worker protocol,
+prompts, inference settings, prompt privacy and independent download/cloud
+consent. No registry entry is added. The coordinator must next run the unchanged
+real native worker smoke on both platforms. Output quality, runtime/memory use,
+timeouts and final ZIP sizes remain CI gates; archive size caps are not RAM caps.
+Publication and exact published-asset readback are still required before promotion.
 
 ## Trigger, without publishing
 
@@ -77,15 +105,33 @@ following exact commits; CI fetches the commit archives, not mutable tag URLs.
 | [whisper.cpp v1.7.6](https://github.com/ggml-org/whisper.cpp/tree/a8d002cfd879315632a579e73f0148d06959de36) | `a8d002cfd879315632a579e73f0148d06959de36` | 7,309,272 | `7b17da903114ed45d82f48c030e3be6a5a8a279f884b2f733706dbb4e832fb6b` |
 | [llama.cpp b6780](https://github.com/ggml-org/llama.cpp/tree/b22572e97dc51757d3ebe917a5a283385010ec68) | `b22572e97dc51757d3ebe917a5a283385010ec68` | 25,959,077 | `46387109730a3ea6c288afcc3af56dcbf3c00bbde1618eb1b3b038be1785ef16` |
 
-The model pins below are **raw weight** byte counts and SHA-256s from the pinned
-Hugging Face LFS metadata, not measured distribution ZIP properties. Full weight
-downloads are deferred to explicitly consented CI; CI independently verifies every
-byte against these pins before packaging and again after ZIP extraction.
+The model pins below are **raw weight** byte counts and SHA-256s, not distribution
+ZIP properties. Whisper's pin was originally obtained from pinned Hugging Face
+LFS metadata. For the new Qwen candidate, the official API/LFS metadata was
+requeried and the full immutable weight URL was actually downloaded and hashed
+on the preparation host; all 752,880,160 bytes matched the pin.[1]
+CI independently verifies every byte before packaging and again after extraction.
 
 | Weights | Immutable model revision | Raw bytes | Raw SHA-256 |
 |---|---|---:|---|
 | [Whisper tiny.en](https://huggingface.co/ggerganov/whisper.cpp/tree/5359861c739e955e79d9a303bcbc70fb988958b1) | `5359861c739e955e79d9a303bcbc70fb988958b1` | 77,704,715 | `921e4cf8686fdd993dcd081a5da5b6c365bfde1162e72b08d75ac75289920b1f` |
-| [Official Qwen GGUF Q4_K_M](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/tree/9217f5db79a29953eb74d5343926648285ec7e67) | `9217f5db79a29953eb74d5343926648285ec7e67` | 491,400,032 | `74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db` |
+| [Official Qwen 1.5B GGUF Q2_K](https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/tree/91cad51170dc346986eccefdc2dd33a9da36ead9) | `91cad51170dc346986eccefdc2dd33a9da36ead9` | 752,880,160 | `5ede348e91ce1e7a330926ec5b202c27b864d065149dc463257fde1f98865b3a` |
+
+The candidate's immutable notice/card URLs were also downloaded, not inferred
+from the old model. Exact measured bytes and SHA-256s:[2][3]
+
+| Included notice | Raw bytes | Actual SHA-256 |
+|---|---:|---|
+| `Qwen-LICENSE` | 11,343 | `832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e` |
+| `Qwen-model-card.md` | 4,856 | `57c72d4010fb11a98fc8e62dc8ef112b23a7a7525b71e571ca978d35cb3b2eec` |
+
+The raw candidate leaves 33,551,840 bytes below the 786,432,000-byte (750 MiB)
+download cap. An actual **preparation-only** ZIP containing those weights, the
+two notices and a probe disclaimer measured 733,623,465 bytes downloaded and
+752,896,517 bytes expanded. Installer-like extraction preserved the raw weight
+SHA-256. This is a bounds/extraction probe, **not a distributable release pack**:
+the final native build must include its engine attribution/provenance and pass
+all existing 750 MiB ZIP / 2 GiB expanded / 20,000-path checks independently.
 
 Both model cards and license texts were actually retrieved and hashed. Qwen's
 pinned LICENSE is Apache-2.0, not an assumed license inherited from a different
@@ -130,9 +176,9 @@ Build-tree DLL/library search paths are removed during execution.
 
 `.build.json` and the Actions summary report actual fixture outputs, measured
 quality counters, worker/fixture hashes and source artifact properties. Tiny
-English transcription is not multilingual. A 0.5B quantized text model is a
-low-resource baseline with limited instruction-following/factual/translation
-quality. These tiny fixtures are sanity bounds, not an accuracy benchmark,
+English transcription is not multilingual. The 1.5B Q2_K text model is a bounded,
+aggressively quantized candidate with unverified native instruction-following,
+factual and translation quality. These tiny fixtures are sanity bounds, not an accuracy benchmark,
 injection defense proof, or approval for high-stakes documents.
 
 ## Successful output and promotion
@@ -166,16 +212,37 @@ a durable source offer.
 
 ```sh
 python -W error::ResourceWarning -m unittest discover -s scripts/tests -p test_ai_components.py -v
-# 13 tests: actual ZIPs/digests/modes, limits, path/link/case rejection, cache pins,
-# safe source extraction, notice copying, CLI plans/guards and quality/dependency gates.
+# 15 tests: actual ZIPs/digests/modes, limits, path/link/case rejection, cache pins,
+# source extraction, notices, CLI plans/guards, candidate pins and quality/dependency gates.
 ```
 
-Tests were introduced and observed failing before their corresponding behavior
-was implemented; additional already-passing size/mode checks are characterization
-coverage, not claimed RED evidence. The final case-collision regression failed
-with “ValueError not raised” before the rejection was implemented. Actual source
-and notice fetches plus extraction were exercised separately. `actionlint` 1.7.7
-passes this workflow. No weights, native compiler build, real transcription,
-real summary/translation, or desktop installer was run on the ARM64 host. Native
-CI has **not** been triggered here; any first-run failure remains a real blocker,
-not permission to weaken gates or advertise a usable pack.
+The candidate pin regression was run **before** changing the recipe: it failed
+on the old 0.5B model for both platform plans, then passed after the minimal
+pin/name/notice update. The obsolete test-only 500 MiB assumption now checks the
+actual unchanged 750 MiB installer cap; the exact cap values are also asserted.
+No semantic gate was weakened. Added characterization rejects each independently
+missing summary fact and French marker, the observed wrong-weekday output, and
+out-of-bounds lengths; these already-passing negative checks are not claimed RED
+evidence. Replaying both recovered 0.5B native outputs through `assess_text`
+also confirmed rejection. The focused suite passed all 15 tests. A broader
+`unittest discover -s scripts/tests -v` run was blocked at import for
+`test_freeze`, `test_frozen_pptx` and `test_packaged_operations` because this
+interpreter lacks `pytest`; it is not claimed as a passing full scripts suite.
+No global test dependencies were installed.
+
+Local evidence is in
+`/home/defaultuser/.hermes/cache/scratch/qwen15-candidate/`:
+`hf-model-api.json`, `notice-proof.json`, `raw-weight-proof.json`,
+`model-pack-bound-proof.json`, `old-model-rejection.json`,
+`tdd-{red,green}.{json,log}` and `ai-suite.{json,log}`. TDD records include exact
+commands, exit statuses and builder/test source hashes. Scratch evidence is
+temporary, not a durable release source offer. The 1.5B candidate has **not** run
+native inference here. Native CI and published-asset verification belong to the
+coordinator; any candidate failure is a real blocker, not permission to weaken
+gates or advertise a usable pack.
+
+## Sources
+
+[1] https://huggingface.co/api/models/Qwen/Qwen2.5-1.5B-Instruct-GGUF?blobs=true
+[2] https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/91cad51170dc346986eccefdc2dd33a9da36ead9/README.md
+[3] https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/91cad51170dc346986eccefdc2dd33a9da36ead9/LICENSE

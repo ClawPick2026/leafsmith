@@ -31,10 +31,10 @@ MODELS = {
                 "revision": "5359861c739e955e79d9a303bcbc70fb988958b1", "bytes": 77704715,
                 "url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-tiny.en.bin",
                 "sha256": "921e4cf8686fdd993dcd081a5da5b6c365bfde1162e72b08d75ac75289920b1f"},
-    "llama": {"name": "qwen2.5-0.5b-instruct-q4_k_m.gguf", "version": "qwen2.5-0.5b-q4km-9217f5db-r1",
-              "license": "Apache-2.0", "revision": "9217f5db79a29953eb74d5343926648285ec7e67", "bytes": 491400032,
-              "url": "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/9217f5db79a29953eb74d5343926648285ec7e67/qwen2.5-0.5b-instruct-q4_k_m.gguf",
-              "sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db"},
+    "llama": {"name": "qwen2.5-1.5b-instruct-q2_k.gguf", "version": "qwen2.5-1.5b-q2k-91cad511-r1",
+              "license": "Apache-2.0", "revision": "91cad51170dc346986eccefdc2dd33a9da36ead9", "bytes": 752880160,
+              "url": "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/91cad51170dc346986eccefdc2dd33a9da36ead9/qwen2.5-1.5b-instruct-q2_k.gguf",
+              "sha256": "5ede348e91ce1e7a330926ec5b202c27b864d065149dc463257fde1f98865b3a"},
 }
 NOTICES = {
     "whisper": [
@@ -47,11 +47,11 @@ NOTICES = {
     ],
     "llama": [
         {"name": "Qwen-LICENSE", "bytes": 11343,
-         "url": "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/9217f5db79a29953eb74d5343926648285ec7e67/LICENSE",
+         "url": "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/91cad51170dc346986eccefdc2dd33a9da36ead9/LICENSE",
          "sha256": "832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e"},
         {"name": "Qwen-model-card.md", "bytes": 4856,
-         "url": "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/9217f5db79a29953eb74d5343926648285ec7e67/README.md",
-         "sha256": "fa1fede7f775a20f111cc098c00900092020572ce78976970a5b0ad9ca211999"},
+         "url": "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/91cad51170dc346986eccefdc2dd33a9da36ead9/README.md",
+         "sha256": "57c72d4010fb11a98fc8e62dc8ef112b23a7a7525b71e571ca978d35cb3b2eec"},
     ],
 }
 JFK_SHA256 = "59dfb9a4acb36fe2a2affc14bacbee2920ff435cb13cc314a08c13f66ba7860e"
@@ -455,11 +455,11 @@ def build(component, target, work, output, allow_model_downloads=False, ffmpeg=N
             "Windows: x86_64, statically linked MSVC CRT (/MT); only OS DLL dependencies allowed.\n"
             "Compiled with the runner's licensed Visual Studio toolchain on Windows. Runtime and\n"
             "third-party redistribution terms must be reviewed before publishing.\n"
-            "Tiny English speech and 0.5B quantized text models have limited accuracy. Verify all output.\n",
+            "Tiny English speech and 1.5B Q2_K quantized text models have limited accuracy. Verify all output.\n",
             encoding="utf-8")
     engine_metadata = {"id": component, "name": component + ".cpp CPU engine", "version": plan["source"]["version"] + "-cpu-r1",
                        "platform": target, "license": "MIT (vendored notices included)", "executable": "bin/" + executable}
-    model_metadata = {"id": component + "_model", "name": "Whisper tiny English" if component == "whisper" else "Qwen2.5 0.5B Instruct Q4_K_M",
+    model_metadata = {"id": component + "_model", "name": "Whisper tiny English" if component == "whisper" else "Qwen2.5 1.5B Instruct Q2_K",
                       "version": plan["model"]["version"], "platform": target, "license": plan["model"]["license"],
                       "executable": "models/" + weights.name}
     staging = work / "artifacts"

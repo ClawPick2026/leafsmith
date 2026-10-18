@@ -175,8 +175,58 @@ class SmokeGateTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             api.assess_text("generic unrelated output", "not a translation")
 
+    def test_text_gate_requires_each_fact_and_french_marker_including_observed_wrong_weekday(self):
+        # Characterization, not new inference: preserve the existing gate without changing it.
+        api = builder()
+        summary = "Alice approved a five dollar budget. The team will meet on Friday."
+        french = "Bonjour, mon nom est Alice. Le rendez-vous est vendredi."
+        for missing, replacement in (("Alice", "Someone"), ("five", "six"), ("Friday", "Tuesday")):
+            with self.subTest(summaryMissing=missing), self.assertRaisesRegex(ValueError, "quality gate"):
+                api.assess_text(summary.replace(missing, replacement), french)
+        for missing, replacement in (("Bonjour", "Hello"), ("Alice", "Bob"), ("vendredi", "mardi")):
+            with self.subTest(translationMissing=missing), self.assertRaisesRegex(ValueError, "quality gate"):
+                api.assess_text(summary, french.replace(missing, replacement))
+        # Actual 0.5B native diagnostic translation from both Windows and Linux.
+        with self.assertRaisesRegex(ValueError, "quality gate"):
+            api.assess_text(summary, "Bonjour, mon nom est Alice. Le rendez-vous est mardi. [end of text]")
+        for short_or_long in ("Alice 5", summary + "x" * 4001):
+            with self.subTest(summaryLength=len(short_or_long)), self.assertRaises(ValueError):
+                api.assess_text(short_or_long, french)
+        for short_or_long in ("Bonjour", french + "x" * 4001):
+            with self.subTest(translationLength=len(short_or_long)), self.assertRaises(ValueError):
+                api.assess_text(summary, short_or_long)
+
 
 class RecipeTests(unittest.TestCase):
+    def test_llama_candidate_is_official_15b_q2k_with_measured_immutable_pins(self):
+        api = builder()
+        revision = "91cad51170dc346986eccefdc2dd33a9da36ead9"
+        base = f"https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/{revision}/"
+        for target in ("linux-x86_64", "windows-x86_64"):
+            with self.subTest(target=target):
+                plan = api.build_plan("llama", target)
+                self.assertEqual(plan["model"], {
+                    "name": "qwen2.5-1.5b-instruct-q2_k.gguf",
+                    "version": "qwen2.5-1.5b-q2k-91cad511-r1",
+                    "license": "Apache-2.0", "revision": revision, "bytes": 752880160,
+                    "url": base + "qwen2.5-1.5b-instruct-q2_k.gguf",
+                    "sha256": "5ede348e91ce1e7a330926ec5b202c27b864d065149dc463257fde1f98865b3a",
+                })
+                self.assertEqual(plan["notices"], [
+                    {"name": "Qwen-LICENSE", "bytes": 11343, "url": base + "LICENSE",
+                     "sha256": "832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e"},
+                    {"name": "Qwen-model-card.md", "bytes": 4856, "url": base + "README.md",
+                     "sha256": "57c72d4010fb11a98fc8e62dc8ef112b23a7a7525b71e571ca978d35cb3b2eec"},
+                ])
+        self.assertEqual(api.MAX_DOWNLOAD, 750 * 1024 * 1024)
+        self.assertEqual(api.MAX_EXTRACTED, 2 * 1024 * 1024 * 1024)
+        self.assertLess(752880160 + sum(p["bytes"] for p in plan["notices"]), api.MAX_DOWNLOAD)
+        # Copy coverage only: real pack metadata and NOTICE must describe the new candidate.
+        source = SCRIPT.read_text(encoding="utf-8")
+        self.assertIn('else "Qwen2.5 1.5B Instruct Q2_K"', source)
+        self.assertIn("1.5B Q2_K quantized text models have limited accuracy", source)
+        self.assertNotIn("0.5b", source.lower())
+
     def test_plan_pins_source_models_and_disables_network_accelerators(self):
         api = builder()
         for component in ("whisper", "llama"):
@@ -186,8 +236,8 @@ class RecipeTests(unittest.TestCase):
                 for pin in [plan["source"], plan["model"], *plan["notices"]]:
                     self.assertRegex(pin["sha256"], r"^[0-9a-f]{64}$")
                     self.assertGreater(pin["bytes"], 0)
+                    self.assertLessEqual(pin["bytes"], api.MAX_DOWNLOAD)
                     self.assertTrue(pin["url"].startswith("https://"))
-                self.assertLess(plan["model"]["bytes"], 500 * 1024 * 1024)
                 flags = plan["cmake"]
                 self.assertIn("-DBUILD_SHARED_LIBS=OFF", flags)
                 self.assertIn("-DGGML_NATIVE=OFF", flags)

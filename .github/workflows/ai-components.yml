@@ -129,8 +129,8 @@ jobs:
                   out.write('Actual worker/native inference passed on this runner. Not interactive desktop validation.\n\n')
                   out.write('```json\n' + json.dumps(record, indent=2) + '\n```\n')
           PY
-      - name: Preserve synthetic fixture output after native inference failure
-        if: failure()
+      - name: Preserve synthetic fixture inference evidence
+        if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: ai-diagnostics-${{ matrix.component }}-${{ matrix.target }}
