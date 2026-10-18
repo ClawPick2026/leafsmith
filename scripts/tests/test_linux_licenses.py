@@ -432,6 +432,42 @@ class SourceTests(unittest.TestCase):
             self.assertIn(common.read_text(), contents)
             self.assertTrue(all(not (root / "output" / f).is_symlink() for f in records))
 
+    def test_spdx_style_common_license_reference_resolves_to_debian_file(self):
+        # Ubuntu jammy libpango-1.0-0 1.50.6+ds-2ubuntu1 refers to GPL-2.0/GPL-3.0,
+        # but Debian ships those texts as GPL-2/GPL-3.
+        import tempfile
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder).resolve()
+            copyright = root / "usr/share/doc/libpango-1.0-0/copyright"
+            copyright.parent.mkdir(parents=True)
+            copyright.write_text(
+                'version 2 can be found in "/usr/share/common-licenses/GPL-2.0".\n'
+                'version 3 can be found in "/usr/share/common-licenses/GPL-3.0".\n'
+                'See /usr/share/common-licenses/LGPL-3.0+ and /usr/share/common-licenses/LGPL-2.1.\n')
+            common = root / "usr/share/common-licenses"
+            common.mkdir(parents=True)
+            for name in ("GPL-2", "GPL-3", "LGPL-2.1", "LGPL-3"):
+                (common / name).write_text(name + " fixture text")
+            records = api().debian_notices({"name": "libpango-1.0-0:amd64", "version": "1.50.6+ds-2ubuntu1"},
+                                           root / "output", root)
+            for name in ("GPL-2", "GPL-3", "LGPL-2.1", "LGPL-3"):
+                self.assertIn("linux/common-licenses/" + name, records)
+
+    def test_unresolvable_common_license_reference_still_fails(self):
+        import tempfile
+        for reference in ("GPL-9.0", "LGPL-2.0", "Apache-2"):
+            with self.subTest(reference=reference), tempfile.TemporaryDirectory() as folder:
+                root = Path(folder).resolve()
+                copyright = root / "usr/share/doc/libexample/copyright"
+                copyright.parent.mkdir(parents=True)
+                copyright.write_text("See /usr/share/common-licenses/" + reference + "\n")
+                common = root / "usr/share/common-licenses"
+                common.mkdir(parents=True)
+                (common / "GPL-2").write_text("GPL-2 fixture text")
+                (common / "LGPL-2.1").write_text("LGPL-2.1 fixture text")
+                with self.assertRaisesRegex(ValueError, "Missing referenced common license: " + reference):
+                    api().debian_notices({"name": "libexample:amd64", "version": "1.0"}, root / "output", root)
+
 
 class GateTests(unittest.TestCase):
     def test_collect_reports_entire_dependency_license_failure_set_before_sources(self):
@@ -481,6 +517,54 @@ class GateTests(unittest.TestCase):
                              {'libbadgpl.so.1', 'libbadagpl.so.1'})
             self.assertEqual(len(report['libraries']), 2)
             self.assertFalse((root/'sources/source-inventory.json').exists())
+
+    def test_collect_reports_notice_failures_with_policy_failures(self):
+        # An unresolvable notice must not hide later dependency issues behind a
+        # traceback: every failure is reported once, and nothing is approved.
+        import json
+        from unittest.mock import patch
+        import tempfile
+        module = api()
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            worker = root / 'worker'
+            internal = worker / '_internal'
+            internal.mkdir(parents=True)
+            for name in ('libnonotice.so.1', 'libbadgpl.so.1'):
+                (internal / name).write_bytes(b'synthetic native dependency')
+            (worker / 'paperwork-worker').write_bytes(b'synthetic bootloader')
+            native = root / 'native'
+            native.write_bytes(b'synthetic host')
+            output = worker / 'third-party-licenses'
+            boot = output / 'python/pyinstaller/COPYING.txt'
+            boot.parent.mkdir(parents=True)
+            boot.write_text('PyInstaller bootloader exception fixture')
+            def owner(path, linker):
+                return {'kind': 'debian', 'name': path.name, 'version': '1',
+                        'source_package': path.name, 'source_version': '1',
+                        'original': str(internal / path.name)}
+            def notices(record, destination):
+                if 'nonotice' in record['name']:
+                    raise ValueError('Missing referenced common license: GPL-9.0')
+                path = destination / record['name'] / 'copyright'
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text('License: GPL-3.0', encoding='utf-8')
+                return [path.relative_to(destination).as_posix()]
+            with patch.object(module, 'linker_paths', return_value={}), \
+                    patch.object(module, 'linked_libraries', return_value=[]), \
+                    patch.object(module, 'python_runtime_owner', return_value=None), \
+                    patch.object(module, 'debian_owner', side_effect=owner), \
+                    patch.object(module, 'debian_notices', side_effect=notices), \
+                    patch.object(module, 'fetch_source') as fetch:
+                with self.assertRaisesRegex(ValueError, 'GPL-9.0.*GPL-only|GPL-only.*GPL-9.0'):
+                    module.collect(worker, native, output, root/'sources',
+                                   [{'name': 'pyinstaller', 'notices': ['python/pyinstaller/COPYING.txt']}], [])
+                fetch.assert_not_called()
+            report = json.loads((output/'linux/prebundle-license-review.json').read_text(encoding='utf-8'))
+            self.assertFalse(report['approved'])
+            self.assertEqual({item['basename'] for item in report['issues']},
+                             {'libnonotice.so.1', 'libbadgpl.so.1'})
+            self.assertEqual({item['policy'] for item in report['libraries']}, {'unapproved'})
 
     def test_transitive_ldd_inventory_requires_no_unresolved_libraries(self):
         import tempfile

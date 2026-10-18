@@ -247,6 +247,22 @@ def license_policy(text, source_package, basename, *, source_version=None):
     return "notice-and-exact-source-preserved"
 
 
+def common_license_file(common, name):
+    """Resolve a referenced common-license name to an existing Debian file.
+
+    Some copyrights use SPDX-style names (pango's "GPL-2.0") where Debian
+    ships "GPL-2". Only drop "+"/"-only"/"-or-later" and a GNU family ".0";
+    never map to another version (LGPL-2.0 is not LGPL-2.1).
+    """
+    name = name.rstrip(".")
+    candidates = [name]
+    base = re.sub(r"(?:\+|-only|-or-later)$", "", name)
+    candidates.append(base)
+    if re.fullmatch(r"(?:L?GPL|GFDL)-\d+\.0", base):
+        candidates.append(base[:-2])
+    return next((common / c for c in candidates if (common / c).is_file()), None)
+
+
 def debian_notices(owner, output, filesystem=Path("/")):
     package = owner["name"].split(":", 1)[0]
     source = filesystem / "usr/share/doc" / package / "copyright"
@@ -263,7 +279,7 @@ def debian_notices(owner, output, filesystem=Path("/")):
     common = filesystem / "usr/share/common-licenses"
     referenced = re.findall(r"/usr/share/common-licenses/([\w.+-]+)", source.read_text(encoding="utf-8", errors="replace"))
     for name in referenced:
-        if not (common / name.rstrip(".")).is_file():
+        if common_license_file(common, name) is None:
             raise ValueError("Missing referenced common license: " + name)
     for license_file in sorted(common.iterdir()) if common.is_dir() else []:
         if license_file.is_file():
@@ -463,11 +479,21 @@ def collect(worker, native, output, source_output, python_records, distributions
             owner = debian_owner(system_path, linker)
             key = (owner["name"], owner["version"])
             if key not in debian_cache:
-                debian_cache[key] = debian_notices(owner, output)
-            owner["notices"] = debian_cache[key]
-            copyright_path = next(p for p in owner["notices"] if p.endswith("/copyright"))
-            copyright_text = checked_file(output, copyright_path).read_text(encoding="utf-8", errors="replace")
-            owner["policy"] = classify(owner, copyright_text, path.name)
+                try:
+                    debian_cache[key] = debian_notices(owner, output)
+                except ValueError as error:
+                    # Record with policy failures; never approve without notices.
+                    debian_cache[key] = error
+            if isinstance(debian_cache[key], ValueError):
+                policy_issues.append({"basename": path.name, "package": owner["name"],
+                                      "source_version": owner.get("source_version"), "error": str(debian_cache[key])})
+                owner["notices"] = []
+                owner["policy"] = "unapproved"
+            else:
+                owner["notices"] = debian_cache[key]
+                copyright_path = next(p for p in owner["notices"] if p.endswith("/copyright"))
+                copyright_text = checked_file(output, copyright_path).read_text(encoding="utf-8", errors="replace")
+                owner["policy"] = classify(owner, copyright_text, path.name)
             owner["original_sha256"] = sha256(Path(owner["original"]))
             if owner["policy"] != "unapproved":
                 sources_needed.add((owner["source_package"], owner["source_version"]))
