@@ -101,6 +101,40 @@ class OwnershipTests(unittest.TestCase):
         self.assertEqual(record["source_version"], "3.4.2-4")
         self.assertEqual(record["original"], str(Path("/lib/x86_64-linux-gnu/libffi.so.8")))
 
+    def test_dpkg_ownership_is_batched_not_one_query_per_library(self):
+        # Each dpkg-query call scans the whole database (~0.2 s on hosted runners).
+        from unittest.mock import patch
+        import subprocess
+        calls = []
+        paths = [Path("/lib/x86_64-linux-gnu/lib%d.so.1" % n) for n in range(250)]
+        def run(command, **kwargs):
+            calls.append(command[:2])
+            if command[:2] == ["dpkg-query", "-S"]:
+                lines = ["lib%d:amd64: %s" % (int(Path(p).name[3:-5]), p) for p in command[2:] if not p.endswith("lib7.so.1")]
+                lines.append("diversion by other from: " + str(paths[1]))
+                lines.append("liba:amd64, libb:amd64: " + str(paths[2]))
+                return subprocess.CompletedProcess(command, 1, "\n".join(lines) + "\n", "not owned")
+            if command[:2] == ["dpkg-query", "-W"]:
+                return subprocess.CompletedProcess(command, 0, "".join(
+                    "%s\t1.0-%s\tsrc-%s\t1.0-%s\n" % (name, name, name, name) for name in command[3:]), "")
+            raise AssertionError(command)
+        module = api()
+        with patch.object(module.subprocess, "run", run):
+            index = module.DpkgOwners()
+            candidates = {str(c) for p in paths for c in module.owner_candidates(p, {})}
+            index.prefetch(candidates)  # as collect() does, aliases included
+            batched = len(calls)
+            owners = {p: index.owners(p) for p in paths}
+            record = module.debian_owner(paths[5], {}, index)
+        self.assertEqual(len(calls), batched)  # later lookups are served from the batch
+        self.assertEqual(calls.count(["dpkg-query", "-S"]), -(-len(candidates) // module.DpkgOwners.CHUNK))
+        self.assertEqual(calls.count(["dpkg-query", "-W"]), 1)
+        self.assertEqual(owners[paths[7]], [])
+        self.assertEqual([o[0] for o in owners[paths[1]]], ["lib1:amd64"])
+        self.assertEqual(sorted(o[0] for o in owners[paths[2]]), ["lib2:amd64", "liba:amd64", "libb:amd64"])
+        self.assertEqual((record["name"], record["source_package"], record["source_version"]),
+                         ("lib5:amd64", "src-lib5:amd64", "1.0-lib5:amd64"))
+
     def test_known_freezer_origin_cannot_be_reassigned_to_host_soname(self):
         import tempfile
         import subprocess
@@ -151,6 +185,29 @@ class SourceTests(unittest.TestCase):
         dsc = root / "example_1.2-3.dsc"
         dsc.write_text("Format: 3.0 (quilt)\nSource: example\nVersion: " + version + "\nChecksums-Sha256:\n" + entries)
         return archive, dsc
+
+    def test_exact_sources_download_concurrently_in_deterministic_order(self):
+        import threading, time
+        from unittest.mock import patch
+        module = api()
+        active, peak, lock = [0], [0], threading.Lock()
+        def fetch(package, version, output):
+            with lock:
+                active[0] += 1
+                peak[0] = max(peak[0], active[0])
+            time.sleep(0.05)
+            with lock:
+                active[0] -= 1
+            if package == "broken":
+                raise ValueError("Cannot obtain exact corresponding source broken=1")
+            return {"source_package": package, "source_version": version}
+        needed = {("pkg%02d" % n, "1.%d" % n) for n in range(16)}
+        with patch.object(module, "fetch_source", side_effect=fetch):
+            records = module.fetch_sources(needed, Path("/unused"))
+            self.assertGreater(peak[0], 1)
+            self.assertEqual([r["source_package"] for r in records], sorted(p for p, _ in needed))
+            with self.assertRaisesRegex(ValueError, "broken=1"):
+                module.fetch_sources(needed | {("broken", "1")}, Path("/unused"))
 
     def test_source_fetch_pins_version_and_checks_actual_dsc_archives(self):
         import tempfile
@@ -626,7 +683,7 @@ class GateTests(unittest.TestCase):
             boot = output / 'python/pyinstaller/COPYING.txt'
             boot.parent.mkdir(parents=True)
             boot.write_text('PyInstaller bootloader exception fixture')
-            def owner(path, linker):
+            def owner(path, linker, dpkg=None):
                 return {'kind': 'debian', 'name': path.name, 'version': '1',
                         'source_package': path.name, 'source_version': '1',
                         'original': str(internal / path.name)}
@@ -640,6 +697,7 @@ class GateTests(unittest.TestCase):
                     patch.object(module, 'linked_libraries', return_value=[]), \
                     patch.object(module, 'python_runtime_owner', return_value=None), \
                     patch.object(module, 'debian_owner', side_effect=owner), \
+                    patch.object(module, 'DpkgOwners'), \
                     patch.object(module, 'debian_notices', side_effect=notices), \
                     patch.object(module, 'fetch_source') as fetch:
                 with self.assertRaises(ValueError):
@@ -674,7 +732,7 @@ class GateTests(unittest.TestCase):
             boot = output / 'python/pyinstaller/COPYING.txt'
             boot.parent.mkdir(parents=True)
             boot.write_text('PyInstaller bootloader exception fixture')
-            def owner(path, linker):
+            def owner(path, linker, dpkg=None):
                 return {'kind': 'debian', 'name': path.name, 'version': '1',
                         'source_package': path.name, 'source_version': '1',
                         'original': str(internal / path.name)}
@@ -689,6 +747,7 @@ class GateTests(unittest.TestCase):
                     patch.object(module, 'linked_libraries', return_value=[]), \
                     patch.object(module, 'python_runtime_owner', return_value=None), \
                     patch.object(module, 'debian_owner', side_effect=owner), \
+                    patch.object(module, 'DpkgOwners'), \
                     patch.object(module, 'debian_notices', side_effect=notices), \
                     patch.object(module, 'fetch_source') as fetch:
                 with self.assertRaisesRegex(ValueError, 'GPL-9.0.*GPL-only|GPL-only.*GPL-9.0'):
@@ -781,6 +840,7 @@ class GateTests(unittest.TestCase):
                     patch.object(module, "linked_libraries", return_value=[]), \
                     patch.object(module, "python_runtime_owner", return_value=None), \
                     patch.object(module, "debian_owner", return_value=owner), \
+                    patch.object(module, "DpkgOwners"), \
                     patch.object(module, "debian_notices", side_effect=lambda owner, out: copy_notices(owner, out, root)), \
                     patch.object(module, "fetch_source", side_effect=ValueError("missing exact corresponding source")) as fetch:
                 with self.assertRaisesRegex(ValueError, "exact corresponding source"):
@@ -831,6 +891,7 @@ class GateTests(unittest.TestCase):
                     patch.object(module, "linked_libraries", return_value=[]), \
                     patch.object(module, "python_runtime_owner", return_value=None), \
                     patch.object(module, "debian_owner", return_value=owner), \
+                    patch.object(module, "DpkgOwners"), \
                     patch.object(module, "debian_notices", side_effect=lambda owner, out: copy_notices(owner, out, root)), \
                     patch.object(module, "fetch_source", side_effect=ValueError("missing exact corresponding source")) as fetch:
                 # The binary version and complete notice stay unchanged: only
@@ -938,6 +999,7 @@ class GateTests(unittest.TestCase):
                     patch.object(module, "linked_libraries", return_value=[]), \
                     patch.object(module, "python_runtime_owner", return_value=None), \
                     patch.object(module, "debian_owner", return_value=owner), \
+                    patch.object(module, "DpkgOwners"), \
                     patch.object(module, "debian_notices", side_effect=lambda owner, out: copy_notices(owner, out, root)), \
                     patch.object(module, "fetch_source", side_effect=synthetic_source) as fetch, \
                     patch.object(module, "license_policy", wraps=module.license_policy) as policy:

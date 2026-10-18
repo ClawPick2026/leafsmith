@@ -93,12 +93,50 @@ def linker_paths():
     return paths
 
 
-def debian_owner(path, linker):
-    """Resolve original installed path through ldconfig, then exact dpkg owner.
+class DpkgOwners:
+    """Batched exact dpkg ownership. Every dpkg-query call scans the whole
+    database (~0.2 s on hosted runners), so query all candidates at once."""
 
-    dpkg -S on a PyInstaller copy is meaningless. Also try merged-/usr aliases,
-    since dpkg's recorded path can predate the runner's directory symlinks.
-    """
+    CHUNK = 200
+
+    def __init__(self):
+        self.files = {}     # candidate path -> owning package tokens
+        self.packages = {}  # package token -> (binary, version, source, source_version)
+
+    def prefetch(self, candidates):
+        pending = [p for p in dict.fromkeys(str(c) for c in candidates) if p not in self.files]
+        for start in range(0, len(pending), self.CHUNK):
+            chunk = pending[start:start + self.CHUNK]
+            for path in chunk:
+                self.files[path] = []
+            # Nonzero when any path is unowned; matches are still printed.
+            found = command(["dpkg-query", "-S", *chunk])
+            for line in found.stdout.splitlines():
+                if ": " not in line or line.startswith("diversion by "):
+                    continue
+                packages, installed = line.rsplit(": ", 1)
+                if installed in chunk:
+                    owners = self.files[installed]
+                    owners.extend(p for p in (p.strip() for p in packages.split(",")) if p not in owners)
+        names = sorted({p for path in pending for p in self.files[path]} - set(self.packages))
+        if names:
+            result = command(["dpkg-query", "-W", "-f=${binary:Package}\t${Version}\t${source:Package}\t${source:Version}\n", *names])
+            result.check_returncode()
+            for line in result.stdout.splitlines():
+                binary, version, source, source_version = line.split("\t")
+                self.packages[binary] = (binary, version, source, source_version)
+            missing = [name for name in names if name not in self.packages]
+            if missing:
+                raise ValueError("Unresolved dpkg package identity: " + ", ".join(missing))
+
+    def owners(self, path):
+        self.prefetch([path])
+        return [self.packages[p] for p in self.files[str(path)]]
+
+
+def owner_candidates(path, linker):
+    """Original installed paths through ldconfig, plus merged-/usr aliases,
+    since dpkg's recorded path can predate the runner's directory symlinks."""
     paths = []
     if path.is_absolute():
         paths.extend([path, path.resolve()])
@@ -111,20 +149,20 @@ def debian_owner(path, linker):
             candidates.append(Path("/usr" + text))
         elif text.startswith(("/usr/lib/", "/usr/lib64/")):
             candidates.append(Path(text[4:]))
+    return list(dict.fromkeys(candidates))
+
+
+def debian_owner(path, linker, dpkg=None):
+    """Resolve original installed path through ldconfig, then exact dpkg owner.
+
+    dpkg -S on a PyInstaller copy is meaningless.
+    """
+    dpkg = dpkg or DpkgOwners()
+    candidates = owner_candidates(path, linker)
+    dpkg.prefetch(candidates)
     owners = {}
-    for original in dict.fromkeys(candidates):
-        found = command(["dpkg-query", "-S", str(original)])
-        if found.returncode:
-            continue
-        for line in found.stdout.splitlines():
-            if ": " not in line:
-                continue
-            package, installed = line.rsplit(": ", 1)
-            if installed != str(original):
-                continue
-            result = command(["dpkg-query", "-W", "-f=${binary:Package}\t${Version}\t${source:Package}\t${source:Version}\n", package])
-            result.check_returncode()
-            binary, version, source, source_version = result.stdout.strip().split("\t")
+    for original in candidates:
+        for binary, version, source, source_version in dpkg.owners(original):
             owners[(binary, version)] = {"kind": "debian", "name": binary, "version": version,
                                         "source_package": source, "source_version": source_version,
                                         "original": str(original)}
@@ -453,6 +491,19 @@ def fetch_source(package, version, output):
             "files": {(directory.relative_to(output) / name).as_posix(): digest for name, digest in files.items()}}
 
 
+def fetch_sources(needed, output, workers=8):
+    """Download exact sources concurrently, each into its own directory, with
+    the same apt authentication and .dsc checks. Results keep sorted order."""
+    from concurrent.futures import ThreadPoolExecutor
+    needed = sorted(needed)
+    for package, version in needed:
+        print("Downloading exact corresponding source " + package + "=" + version, flush=True)
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futures = [pool.submit(fetch_source, package, version, output) for package, version in needed]
+    # The pool has finished every download; report the first failure in order.
+    return [future.result() for future in futures]
+
+
 def shared_libraries(root):
     """Inventory actual *.so / *.so.* payloads, including wheel .libs folders."""
     root = Path(root).resolve()
@@ -559,6 +610,11 @@ def collect(worker, native, output, source_output, python_records, distributions
     debian_cache = {}
     sources_needed = set()
     policy_issues = []
+    # One batched dpkg lookup for every system-library candidate.
+    dpkg = DpkgOwners()
+    roots = [origins.get(p.resolve().relative_to(worker).as_posix().removeprefix("_internal/")) or Path(p.name)
+             for p in shipped] + superset
+    dpkg.prefetch(c for root in roots for c in owner_candidates(root, linker))
 
     def classify(owner, text, basename):
         try:
@@ -591,7 +647,7 @@ def collect(worker, native, output, source_output, python_records, distributions
                 system_path = collected_original or Path(path.name)
             else:
                 system_path = path
-            owner = debian_owner(system_path, linker)
+            owner = debian_owner(system_path, linker, dpkg)
             key = (owner["name"], owner["version"])
             if key not in debian_cache:
                 try:
@@ -625,10 +681,7 @@ def collect(worker, native, output, source_output, python_records, distributions
     if source_output.exists() and any(source_output.iterdir()):
         raise ValueError("Corresponding source destination must be fresh; refusing stale sources: " + str(source_output))
     source_output.mkdir(parents=True, exist_ok=True)
-    sources = []
-    for package, version in sorted(sources_needed):
-        print("Downloading exact corresponding source " + package + "=" + version, flush=True)
-        sources.append(fetch_source(package, version, source_output))
+    sources = fetch_sources(sources_needed, source_output)
     inventory = {"schema": 1, "platform": sys.platform, "libraries": libraries, "sources": sources,
                  "scope": "Actual frozen-worker libraries plus native/worker ldd closure and explicit loader modules; superset is not a claim that all dependencies ship.",
                  "binaries": [{"name": "paperwork-worker", "sha256": sha256(worker / "paperwork-worker"),

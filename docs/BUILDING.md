@@ -138,14 +138,16 @@ The Linux CI path additionally runs:
 
 ```sh
 # After npm build, worker freeze and native tests; requires native Linux toolchain.
-cargo build --release --manifest-path src-tauri/Cargo.toml \
-  --target x86_64-unknown-linux-gnu
+# Build the exact release binary once; it is inventoried, then bundled as-is.
+npm run tauri -- build --target x86_64-unknown-linux-gnu --no-bundle
 python scripts/license-report.py --require-rust \
   --linux-native src-tauri/target/x86_64-unknown-linux-gnu/release/paperwork-desktop \
   --linux-extra-library '/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/*/loaders/*.so' \
   --linux-extra-library '/usr/lib/x86_64-linux-gnu/gtk-3.0/*/immodules/*.so' \
-  --linux-extra-library '/usr/lib/x86_64-linux-gnu/gio/modules/*.so'
-# After normal Tauri bundle creation:
+  --linux-extra-library '/usr/lib/x86_64-linux-gnu/gio/modules/*.so' \
+  --linux-extra-library '/usr/lib/x86_64-linux-gnu/webkit2gtk-4.1/injected-bundle/*.so' \
+  --linux-extra-library '/usr/lib/x86_64-linux-gnu/webkit2gtk-4.1/WebKit*Process'
+npm run tauri -- bundle --target x86_64-unknown-linux-gnu --bundles appimage
 python scripts/audit_linux_libraries.py \
   --appimage 'src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/appimage/*.AppImage' \
   --inventory build/worker/paperwork-worker/third-party-licenses/linux-libraries.json \
@@ -268,13 +270,22 @@ git tag -a v0.1.0-rc.2 -m "Paperwork 0.1.0 RC2" && git push origin v0.1.0-rc.2
 gh run watch RUN_ID --repo ClawPick2026/paperwork-desktop --exit-status
 ```
 
-The `publish` job runs only if both platform builds pass, including the Linux
-postbundle license/source audit. It verifies every downloaded asset against both
-`SHA256SUMS` files, uploads the AppImage, NSIS installer, notices ZIPs, Linux
-corresponding-source ZIP and checksum lists to a draft release, then publishes
-it. It is the only job with `contents: write`. A failed build publishes nothing.
-To retry after fixing a failure, delete the tag (and any leftover draft
-release) and push the tag again on the fixed commit.
+The tag run first checks the tag and release notes, so a mistake fails in
+seconds. It then looks for an earlier successful `Desktop packages` run for the
+same commit, such as the run started by merging to `main`, whose package
+artifacts have not expired (14 days). If one exists, the tag run publishes those
+already-verified packages in about a minute instead of rebuilding them. Push the
+tag after that run has passed to get this fast path; otherwise the tag run
+builds and checks both packages itself.
+
+The `publish` job uses only packages whose builds passed every check, including
+the Linux postbundle license/source audit. It verifies every downloaded asset
+against both `SHA256SUMS` files, uploads the AppImage, NSIS installer, notices
+ZIPs, Linux corresponding-source ZIP and checksum lists to a draft release, then
+publishes it. It is the only job with `contents: write`, and the release notes
+name the run that built the packages. A failed build publishes nothing. To retry
+after fixing a failure, delete the tag (and any leftover draft release) and push
+the tag again on the fixed commit.
 
 ## Local development
 
