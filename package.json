@@ -10,7 +10,10 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1 --port 4173",
     "tauri": "tauri",
-    "test": "node --experimental-strip-types --test tests/*.test.ts"
+    "test": "node --experimental-strip-types --test tests/*.test.ts web/tests/*.test.ts",
+    "web:dev": "npx --yes lakebed@0.0.40 dev web --host 127.0.0.1 --port 3030",
+    "web:build": "npx --yes lakebed@0.0.40 build web",
+    "web:test": "node --experimental-strip-types --test web/tests/*.test.ts"
   },
   "dependencies": {
     "preact": "11.0.1",

@@ -21,6 +21,8 @@
   },
   "include": [
     "src",
+    "web/client",
+    "web/shared",
     "vite.config.ts"
   ]
 }

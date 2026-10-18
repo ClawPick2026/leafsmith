@@ -15,3 +15,5 @@ native-review.json
 architecture-handoff.md
 .env
 .env.*
+.test-venv/
+web/.lakebed/

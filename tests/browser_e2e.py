@@ -1,9 +1,9 @@
 """Real Chromium acceptance; no Tauri bridge injection or mocked job results.
 
 Run with Playwright, pypdf, reportlab and Pillow installed:
-  ../paperwork/.test-venv/bin/python tests/browser_e2e.py http://127.0.0.1:1420
+  .test-venv/bin/python tests/browser_e2e.py http://127.0.0.1:1420
 Optional PAPERWORK_BROWSER_ENV points to a JSON executable_path/library_path/
-launch_args config (defaults to ../paperwork/tests/browser-env.json if present).
+launch_args config (defaults to web/tests/browser-env.json if present).
 Only test-local browser environment is changed. For stable release acceptance,
 serve a frozen copy of dist rather than an actively edited Vite/HMR session;
 PAPERWORK_SERVED_BUILD records that served directory's asset hashes. Capture
@@ -33,7 +33,7 @@ ART = ROOT / 'docs/screenshots/browser'
 ART.mkdir(parents=True, exist_ok=True)
 BASE = sys.argv[1] if len(sys.argv) > 1 else 'http://127.0.0.1:1420'
 REPORT = ROOT / 'tests/browser-verification.json'
-CONFIG = Path(os.environ.get('PAPERWORK_BROWSER_ENV', str(ROOT.parent / 'paperwork/tests/browser-env.json')))
+CONFIG = Path(os.environ.get('PAPERWORK_BROWSER_ENV', str(ROOT / 'web/tests/browser-env.json')))
 STARTED = datetime.now(timezone.utc).isoformat()
 SERVED_BUILD = Path(os.environ['PAPERWORK_SERVED_BUILD']).resolve() if os.environ.get('PAPERWORK_SERVED_BUILD') else None
 BUILD_MANIFEST = [

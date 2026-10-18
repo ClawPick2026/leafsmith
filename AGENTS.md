@@ -1,14 +1,14 @@
-# Paperwork Desktop
+# Paperwork — web and desktop monorepo
 
 ## Authority and scope
-- User approved an independent installable app, public GitHub repository under MIT, full original feature scope, same Preact visual design as the Lakebed site, Windows NSIS and Linux AppImage. Preserve the existing website at ../paperwork; only the coordinator may update its download link after actual release assets exist.
+- User approved one repository for the Lakebed website and installable app, under MIT. The canonical checkout is ~/Projects/paperwork. Desktop build/worker/native paths remain at the root; the website capsule is web/. Preserve its deployment identity and public download URLs; only the coordinator may update download links after actual release assets exist.
 - User decisions: local processing by default; local AI models plus optional user-configured API providers; core app plus optional versioned processing/model downloads with explicit consent. Never send documents externally without per-operation consent. Never install tools globally or require administrator access as an implementation shortcut.
 - First package targets: Windows x86_64 and Linux x86_64. The development host is Linux ARM64 with no Rust/C toolchain. CI build results are not equivalent to native interactive Windows/Linux desktop testing.
 - App code MIT; dependencies and models retain their licenses. No AGPL components or unredistributable FFmpeg builds. Preserve third-party notices and source-offer obligations. No invented license claims.
 
 ## Architecture and file ownership
 - Preact + TypeScript + bundled Tailwind/Vite assets; Tauri 2 native Rust host; bundled Python worker frozen with PyInstaller so users do not need Python.
-- Reuse current website client/index.tsx, shared catalog/pages, and engine implementations. Desktop must not load processing libraries from CDNs at runtime; use bundled npm packages with lockfile.
+- Maintain exactly one implementation of shared UI, processing algorithms, catalog and page parsing under web/client/ and web/shared/. Keeping canonical sources inside the Lakebed capsule allows capsule-local relative imports; desktop adapters import them directly, without generation or editable copies. Keep web/shared/ pure TypeScript and all web/client/ imports capsule-local or platform-approved Preact/Lakebed imports. Inject platform library loaders and UI slots; only src/ may import bundled npm processing packages and Tauri. Desktop must not load processing libraries from CDNs at runtime. Keep existing browser/desktop library versions explicit in their adapters.
 - Frontend worker owns src/** and frontend tests only. PDF worker owns worker/pdf_ops.py, worker/tests/test_pdf_ops.py and worker/test-requirements.txt only. Media/AI worker owns worker/media_ops.py, worker/tests/test_media_ops.py and worker/media-requirements.txt only. Coordinator owns Rust, app packaging, project manifests, shared contracts and integration. Do not edit each other's files.
 - Worker contract `run(request: dict) -> dict`: request = {operation: string, inputs: absolute local file path[], output_dir: absolute job directory, options: object, engines: object}. Return {outputs:[{path,name,mime}], details:object}. All outputs must be inside output_dir. No raw file bytes/passwords/API keys in logs. Errors must be actionable; never return fabricated results.
 - worker/pdf_ops.py exports `OPERATIONS` set and `run(request)`; worker/media_ops.py same. Worker main dispatches a single JSON-line request from stdin to one module, emits one JSON result {ok:true,result:...} or {ok:false,error:{code,message}}, and exits. Stdout is reserved for protocol JSON. No arbitrary command execution from frontend.
@@ -22,3 +22,9 @@
 - Existing text editing must actually modify existing text objects, not hide them with a white rectangle. Font substitutions, complex-layout limits, best-effort Office reconstruction, non-removable watermark cases and model limitations must be explicit. Known-password unlocking only. Electronic signatures are not certificate signatures.
 - Inputs can be untrusted. Reject malformed files, unsafe archives, path traversal, unknown operations; run subprocesses without a shell, use timeouts, clean temp files, do not overwrite source files. No network during local jobs unless component installation or explicit cloud consent.
 - Workers do not commit, push, tag, publish, deploy, use paid services or recurse into more agents. Coordinator owns external side effects.
+
+## Monorepo commands and preservation
+- `npm test` runs both frontend suites. `npm run build` typechecks shared code and bundles desktop; `npm run web:build` builds the Lakebed capsule. `npm run dev` starts desktop preview; `npm run web:dev` starts the website on loopback port 3030. Native package workflows retain their existing root-relative paths.
+- Follow web/AGENTS.md for website privacy, Lakebed runtime and browser acceptance. The website must never gain native imports, document uploads, or cloud processing as a consequence of code sharing.
+- Run browser acceptance against freshly built/served outputs of both targets and independently parse downloads. Browser-preview tests do not prove native IPC or installer acceptance.
+- Do not create a nested Git repository under web/. Both histories are preserved in this repository; `archive/web-initial` retains the original Lakebed scaffold commit. Existing desktop release work may be staged/unstaged: preserve it and keep unrelated release fixes out of migration-only commits.

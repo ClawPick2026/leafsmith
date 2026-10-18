@@ -1,0 +1,7 @@
+.lakebed/
+.env.lakebed.server
+.test-venv/
+tests/browser-env/
+tests/browser-env.json
+tests/artifacts/
+__pycache__/

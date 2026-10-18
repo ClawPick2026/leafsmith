@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@source "../web/client";
+@source "../web/shared";
 
 html { scroll-behavior: smooth; }
 body { margin: 0; min-width: 320px; background: #f8f9f4; }

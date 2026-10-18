@@ -1,0 +1,1217 @@
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts
+tests/pages.test.ts sha256=8a9628a8175e705170552d53d032aceff52d4573cd6f4c0a240a78a7d90b2b82
+✖ blank page range selects every 1-based page (11.567436ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 862.411087
+
+✖ failing tests:
+
+test at tests/pages.test.ts:4:1
+✖ blank page range selects every 1-based page (11.567436ms)
+  Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/home/defaultuser/Projects/paperwork/shared/pages.ts' imported from /home/defaultuser/Projects/paperwork/tests/pages.test.ts
+      at finalizeResolution (node:internal/modules/esm/resolve:272:11)
+      at moduleResolve (node:internal/modules/esm/resolve:879:10)
+      at defaultResolve (node:internal/modules/esm/resolve:1006:11)
+      at #cachedDefaultResolve (node:internal/modules/esm/loader:708:20)
+      at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:728:38)
+      at ModuleLoader.resolveSync (node:internal/modules/esm/loader:766:56)
+      at #resolve (node:internal/modules/esm/loader:690:17)
+      at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:610:35)
+      at node:internal/modules/esm/loader:639:32
+      at TracingChannel.tracePromise (node:diagnostics_channel:538:22) {
+    code: 'ERR_MODULE_NOT_FOUND',
+    url: 'file:///home/defaultuser/Projects/paperwork/shared/pages.ts'
+  }
+EXIT: 1
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts
+tests/pages.test.ts sha256=8a9628a8175e705170552d53d032aceff52d4573cd6f4c0a240a78a7d90b2b82
+shared/pages.ts sha256=2313864bfe02911a2d9b59e65171c69dc488ce45861412c1419dfc0b5fd0f0d6
+✔ blank page range selects every 1-based page (72.466766ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 639.407952
+EXIT: 0
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts
+tests/pages.test.ts sha256=657be5a3d1ecdf2c4e198d553cf38dd6396fab59c3e0b8205bda3f3da57b7a92
+shared/pages.ts sha256=2313864bfe02911a2d9b59e65171c69dc488ce45861412c1419dfc0b5fd0f0d6
+✖ comma ranges preserve requested order and deduplicate (17.122376ms)
+✔ blank page range selects every 1-based page (6.442161ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 798.470985
+
+✖ failing tests:
+
+test at tests/pages.test.ts:5:1
+✖ comma ranges preserve requested order and deduplicate (17.122376ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    [
+  -   3,
+      1,
+      2,
+  +   3,
+  +   4,
+      5
+    ]
+  
+      at TestContext.<anonymous> (file:///home/defaultuser/Projects/paperwork/tests/pages.test.ts:6:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.start (node:internal/test_runner/test:1257:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ 1, 2, 3, 4, 5 ],
+    expected: [ 3, 1, 2, 5 ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+EXIT: 1
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts
+tests/pages.test.ts sha256=657be5a3d1ecdf2c4e198d553cf38dd6396fab59c3e0b8205bda3f3da57b7a92
+shared/pages.ts sha256=330ced4bd6c8bf98d6fd77c75cabc6743e2e88a6c29c1bd332028a635e54af31
+✔ comma ranges preserve requested order and deduplicate (8.975817ms)
+✔ blank page range selects every 1-based page (1.236368ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 677.535005
+EXIT: 0
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+shared/pages.ts sha256=330ced4bd6c8bf98d6fd77c75cabc6743e2e88a6c29c1bd332028a635e54af31
+✔ comma ranges preserve requested order and deduplicate (13.054155ms)
+✖ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (7.471122ms)
+✔ blank page range selects every 1-based page (2.863828ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 2
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 751.228494
+
+✖ failing tests:
+
+test at tests/pages.test.ts:9:1
+✖ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (7.471122ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception: 0
+      at TestContext.<anonymous> (file:///home/defaultuser/Projects/paperwork/tests/pages.test.ts:11:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+      at Test.postRun (node:internal/test_runner/test:1537:19)
+      at Test.run (node:internal/test_runner/test:1462:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+EXIT: 1
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+✔ comma ranges preserve requested order and deduplicate (8.037218ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (6.186517ms)
+✔ blank page range selects every 1-based page (3.333078ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 669.946121
+EXIT: 0
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=2eb80e84bef5670422393d36fc8e1b568490d9e777928a782c71cbf1796b1cc1
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+✖ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (7.486877ms)
+✔ comma ranges preserve requested order and deduplicate (27.243465ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (5.707874ms)
+✔ blank page range selects every 1-based page (1.293598ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 3
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 803.327155
+
+✖ failing tests:
+
+test at tests/engine.test.ts:6:1
+✖ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (7.486877ms)
+  Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/home/defaultuser/Projects/paperwork/client/engine.ts' imported from /home/defaultuser/Projects/paperwork/tests/engine.test.ts
+      at finalizeResolution (node:internal/modules/esm/resolve:272:11)
+      at moduleResolve (node:internal/modules/esm/resolve:879:10)
+      at defaultResolve (node:internal/modules/esm/resolve:1006:11)
+      at #cachedDefaultResolve (node:internal/modules/esm/loader:708:20)
+      at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:728:38)
+      at ModuleLoader.resolveSync (node:internal/modules/esm/loader:766:56)
+      at #resolve (node:internal/modules/esm/loader:690:17)
+      at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:610:35)
+      at node:internal/modules/esm/loader:639:32
+      at TracingChannel.tracePromise (node:diagnostics_channel:538:22) {
+    code: 'ERR_MODULE_NOT_FOUND',
+    url: 'file:///home/defaultuser/Projects/paperwork/client/engine.ts'
+  }
+EXIT: 1
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=2eb80e84bef5670422393d36fc8e1b568490d9e777928a782c71cbf1796b1cc1
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=d5fad2aa365a3cb9f6dc7d7c8dc5bdca508449a824f1eabdc34869b1933a0dbb
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (59.457691ms)
+✔ comma ranges preserve requested order and deduplicate (4.014248ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (1.821616ms)
+✔ blank page range selects every 1-based page (1.257054ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 437.973307
+EXIT: 0
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=792697b0a6a9f9326b667d3874c8e89aa2f38f22b5c04723ac9f885a048aaae2
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=d5fad2aa365a3cb9f6dc7d7c8dc5bdca508449a824f1eabdc34869b1933a0dbb
+✖ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (8.583823ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (1.754228ms)
+✔ comma ranges preserve requested order and deduplicate (4.578116ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (2.435487ms)
+✔ blank page range selects every 1-based page (0.955502ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 4
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 341.194984
+
+✖ failing tests:
+
+test at tests/engine.test.ts:18:1
+✖ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (8.583823ms)
+  TypeError: e.loadPdfLib is not a function
+      at TestContext.<anonymous> (file:///home/defaultuser/Projects/paperwork/tests/engine.test.ts:20:26)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+EXIT: 1
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=792697b0a6a9f9326b667d3874c8e89aa2f38f22b5c04723ac9f885a048aaae2
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=4c7ee13e4f6a3c2c3f76ec3ee12cc3f2436a49fe419bdfd0e7e2aaf39e8de1c6
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (33.422922ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (5.711698ms)
+✔ comma ranges preserve requested order and deduplicate (5.402993ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (6.098098ms)
+✔ blank page range selects every 1-based page (3.152054ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 728.426685
+EXIT: 0
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=d5be30bfd4256da2ae3ce1184730ddf1f44cf469ca717888bfc7f39b0fa9222a
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=4c7ee13e4f6a3c2c3f76ec3ee12cc3f2436a49fe419bdfd0e7e2aaf39e8de1c6
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (121.715096ms)
+✖ demo PDF round-trips three pages, labeled content and editable name/approved fields (7.266449ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (1.493369ms)
+✔ comma ranges preserve requested order and deduplicate (17.52902ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (6.152557ms)
+✔ blank page range selects every 1-based page (3.347212ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 5
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1290.090466
+
+✖ failing tests:
+
+test at tests/engine.test.ts:39:1
+✖ demo PDF round-trips three pages, labeled content and editable name/approved fields (7.266449ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> (file:///home/defaultuser/Projects/paperwork/tests/engine.test.ts:41:10)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+EXIT: 1
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts tests/catalog.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=d5be30bfd4256da2ae3ce1184730ddf1f44cf469ca717888bfc7f39b0fa9222a
+tests/catalog.test.ts sha256=2c9d71b09b6bd02cd8008a4e69bed1b3d33a70204dc20e3b9ddf643eabe11e2d
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=c3c5d318de11d058e4e937c9bb7a68d2a6c8ab8ddc9b726743e9323bb393274e
+✖ tool discovery filters active browser tools by category and search (5.804229ms)
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (20.993136ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (464.541785ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (1.988386ms)
+✔ comma ranges preserve requested order and deduplicate (5.190051ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (1.845072ms)
+✔ blank page range selects every 1-based page (1.446442ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 6
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 759.449657
+
+✖ failing tests:
+
+test at tests/catalog.test.ts:4:1
+✖ tool discovery filters active browser tools by category and search (5.804229ms)
+  AssertionError [ERR_ASSERTION]: browser tool discovery is implemented
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> (file:///home/defaultuser/Projects/paperwork/tests/catalog.test.ts:6:10)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+EXIT: 1
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts tests/catalog.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=7eab8d941d48254ab5c8c6e0806e9d424a39b41519004c14a4379f448742bb1d
+tests/catalog.test.ts sha256=2c9d71b09b6bd02cd8008a4e69bed1b3d33a70204dc20e3b9ddf643eabe11e2d
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=c3c5d318de11d058e4e937c9bb7a68d2a6c8ab8ddc9b726743e9323bb393274e
+✔ tool discovery filters active browser tools by category and search (14.459946ms)
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (20.719036ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (229.748391ms)
+✖ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (8.743186ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (1.213586ms)
+✔ comma ranges preserve requested order and deduplicate (5.839996ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (2.46925ms)
+✔ blank page range selects every 1-based page (1.376361ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 7
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 598.13941
+
+✖ failing tests:
+
+test at tests/engine.test.ts:61:1
+✖ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (8.743186ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> (file:///home/defaultuser/Projects/paperwork/tests/engine.test.ts:63:10)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+EXIT: 1
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts tests/catalog.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=7eab8d941d48254ab5c8c6e0806e9d424a39b41519004c14a4379f448742bb1d
+tests/catalog.test.ts sha256=2c9d71b09b6bd02cd8008a4e69bed1b3d33a70204dc20e3b9ddf643eabe11e2d
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=69c05a041f6a91a4758164752abaa3246085f22b2d25bb886a97d50103e96e08
+✔ tool discovery filters active browser tools by category and search (24.536635ms)
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (25.827685ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (315.799751ms)
+✔ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (29.999307ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (1.21397ms)
+✔ comma ranges preserve requested order and deduplicate (6.208854ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (1.218585ms)
+✔ blank page range selects every 1-based page (0.738182ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 659.225566
+EXIT: 0
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts tests/catalog.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=4b39991448e8c0d85dd0c87be55d2af5b37dbc384892b8db91ec4770b55ad14c
+tests/catalog.test.ts sha256=2c9d71b09b6bd02cd8008a4e69bed1b3d33a70204dc20e3b9ddf643eabe11e2d
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=69c05a041f6a91a4758164752abaa3246085f22b2d25bb886a97d50103e96e08
+✔ tool discovery filters active browser tools by category and search (18.865642ms)
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (15.723599ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (209.436213ms)
+✔ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (29.836829ms)
+✖ merge concatenates PDF pages and enforces the combined 200-page limit (2.835878ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (1.353975ms)
+✔ comma ranges preserve requested order and deduplicate (5.30551ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (1.326204ms)
+✔ blank page range selects every 1-based page (1.167813ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 8
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 529.850349
+
+✖ failing tests:
+
+test at tests/engine.test.ts:74:1
+✖ merge concatenates PDF pages and enforces the combined 200-page limit (2.835878ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> (file:///home/defaultuser/Projects/paperwork/tests/engine.test.ts:76:10)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+EXIT: 1
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts tests/catalog.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=4b39991448e8c0d85dd0c87be55d2af5b37dbc384892b8db91ec4770b55ad14c
+tests/catalog.test.ts sha256=2c9d71b09b6bd02cd8008a4e69bed1b3d33a70204dc20e3b9ddf643eabe11e2d
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=35bbd56676ad5f6d9543cb7255b19cf05270f9ec5dc79c61bf6cebbd534c63bb
+✔ tool discovery filters active browser tools by category and search (13.686593ms)
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (19.02718ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (306.962124ms)
+✔ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (32.956629ms)
+✔ merge concatenates PDF pages and enforces the combined 200-page limit (239.228337ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (2.186236ms)
+✔ comma ranges preserve requested order and deduplicate (5.443282ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (1.58129ms)
+✔ blank page range selects every 1-based page (2.165313ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 912.250816
+EXIT: 0
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts tests/catalog.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=746f1f4e977c02e7eb3a59fbc6bfec30dd8b585464a1947b790cb6f492dce5c4
+tests/catalog.test.ts sha256=2c9d71b09b6bd02cd8008a4e69bed1b3d33a70204dc20e3b9ddf643eabe11e2d
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=35bbd56676ad5f6d9543cb7255b19cf05270f9ec5dc79c61bf6cebbd534c63bb
+✔ tool discovery filters active browser tools by category and search (25.160245ms)
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (21.977742ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (268.476236ms)
+✔ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (36.995147ms)
+✔ merge concatenates PDF pages and enforces the combined 200-page limit (190.32701ms)
+✖ overlays draw text, rectangles and flattened highlights without discarding interactive fields (3.532362ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (1.223738ms)
+✔ comma ranges preserve requested order and deduplicate (6.033379ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (1.301895ms)
+✔ blank page range selects every 1-based page (0.908957ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 9
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 851.81358
+
+✖ failing tests:
+
+test at tests/engine.test.ts:82:1
+✖ overlays draw text, rectangles and flattened highlights without discarding interactive fields (3.532362ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> (file:///home/defaultuser/Projects/paperwork/tests/engine.test.ts:84:10)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+EXIT: 1
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts tests/catalog.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=746f1f4e977c02e7eb3a59fbc6bfec30dd8b585464a1947b790cb6f492dce5c4
+tests/catalog.test.ts sha256=2c9d71b09b6bd02cd8008a4e69bed1b3d33a70204dc20e3b9ddf643eabe11e2d
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=75488df5b82afcbd6348d01b5e3aa1afa4d1fd8f3baa3eaefed5a7a639d8dd65
+✔ tool discovery filters active browser tools by category and search (13.56234ms)
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (21.613403ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (206.268126ms)
+✔ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (27.153989ms)
+✔ merge concatenates PDF pages and enforces the combined 200-page limit (152.049537ms)
+✔ overlays draw text, rectangles and flattened highlights without discarding interactive fields (46.414229ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (1.776757ms)
+✔ comma ranges preserve requested order and deduplicate (5.700515ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (1.358127ms)
+✔ blank page range selects every 1-based page (0.966497ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 699.730332
+EXIT: 0
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts tests/catalog.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=2dfaba6aa7c21fee85a66316af223fb71469a1e75695b11e613794fc5f955d45
+tests/catalog.test.ts sha256=2c9d71b09b6bd02cd8008a4e69bed1b3d33a70204dc20e3b9ddf643eabe11e2d
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=75488df5b82afcbd6348d01b5e3aa1afa4d1fd8f3baa3eaefed5a7a639d8dd65
+✔ tool discovery filters active browser tools by category and search (13.193474ms)
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (24.956203ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (214.114759ms)
+✔ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (31.435897ms)
+✔ merge concatenates PDF pages and enforces the combined 200-page limit (225.354779ms)
+✔ overlays draw text, rectangles and flattened highlights without discarding interactive fields (47.100382ms)
+✖ form filling updates text, checkboxes and choices, preserves fields unless flattened, and rejects unknown fields (3.265117ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (1.108347ms)
+✔ comma ranges preserve requested order and deduplicate (4.981794ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (1.404128ms)
+✔ blank page range selects every 1-based page (1.061346ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 10
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 822.809526
+
+✖ failing tests:
+
+test at tests/engine.test.ts:93:1
+✖ form filling updates text, checkboxes and choices, preserves fields unless flattened, and rejects unknown fields (3.265117ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> (file:///home/defaultuser/Projects/paperwork/tests/engine.test.ts:95:10)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+EXIT: 1
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts tests/catalog.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=2dfaba6aa7c21fee85a66316af223fb71469a1e75695b11e613794fc5f955d45
+tests/catalog.test.ts sha256=2c9d71b09b6bd02cd8008a4e69bed1b3d33a70204dc20e3b9ddf643eabe11e2d
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=2a32602d275be41d6670720da768ea9943642bee6f478f3976a140479e3bfce8
+✔ tool discovery filters active browser tools by category and search (63.645328ms)
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (107.004476ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (842.308166ms)
+✔ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (140.777667ms)
+✔ merge concatenates PDF pages and enforces the combined 200-page limit (719.256108ms)
+✔ overlays draw text, rectangles and flattened highlights without discarding interactive fields (148.028844ms)
+✔ form filling updates text, checkboxes and choices, preserves fields unless flattened, and rejects unknown fields (160.661982ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (2.991875ms)
+✔ comma ranges preserve requested order and deduplicate (26.612018ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (11.62595ms)
+✔ blank page range selects every 1-based page (1.244967ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3102.146134
+EXIT: 0
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts tests/catalog.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=14518a23d873b533ef6ca91aabcdabb7c492108d5e786548d193d4ef5b583b15
+tests/catalog.test.ts sha256=2c9d71b09b6bd02cd8008a4e69bed1b3d33a70204dc20e3b9ddf643eabe11e2d
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=2a32602d275be41d6670720da768ea9943642bee6f478f3976a140479e3bfce8
+✔ tool discovery filters active browser tools by category and search (23.705137ms)
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (34.694214ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (253.20486ms)
+✔ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (41.76923ms)
+✔ merge concatenates PDF pages and enforces the combined 200-page limit (155.362049ms)
+✔ overlays draw text, rectangles and flattened highlights without discarding interactive fields (58.430659ms)
+✔ form filling updates text, checkboxes and choices, preserves fields unless flattened, and rejects unknown fields (97.294403ms)
+✖ images become natural-sized PDF pages and image overlays validate decoded PNG data (3.475737ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (1.234428ms)
+✔ comma ranges preserve requested order and deduplicate (7.288332ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (1.349047ms)
+✔ blank page range selects every 1-based page (1.100269ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 11
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 995.096356
+
+✖ failing tests:
+
+test at tests/engine.test.ts:111:1
+✖ images become natural-sized PDF pages and image overlays validate decoded PNG data (3.475737ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> (file:///home/defaultuser/Projects/paperwork/tests/engine.test.ts:113:10)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+EXIT: 1
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts tests/catalog.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=14518a23d873b533ef6ca91aabcdabb7c492108d5e786548d193d4ef5b583b15
+tests/catalog.test.ts sha256=2c9d71b09b6bd02cd8008a4e69bed1b3d33a70204dc20e3b9ddf643eabe11e2d
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=a8c4db64f8b57fb65505e7842eeac19e4df8d7e0b2a7494fc436702cf590420c
+✔ tool discovery filters active browser tools by category and search (57.523844ms)
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (32.616517ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (301.977796ms)
+✔ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (31.47617ms)
+✔ merge concatenates PDF pages and enforces the combined 200-page limit (165.262122ms)
+✔ overlays draw text, rectangles and flattened highlights without discarding interactive fields (61.391054ms)
+✔ form filling updates text, checkboxes and choices, preserves fields unless flattened, and rejects unknown fields (55.202224ms)
+✔ images become natural-sized PDF pages and image overlays validate decoded PNG data (16.146022ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (1.472282ms)
+✔ comma ranges preserve requested order and deduplicate (9.154472ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (1.373356ms)
+✔ blank page range selects every 1-based page (1.054498ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1045.239378
+EXIT: 0
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts tests/catalog.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=ed55428baa2bc9f1a12445331b50af7e6a5661a57c285590e8279e5cb26898f2
+tests/catalog.test.ts sha256=2c9d71b09b6bd02cd8008a4e69bed1b3d33a70204dc20e3b9ddf643eabe11e2d
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=a8c4db64f8b57fb65505e7842eeac19e4df8d7e0b2a7494fc436702cf590420c
+✔ tool discovery filters active browser tools by category and search (16.251407ms)
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (23.633431ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (202.59245ms)
+✔ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (28.038197ms)
+✔ merge concatenates PDF pages and enforces the combined 200-page limit (151.509915ms)
+✔ overlays draw text, rectangles and flattened highlights without discarding interactive fields (47.247475ms)
+✔ form filling updates text, checkboxes and choices, preserves fields unless flattened, and rejects unknown fields (50.961757ms)
+✔ images become natural-sized PDF pages and image overlays validate decoded PNG data (20.744792ms)
+✖ optimization returns a valid PDF with fields and never increases file size (3.37027ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (1.369278ms)
+✔ comma ranges preserve requested order and deduplicate (5.957051ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (4.344688ms)
+✔ blank page range selects every 1-based page (1.335354ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 12
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 792.464251
+
+✖ failing tests:
+
+test at tests/engine.test.ts:123:1
+✖ optimization returns a valid PDF with fields and never increases file size (3.37027ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> (file:///home/defaultuser/Projects/paperwork/tests/engine.test.ts:125:10)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+EXIT: 1
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts tests/catalog.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=ed55428baa2bc9f1a12445331b50af7e6a5661a57c285590e8279e5cb26898f2
+tests/catalog.test.ts sha256=2c9d71b09b6bd02cd8008a4e69bed1b3d33a70204dc20e3b9ddf643eabe11e2d
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=8313368305c814318f80baa380c80f861d2c5c6eb21ed33a2fef7f398bc07299
+✔ tool discovery filters active browser tools by category and search (13.448384ms)
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (41.212798ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (288.552127ms)
+✔ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (31.096067ms)
+✔ merge concatenates PDF pages and enforces the combined 200-page limit (182.538795ms)
+✔ overlays draw text, rectangles and flattened highlights without discarding interactive fields (43.553801ms)
+✔ form filling updates text, checkboxes and choices, preserves fields unless flattened, and rejects unknown fields (51.254988ms)
+✔ images become natural-sized PDF pages and image overlays validate decoded PNG data (18.745565ms)
+✔ optimization returns a valid PDF with fields and never increases file size (6.883928ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (1.380662ms)
+✔ comma ranges preserve requested order and deduplicate (4.862629ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (2.357081ms)
+✔ blank page range selects every 1-based page (1.093499ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 994.753801
+EXIT: 0
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts tests/catalog.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=2a0b7a3e1a0bf68a6640f86a15b385787c023135390a90ff9a65469d03d5485d
+tests/catalog.test.ts sha256=2c9d71b09b6bd02cd8008a4e69bed1b3d33a70204dc20e3b9ddf643eabe11e2d
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=8313368305c814318f80baa380c80f861d2c5c6eb21ed33a2fef7f398bc07299
+✔ tool discovery filters active browser tools by category and search (24.857462ms)
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (37.755824ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (388.601847ms)
+✔ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (37.750208ms)
+✔ merge concatenates PDF pages and enforces the combined 200-page limit (157.093271ms)
+✔ overlays draw text, rectangles and flattened highlights without discarding interactive fields (57.900972ms)
+✔ form filling updates text, checkboxes and choices, preserves fields unless flattened, and rejects unknown fields (50.006395ms)
+✔ images become natural-sized PDF pages and image overlays validate decoded PNG data (27.365163ms)
+✔ optimization returns a valid PDF with fields and never increases file size (13.582846ms)
+✖ QR output is safe SVG, UTF-8 encodes non-Latin text and limits payload to 1000 bytes (3.11149ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (1.765829ms)
+✔ comma ranges preserve requested order and deduplicate (5.265795ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (2.488623ms)
+✔ blank page range selects every 1-based page (1.154193ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 13
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1127.386463
+
+✖ failing tests:
+
+test at tests/engine.test.ts:131:1
+✖ QR output is safe SVG, UTF-8 encodes non-Latin text and limits payload to 1000 bytes (3.11149ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> (file:///home/defaultuser/Projects/paperwork/tests/engine.test.ts:133:10)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+EXIT: 1
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts tests/catalog.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=2a0b7a3e1a0bf68a6640f86a15b385787c023135390a90ff9a65469d03d5485d
+tests/catalog.test.ts sha256=2c9d71b09b6bd02cd8008a4e69bed1b3d33a70204dc20e3b9ddf643eabe11e2d
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=af3115e723aa3b9b9fe4f7b6434bc99791ab1d839afb4dc4a1a82285c5064dc5
+✔ tool discovery filters active browser tools by category and search (17.543593ms)
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (23.583566ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (210.434189ms)
+✔ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (28.751665ms)
+✔ merge concatenates PDF pages and enforces the combined 200-page limit (153.813891ms)
+✔ overlays draw text, rectangles and flattened highlights without discarding interactive fields (47.1419ms)
+✔ form filling updates text, checkboxes and choices, preserves fields unless flattened, and rejects unknown fields (52.882479ms)
+✔ images become natural-sized PDF pages and image overlays validate decoded PNG data (18.190384ms)
+✔ optimization returns a valid PDF with fields and never increases file size (6.055896ms)
+✔ QR output is safe SVG, UTF-8 encodes non-Latin text and limits payload to 1000 bytes (566.110585ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (3.403115ms)
+✔ comma ranges preserve requested order and deduplicate (3.525042ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (1.554437ms)
+✔ blank page range selects every 1-based page (1.003342ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1421.11448
+EXIT: 0
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts tests/catalog.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=6358cbf8c141f8301563c40edf0bc6835d9d2ef84cebf1bc02de146fdd0fe83e
+tests/catalog.test.ts sha256=2c9d71b09b6bd02cd8008a4e69bed1b3d33a70204dc20e3b9ddf643eabe11e2d
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=af3115e723aa3b9b9fe4f7b6434bc99791ab1d839afb4dc4a1a82285c5064dc5
+✔ tool discovery filters active browser tools by category and search (16.357085ms)
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (42.115868ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (252.898677ms)
+✔ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (78.15461ms)
+✔ merge concatenates PDF pages and enforces the combined 200-page limit (168.600631ms)
+✔ overlays draw text, rectangles and flattened highlights without discarding interactive fields (46.330778ms)
+✔ form filling updates text, checkboxes and choices, preserves fields unless flattened, and rejects unknown fields (48.807784ms)
+✔ images become natural-sized PDF pages and image overlays validate decoded PNG data (19.541806ms)
+✔ optimization returns a valid PDF with fields and never increases file size (6.606682ms)
+✔ QR output is safe SVG, UTF-8 encodes non-Latin text and limits payload to 1000 bytes (87.021676ms)
+✖ PDF.js rendering uses pinned worker, copies bytes, limits canvas pixels and destroys documents (3.952747ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (1.266734ms)
+✔ comma ranges preserve requested order and deduplicate (4.906548ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (4.265373ms)
+✔ blank page range selects every 1-based page (2.709321ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 14
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1115.428104
+
+✖ failing tests:
+
+test at tests/engine.test.ts:143:1
+✖ PDF.js rendering uses pinned worker, copies bytes, limits canvas pixels and destroys documents (3.952747ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> (file:///home/defaultuser/Projects/paperwork/tests/engine.test.ts:145:10)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+EXIT: 1
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts tests/catalog.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=6358cbf8c141f8301563c40edf0bc6835d9d2ef84cebf1bc02de146fdd0fe83e
+tests/catalog.test.ts sha256=2c9d71b09b6bd02cd8008a4e69bed1b3d33a70204dc20e3b9ddf643eabe11e2d
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=8cee7325e64d42bfa0df6edaf74d02916ebcb97b668f69612f916efd17203607
+✔ tool discovery filters active browser tools by category and search (15.42205ms)
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (31.244036ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (256.55466ms)
+✔ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (31.514584ms)
+✔ merge concatenates PDF pages and enforces the combined 200-page limit (160.34347ms)
+✔ overlays draw text, rectangles and flattened highlights without discarding interactive fields (41.053668ms)
+✔ form filling updates text, checkboxes and choices, preserves fields unless flattened, and rejects unknown fields (55.538533ms)
+✔ images become natural-sized PDF pages and image overlays validate decoded PNG data (24.537044ms)
+✔ optimization returns a valid PDF with fields and never increases file size (8.534821ms)
+✔ QR output is safe SVG, UTF-8 encodes non-Latin text and limits payload to 1000 bytes (97.418306ms)
+✔ PDF.js rendering uses pinned worker, copies bytes, limits canvas pixels and destroys documents (10.391114ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (1.708364ms)
+✔ comma ranges preserve requested order and deduplicate (5.921812ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (1.31512ms)
+✔ blank page range selects every 1-based page (1.063728ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1146.499172
+EXIT: 0
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts tests/catalog.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=2e99f7fa80cc17f5c5e32be949649ed4ad7b252f7ebecf6d2e8b3c82c59003b6
+tests/catalog.test.ts sha256=2c9d71b09b6bd02cd8008a4e69bed1b3d33a70204dc20e3b9ddf643eabe11e2d
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=8cee7325e64d42bfa0df6edaf74d02916ebcb97b668f69612f916efd17203607
+✔ tool discovery filters active browser tools by category and search (16.602232ms)
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (28.940077ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (229.573074ms)
+✔ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (37.014805ms)
+✔ merge concatenates PDF pages and enforces the combined 200-page limit (170.800987ms)
+✔ overlays draw text, rectangles and flattened highlights without discarding interactive fields (44.455462ms)
+✔ form filling updates text, checkboxes and choices, preserves fields unless flattened, and rejects unknown fields (58.371148ms)
+✔ images become natural-sized PDF pages and image overlays validate decoded PNG data (27.249548ms)
+✔ optimization returns a valid PDF with fields and never increases file size (5.460568ms)
+✔ QR output is safe SVG, UTF-8 encodes non-Latin text and limits payload to 1000 bytes (79.417431ms)
+✔ PDF.js rendering uses pinned worker, copies bytes, limits canvas pixels and destroys documents (8.138445ms)
+✖ text extraction preserves selected page order, line breaks, original bytes and releases PDF.js resources (3.338676ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (1.114968ms)
+✔ comma ranges preserve requested order and deduplicate (4.846749ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (1.302756ms)
+✔ blank page range selects every 1-based page (0.786298ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 15
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1013.053617
+
+✖ failing tests:
+
+test at tests/engine.test.ts:166:1
+✖ text extraction preserves selected page order, line breaks, original bytes and releases PDF.js resources (3.338676ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> (file:///home/defaultuser/Projects/paperwork/tests/engine.test.ts:168:10)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+EXIT: 1
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts tests/catalog.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=2e99f7fa80cc17f5c5e32be949649ed4ad7b252f7ebecf6d2e8b3c82c59003b6
+tests/catalog.test.ts sha256=2c9d71b09b6bd02cd8008a4e69bed1b3d33a70204dc20e3b9ddf643eabe11e2d
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=566ba0ecd4c7218d8f304430411f7248ab3a11da29dd253daee0df4fd48487f6
+✔ tool discovery filters active browser tools by category and search (14.336444ms)
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (29.792563ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (373.553704ms)
+✔ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (30.621245ms)
+✔ merge concatenates PDF pages and enforces the combined 200-page limit (262.658239ms)
+✔ overlays draw text, rectangles and flattened highlights without discarding interactive fields (64.505612ms)
+✔ form filling updates text, checkboxes and choices, preserves fields unless flattened, and rejects unknown fields (59.117943ms)
+✔ images become natural-sized PDF pages and image overlays validate decoded PNG data (27.425589ms)
+✔ optimization returns a valid PDF with fields and never increases file size (6.232962ms)
+✔ QR output is safe SVG, UTF-8 encodes non-Latin text and limits payload to 1000 bytes (209.017189ms)
+✔ PDF.js rendering uses pinned worker, copies bytes, limits canvas pixels and destroys documents (18.342991ms)
+✔ text extraction preserves selected page order, line breaks, original bytes and releases PDF.js resources (6.874315ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (3.771445ms)
+✔ comma ranges preserve requested order and deduplicate (4.185243ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (8.20592ms)
+✔ blank page range selects every 1-based page (2.607241ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1523.097441
+EXIT: 0
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts tests/catalog.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=aa07770e1b72831c8bc21fb326ad2b41b17ff195dbe72ba442f7d2c6793f753f
+tests/catalog.test.ts sha256=2c9d71b09b6bd02cd8008a4e69bed1b3d33a70204dc20e3b9ddf643eabe11e2d
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=566ba0ecd4c7218d8f304430411f7248ab3a11da29dd253daee0df4fd48487f6
+✔ tool discovery filters active browser tools by category and search (12.133137ms)
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (34.356959ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (221.495414ms)
+✔ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (29.577243ms)
+✔ merge concatenates PDF pages and enforces the combined 200-page limit (149.508215ms)
+✔ overlays draw text, rectangles and flattened highlights without discarding interactive fields (42.138073ms)
+✔ form filling updates text, checkboxes and choices, preserves fields unless flattened, and rejects unknown fields (52.69172ms)
+✔ images become natural-sized PDF pages and image overlays validate decoded PNG data (23.459976ms)
+✔ optimization returns a valid PDF with fields and never increases file size (5.454622ms)
+✔ QR output is safe SVG, UTF-8 encodes non-Latin text and limits payload to 1000 bytes (90.867158ms)
+✔ PDF.js rendering uses pinned worker, copies bytes, limits canvas pixels and destroys documents (7.666341ms)
+✔ text extraction preserves selected page order, line breaks, original bytes and releases PDF.js resources (4.51718ms)
+✖ image processing decodes input, clamps resize/filter/quality settings, and returns actual canvas MIME (2.932449ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (1.082788ms)
+✔ comma ranges preserve requested order and deduplicate (9.390102ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (1.676782ms)
+✔ blank page range selects every 1-based page (0.995118ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 16
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 947.154256
+
+✖ failing tests:
+
+test at tests/engine.test.ts:184:1
+✖ image processing decodes input, clamps resize/filter/quality settings, and returns actual canvas MIME (2.932449ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> (file:///home/defaultuser/Projects/paperwork/tests/engine.test.ts:186:10)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+EXIT: 1
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts tests/catalog.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=aa07770e1b72831c8bc21fb326ad2b41b17ff195dbe72ba442f7d2c6793f753f
+tests/catalog.test.ts sha256=2c9d71b09b6bd02cd8008a4e69bed1b3d33a70204dc20e3b9ddf643eabe11e2d
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=5867d308777b19f9c52b63ab4295e29548fa441e097616c5855eaffc0340eb57
+✔ tool discovery filters active browser tools by category and search (16.707256ms)
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (21.942755ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (295.956145ms)
+✔ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (29.561165ms)
+✔ merge concatenates PDF pages and enforces the combined 200-page limit (194.609205ms)
+✔ overlays draw text, rectangles and flattened highlights without discarding interactive fields (41.286331ms)
+✔ form filling updates text, checkboxes and choices, preserves fields unless flattened, and rejects unknown fields (55.687852ms)
+✔ images become natural-sized PDF pages and image overlays validate decoded PNG data (23.274453ms)
+✔ optimization returns a valid PDF with fields and never increases file size (5.183132ms)
+✔ QR output is safe SVG, UTF-8 encodes non-Latin text and limits payload to 1000 bytes (95.024422ms)
+✔ PDF.js rendering uses pinned worker, copies bytes, limits canvas pixels and destroys documents (59.164242ms)
+✔ text extraction preserves selected page order, line breaks, original bytes and releases PDF.js resources (5.107381ms)
+✔ image processing decodes input, clamps resize/filter/quality settings, and returns actual canvas MIME (3.895367ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (1.279768ms)
+✔ comma ranges preserve requested order and deduplicate (16.437552ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (8.230235ms)
+✔ blank page range selects every 1-based page (1.138185ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1229.880052
+EXIT: 0
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts tests/catalog.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=27d3e1f5f4ef8975f8a56f87ac35e6f6f4464c2589a697ea61a31bf7f4e7c095
+tests/catalog.test.ts sha256=2c9d71b09b6bd02cd8008a4e69bed1b3d33a70204dc20e3b9ddf643eabe11e2d
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=5867d308777b19f9c52b63ab4295e29548fa441e097616c5855eaffc0340eb57
+✔ tool discovery filters active browser tools by category and search (19.104593ms)
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (56.549114ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (330.026256ms)
+✔ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (28.387437ms)
+✔ merge concatenates PDF pages and enforces the combined 200-page limit (203.482288ms)
+✔ overlays draw text, rectangles and flattened highlights without discarding interactive fields (76.562099ms)
+✔ form filling updates text, checkboxes and choices, preserves fields unless flattened, and rejects unknown fields (57.920715ms)
+✔ images become natural-sized PDF pages and image overlays validate decoded PNG data (28.390845ms)
+✔ optimization returns a valid PDF with fields and never increases file size (6.761171ms)
+✔ QR output is safe SVG, UTF-8 encodes non-Latin text and limits payload to 1000 bytes (85.428554ms)
+✔ PDF.js rendering uses pinned worker, copies bytes, limits canvas pixels and destroys documents (7.738874ms)
+✔ text extraction preserves selected page order, line breaks, original bytes and releases PDF.js resources (4.666335ms)
+✔ image processing decodes input, clamps resize/filter/quality settings, and returns actual canvas MIME (3.41154ms)
+✖ image merging places decoded images in order, produces PNG, caps pixels and closes resources (2.914037ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (1.043765ms)
+✔ comma ranges preserve requested order and deduplicate (4.587806ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (1.862655ms)
+✔ blank page range selects every 1-based page (2.725536ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 17
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1326.642916
+
+✖ failing tests:
+
+test at tests/engine.test.ts:204:1
+✖ image merging places decoded images in order, produces PNG, caps pixels and closes resources (2.914037ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> (file:///home/defaultuser/Projects/paperwork/tests/engine.test.ts:206:10)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+EXIT: 1
+
+COMMAND: node --experimental-strip-types --test tests/pages.test.ts tests/engine.test.ts tests/catalog.test.ts
+tests/pages.test.ts sha256=43ea09504a53e9ef3e20f4f98f2c56b763825decd1e6e9c158b46c87b3aaeaea
+tests/engine.test.ts sha256=27d3e1f5f4ef8975f8a56f87ac35e6f6f4464c2589a697ea61a31bf7f4e7c095
+tests/catalog.test.ts sha256=2c9d71b09b6bd02cd8008a4e69bed1b3d33a70204dc20e3b9ddf643eabe11e2d
+shared/pages.ts sha256=605e3e87fea6e578588bd6ccec9d3b86ca5a0ad9206ed8ed12c5bac9b21c6805
+client/engine.ts sha256=ff3c59b004b04d8e81ffcc4b81ace104528938b883a3f4fd11ee94256c9f387d
+✔ tool discovery filters active browser tools by category and search (16.235867ms)
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (30.006038ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (215.335925ms)
+✔ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (29.607072ms)
+✔ merge concatenates PDF pages and enforces the combined 200-page limit (149.060447ms)
+✔ overlays draw text, rectangles and flattened highlights without discarding interactive fields (43.294887ms)
+✔ form filling updates text, checkboxes and choices, preserves fields unless flattened, and rejects unknown fields (53.858916ms)
+✔ images become natural-sized PDF pages and image overlays validate decoded PNG data (23.969365ms)
+✔ optimization returns a valid PDF with fields and never increases file size (5.64955ms)
+✔ QR output is safe SVG, UTF-8 encodes non-Latin text and limits payload to 1000 bytes (88.963801ms)
+✔ PDF.js rendering uses pinned worker, copies bytes, limits canvas pixels and destroys documents (7.574058ms)
+✔ text extraction preserves selected page order, line breaks, original bytes and releases PDF.js resources (4.141952ms)
+✔ image processing decodes input, clamps resize/filter/quality settings, and returns actual canvas MIME (3.269833ms)
+✔ image merging places decoded images in order, produces PNG, caps pixels and closes resources (2.698264ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (1.149906ms)
+✔ comma ranges preserve requested order and deduplicate (4.552322ms)
+✔ range validation rejects malformed, reversed, out-of-bounds ranges and invalid counts (3.224456ms)
+✔ blank page range selects every 1-based page (1.032469ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 960.105736
+EXIT: 0

@@ -1,6 +1,10 @@
-# Paperwork Desktop
+# Paperwork
 
-Local-first PDF, document, image and media tools, with the same interface as [Paperwork on the web](https://paperwork.lakebed.app).
+Local-first PDF, document, image and media tools for [your browser](https://paperwork.lakebed.app) and desktop.
+
+The [browser edition](web/README.md) runs in your browser with a reduced feature set. The desktop edition adds native document and media tools. Both editions are maintained together; the existing GitHub URL and published downloads remain unchanged.
+
+## Desktop edition
 
 **Release status:** a [Windows x86_64 preview installer (0.1.0 RC1)](https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.1) is published. It passed automated silent installation, native host/worker checks and 22 packaged document-operation checks. It is unsigned; interactive GUI and uninstall testing are pending. Linux and remaining optional engine/model packs are still being completed. This is not the finished cross-platform release.
 
