@@ -17,9 +17,10 @@ work=/work/build/aur
 
 case "$phase" in
   plan) packages=(python-pytest) ;;
-  # Pillow, pypdf and ReportLab create and independently read the smoke fixtures.
+  # Pillow, pypdf and ReportLab create and independently read the smoke fixtures;
+  # pypdf needs cryptography to read back the AES-256 output of protect_pdf.
   build) packages=(namcap shellcheck desktop-file-utils xorg-server-xvfb xorg-xauth
-                   python-pillow python-pypdf python-reportlab) ;;
+                   python-pillow python-pypdf python-reportlab python-cryptography) ;;
   *) echo "Unknown phase $phase" >&2; exit 2 ;;
 esac
 pacman -Syu --noconfirm --needed git python "${packages[@]}"

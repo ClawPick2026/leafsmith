@@ -1175,3 +1175,5 @@ packaging/aur/PKGBUILD.in sha256=f5f6152d06ace6177e52b49ff3cb011b46e3cbd2640ae39
 exit=0
 ............ss..                                                         [100%]
 14 passed, 2 skipped in 3.58s
+
+AUR SMOKE HARNESS RED 2026-10-18T23:11:19+0000 — CI run 39175246566: namcap gate passed (53 accepted); smoke 20/22, protect-aes readback 'cryptography>=3.1 is required for AES algorithm', unlock-known-password got the unprotected fixture. Fix: python-cryptography in the build container.
