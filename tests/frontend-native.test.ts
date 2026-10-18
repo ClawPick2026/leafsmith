@@ -26,7 +26,7 @@ test('provides an actionable parameter schema for every native operation without
   assert.deepEqual(catalog.nativeTools.map(t => t.id).sort(), [...native.nativeOperations].sort());
   const edit = catalog.nativeTools.find(t => t.id === 'edit_pdf_text');
   assert.equal(edit?.fields.find(f => f.key === 'object_index')?.value, 0);
-  assert.equal(edit?.fields.find(f => f.key === 'font')?.value, 'Helvetica');
+  assert.equal(edit?.fields.find(f => f.key === 'font')?.value, native.KEEP_ORIGINAL_FONT);
   const ai = catalog.nativeTools.find(t => t.id === 'summarize');
   assert.equal(ai?.fields.find(f => f.key === 'provider')?.value, 'ollama');
   assert.equal(ai?.fields.find(f => f.key === 'endpoint')?.value, 'http://127.0.0.1:11434');

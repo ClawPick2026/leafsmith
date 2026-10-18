@@ -113,6 +113,14 @@ fn requires_cloud_consent(options:&Value)->Result<bool,String>{
     Ok(cloud)
 }
 
+/// Only translation embeds a font, and its PDF writer needs TrueType outlines.
+fn translation_font(operation:&str,font:&Path)->Result<String,String>{
+    if operation!="translate_pdf"{return Err("A font file applies only to PDF translation.".into());}
+    let extension=font.extension().and_then(|s|s.to_str()).unwrap_or("").to_ascii_lowercase();
+    if extension!="ttf"{return Err("Select a TrueType (.ttf) font file.".into());}
+    Ok(font.to_string_lossy().into_owned())
+}
+
 #[tauri::command]
 async fn run_native_job(app:tauri::AppHandle,state:State<'_,NativeState>,request:JobRequest)->Result<JobResult,String>{
     if !paperwork_security::is_supported_operation(&request.operation){return Err("This operation is not supported.".into());}
@@ -135,6 +143,10 @@ async fn run_native_job(app:tauri::AppHandle,state:State<'_,NativeState>,request
         if !["bin","gguf","ggml"].contains(&extension.as_str()){return Err("Select a local .bin, .gguf or .ggml model file.".into());}
         let key=if request.operation=="transcribe"{"whisper_model"}else{"llama_model"};
         engine_paths.insert(key.into(),model.to_string_lossy().into_owned());
+    }
+    if let Some(font_id)=request.options.get("font_file_id").and_then(Value::as_str) {
+        let font=state.inputs.lock().map_err(|_|"Font grants are unavailable.")?.get(font_id).cloned().ok_or("Select the font file again.")?;
+        engine_paths.insert("pdf_font".into(),translation_font(&request.operation,&font)?);
     }
     let payload=json!({"operation":request.operation,"inputs":inputs,"output_dir":job,"options":request.options,"engines":engine_paths});
     let worker=worker_path(&app)?;
@@ -172,6 +184,16 @@ fn self_test(app:&tauri::AppHandle)->Result<Value,String>{
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn translation_font_grant_requires_translate_pdf_and_a_truetype_file() {
+        let font=Path::new("/granted/Noto Sans.TTF");
+        assert_eq!(translation_font("translate_pdf",font),Ok("/granted/Noto Sans.TTF".to_owned()));
+        assert!(translation_font("summarize",font).is_err());
+        for name in ["/granted/font.otf","/granted/font.ttf.exe","/granted/font"] {
+            assert!(translation_font("translate_pdf",Path::new(name)).is_err(),"{name}");
+        }
+    }
 
     #[test]
     fn only_final_exit_triggers_application_cleanup() {

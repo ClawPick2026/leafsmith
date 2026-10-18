@@ -49,11 +49,15 @@ test('local executable providers omit stale HTTP configuration but retain opaque
 
 test('PDF requests omit per-job cloud metadata rejected by the strict PDF worker', () => {
   const media = new Set(['summarize','translate_pdf','transcribe','compress_video','enhance_image']);
+  // Blank/"keep original"/"None" defaults are UI placeholders for worker defaults and are omitted.
+  const placeholders: Record<string, string[]> = {edit_pdf_text:['font','font_size'], remove_watermark:['page','annotation_subtype']};
+  const required: Record<string, Record<string, unknown>> = {remove_watermark:{exact_text:'DRAFT'}};
   for (const operation of nativeOperations.filter(id => !media.has(id))) {
-    const options = defaults(operation);
+    const options = {...defaults(operation), ...required[operation]};
+    const expected = Object.fromEntries(Object.entries(options).filter(([key]) => !placeholders[operation]?.includes(key)));
     const inputIds = operation === 'form_template' ? [] : ['pdf-grant'];
     for (const cloud_consent of [false, true]) {
-      assert.deepEqual(buildNativeRequest(operation, inputIds, {...options, cloud_consent}).request.options, options, operation);
+      assert.deepEqual(buildNativeRequest(operation, inputIds, {...options, cloud_consent}).request.options, expected, operation);
     }
   }
 });

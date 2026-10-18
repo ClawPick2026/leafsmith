@@ -216,7 +216,7 @@ def _translation(source, directory, options, engines):
     font = TTFont(font_name, font_path)
     missing = {ord(c) for c in translated if not c.isspace() and ord(c) not in font.face.charToGlyph}
     if missing:
-        raise ValueError("Translation contains characters absent from the PDF font; select a suitable licensed engines.pdf_font")
+        raise ValueError("The translation contains characters the PDF font lacks. Select a TrueType font (.ttf) that covers the target language and allows embedding")
     pdfmetrics.registerFont(font)
     style = ParagraphStyle("translation", fontName=font_name, fontSize=11, leading=16, wordWrap="CJK")
     with tempfile.TemporaryDirectory(prefix="translation-", dir=directory) as temporary:
@@ -239,25 +239,33 @@ def _chunks(text, size):
 
 
 def _summary(source, directory, options, engines):
+    import re
     output = _output(directory, "summary.md", "text/markdown")
+    language = options.get("language", "")
+    if not isinstance(language, str) or (language and not re.fullmatch(r"[\w -]{2,60}", language)):
+        raise ValueError("language must be blank or a summary language name or BCP-47 code")
+    instruction = f" Write the summary in {language}." if language else ""
     generate, provider, state = _model_client(options, engines, directory)
     text = _read_text(source, options)
     size = _number(options, "chunk_chars", 12000, 1000, 24000, True)
     chunks = _chunks(text, size)
-    parts = [generate("Summarize this document chunk factually. Keep names, decisions and uncertainty; be concise.", chunk)
+    parts = [generate("Summarize this document chunk factually. Keep names, decisions and uncertainty; be concise." + instruction, chunk)
              for chunk in chunks]
     while len(parts) > 1:
         merged = "\n\n".join(parts)
         groups = _chunks(merged, size)
-        reduced = [generate("Combine these partial summaries into one concise factual summary. Do not invent missing facts.", group)
+        reduced = [generate("Combine these partial summaries into one concise factual summary. Do not invent missing facts." + instruction, group)
                    for group in groups]
         if len(reduced) >= len(parts) and sum(map(len, reduced)) >= len(merged):
             raise ValueError("Model summaries did not shrink; reduce max_tokens or increase chunk_chars")
         parts = reduced
     with open(output["path"], "x", encoding="utf-8") as handle:
         handle.write("# Model-generated summary\n\nVerify against the original; model output may contain errors.\n\n" + parts[0] + "\n")
-    return {"outputs": [output], "details": {"provider": provider, "model_generated": True,
-            "input_chunks": len(chunks), "model_requests": state["requests"], "notice": "Not a verified factual extract."}}
+    details = {"provider": provider, "model_generated": True, "input_chunks": len(chunks),
+               "model_requests": state["requests"], "notice": "Not a verified factual extract."}
+    if language:
+        details["language"] = language
+    return {"outputs": [output], "details": details}
 
 
 def _remote_speech(wav, temporary, options, cloud, timeout):

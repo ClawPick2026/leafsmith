@@ -593,3 +593,20 @@ test_whisper_cli_adapter_real_wav_extraction_not_speech_quality (test_media_ops.
 Ran 16 tests in 8.123s
 
 OK
+
+=== 2026-10-18 summary language + translation font error (feature-plan Q8) ===
+RED  media_ops.py sha256 8739d4c023afa7a62bdc83ce73d06bf0bceddd6d5a890a44c4c14f832ce05775
+     test_media_ops.py sha256 0d864226567afb0fb575128dd9684cddb18a02c912c48d497f5560255edb6486
+     command: .venv-media/bin/python -W error -m unittest <two new tests>
+     result: FAILED (failures=2): tasks lacked 'Write the summary in German.'; glyph error named engines.pdf_font
+TEST FIX  invalid-language case reused an output dir holding summary.md; now uses a fresh dir (assertion unchanged)
+GREEN media_ops.py sha256 154abbd85a74c2fc301aa471f46ee4532fd037ced462a02fe65f06c79e803082
+     test_media_ops.py sha256 824a42618b1eb75788fa960f3b803b6f580676b6cbec5c5a5b1719fa36090c0e
+Ran 2 tests in 2.862s
+
+OK
+     full suite: unittest discover -s worker/tests -p 'test_media*.py' -> exit 0
+Ran 27 tests in 7.854s
+
+OK (skipped=3)
+     Adapter tests only: prompt routing, not model output quality. No FFmpeg on host (3 skips).

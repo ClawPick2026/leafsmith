@@ -20,7 +20,7 @@ Exactly one input per request; maximum file size 512 MiB. Rust MUST grant select
 | `enhance_image` | `brightness=1`, `contrast=1`, `sharpness=1` (finite 0–4); `format="jpeg"` (`jpeg/png/webp`); `quality=85` (integer 1–100; PNG uses lossless optimization); `width=16384`, `height=16384` (integer 1–16384 bounding box, aspect-preserving, never upscales) | `enhanced.jpg/png/webp` |
 | `compress_video` | `crf=36` (integer 10–63); `max_height=1080` (integer 64–2160); `timeout=600` seconds (1–1800); `max_duration=7200` seconds (1–14400) | `compressed.webm`, VP9/Opus |
 | `transcribe` | `provider="whisper.cpp"` or `openai-compatible`; `language="auto"` (local language code); `timeout=600` (1–1800; cloud HTTP capped at 300); `max_duration=7200` (1–14400); remote options below | `transcript.txt`, `transcript.srt` |
-| `summarize` | Model options below | `summary.md`, model-generated map/reduce summary |
+| `summarize` | Model options below; optional `language` (blank or omitted: the model's default, usually the document language; otherwise the same 2–60 word/space/hyphen characters as translation) | `summary.md`, model-generated map/reduce summary |
 | `translate_pdf` | Model options below; required `language` (language name or BCP-47 code, 2–60 word/space/hyphen characters) | `translated.pdf`, `translated.txt` |
 
 Image processing uses Pillow, not generative AI; maximum 40 million pixels, EXIF orientation applied. Static output uses the first image frame. Compression may not reduce size. Video/audio output stops at `max_duration`; the returned details explicitly disclose that limit. Video selects the first video and optional first audio stream, drops metadata/subtitles, uses two encoding threads. H.264 and optional native/generative image stacks are deliberately not exposed: there is no verified redistributable runtime pack for them here.
@@ -45,7 +45,7 @@ Transcription appends `/audio/transcriptions`, uploads FFmpeg-extracted 16 kHz m
 - `ffmpeg`: needed for video and all transcription, including cloud.
 - `whisper`, `whisper_model`: whisper.cpp CLI and separately consented local model. No `options.model_path` escape hatch.
 - `llama`, `llama_model`: llama.cpp CLI and separately consented GGUF. Uses bounded noninteractive completion, 32768 context and two CPU threads. Prompts, generated-text staging and engine diagnostics are created inside a private `llama-*` subdirectory of `output_dir`, closed and cleaned on success or exceptions. Both summary and translation pass the job directory through the adapter. Actual selected runtime/version/model template needs native integration verification; intercepted CLI tests cannot establish supported flags or generation quality.
-- `pdf_font`: optional licensed TrueType font for translation. Defaults to ReportLab's bundled Bitstream Vera. Missing glyphs fail honestly; select a suitable font for CJK/other scripts. Complex-script shaping is not guaranteed.
+- `pdf_font`: optional licensed TrueType font for translation. Rust supplies it only from a user-selected `.ttf` file grant (`options.font_file_id`, `translate_pdf` only). Defaults to ReportLab's bundled Bitstream Vera, which covers Latin scripts only. Missing glyphs fail honestly; select a suitable font for CJK/other scripts. Complex-script shaping is not guaranteed.
 
 Translation produces a **new text document, not an original-layout PDF**. Figures, tables, annotations and original typography are not preserved. Both PDF and TXT contain this notice. Verify translated meaning and model facts against the source.
 

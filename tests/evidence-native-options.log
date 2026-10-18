@@ -1,0 +1,48 @@
+=== 2026-10-18 native option fixes (feature-plan Q1, Q2 watermark part, Q8 frontend) ===
+RED source/test hashes:
+cd7317d90d74e6cbdeafa1e4188446f5e1b9d5b90e8bb217ed42aa81582112bd  src/native-model.ts
+3397ae28bdc77b07eb2af834aeddc81b3b5040a5c9d95fe3f9fa895bb07a954c  src/native-catalog.ts
+2fa18fcbc8c37d98c218691d77058d135ecdbe3de2f7d1816e41573373c5a6d5  src/NativeTools.tsx
+a5ca6b488e141ebf77e20faa5c5d22d703f72834cfcce0aec3cbfe63a2e75738  tests/frontend-native-options.test.ts
+0c0ee0f3a2f1be1ec1530190cc0e592e421128ac5999486766fc2e004eecf6f4  tests/frontend-native.test.ts
+command: node --experimental-strip-types --test tests/frontend-native-options.test.ts -> exit 1
+✖ existing-text edits keep the original font and size unless the user changes them (4.93844ms)
+✖ the font choice lists every standard font the worker accepts after the keep-original default (1.641839ms)
+✖ watermark removal defaults to all pages and exposes annotation types (0.889842ms)
+✖ summary language is optional and blank means the document language; translation keeps a target (0.905227ms)
+✖ a selected translation font travels as an opaque grant for translation only (2.175376ms)
+✖ the native panel offers a separate font-file picker for translation (53.028312ms)
+ℹ tests 6
+ℹ pass 0
+ℹ fail 6
+Reasons: font sent as 'Helvetica'; watermark page always sent; summary language default 'German'; font_file_id passed to every operation; no font picker in NativeTools.tsx.
+
+GREEN hashes:
+c9c62ee12243cd2a745df1bb40fde4c440411b08b7c04d1fcc6967d9f72abf3d  src/native-model.ts
+9a09750641a1dfd472e45358363994ea7db02d1146b936c9e266a87075a2dc14  src/native-catalog.ts
+9379f65747f8df2a750cc2fe5f3bf0324d033cdd2df12fb8330385dbc13d316e  src/NativeTools.tsx
+a0e75d8712e1cc3f9a74a46969ef0bfe58513ecd2476fb51152ceba5db8c3ed2  tests/frontend-native-options.test.ts
+eb9ae3c99a461496927a2886c9da80a8a0f795b587a810dc573501c34549ed6d  tests/frontend-native.test.ts
+ed95f0566c48fbfbf69829179517e57bc974ba7424f7465734465c1f393b4269  tests/frontend-contract-regressions.test.ts
+✔ existing-text edits keep the original font and size unless the user changes them (4.45906ms)
+✔ the font choice lists every standard font the worker accepts after the keep-original default (2.196838ms)
+✔ watermark removal defaults to all pages and exposes annotation types (1.947454ms)
+✔ summary language is optional and blank means the document language; translation keeps a target (0.843381ms)
+✔ a selected translation font travels as an opaque grant for translation only (1.048611ms)
+✔ the native panel offers a separate font-file picker for translation (18.355007ms)
+ℹ tests 6
+ℹ pass 6
+ℹ fail 0
+Full suite: npm test -> exit 0
+ℹ tests 90
+ℹ pass 90
+ℹ fail 0
+Typecheck: npx tsc --noEmit -p tsconfig.json -> exit 0
+Desktop build: npm run build (tsc + Vite) on the combined tree -> exit 0 (existing >500 kB chunk warning only)
+
+Spec changes to existing assertions (intended behaviour change, still exact equality):
+- frontend-native.test.ts: default font is KEEP_ORIGINAL_FONT, not 'Helvetica' (the old default replaced every edited object's font).
+- frontend-contract-regressions.test.ts PDF cloud-metadata test: edit_pdf_text font/font_size and remove_watermark page/annotation_subtype defaults are UI placeholders that the builder omits; remove_watermark supplies exact_text because a selector is required.
+- frontend-native-options.test.ts (new, before first GREEN): blank summary language is sent as '' and handled by the worker, instead of being stripped by the builder.
+
+Not verified here: the Rust font grant (src-tauri/src/main.rs translation_font + unit test) because this host has no cargo/rustc/cc; needs cargo test in CI. Not a packaged-app or interactive check.
