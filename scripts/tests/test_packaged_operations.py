@@ -99,3 +99,25 @@ def test_actual_frozen_worker_builtin_artifacts(tmp_path):
     assert summary["checks_count"] == summary["passed"] == 22
     assert summary["failed"] == 0
     assert len(summary["excluded"]) == 7
+
+
+def test_headless_display_keeps_app_stderr_out_of_protocol_stdout(tmp_path, monkeypatch):
+    # Debian's xvfb-run runs the command with 2>&1; a GTK warning on stderr
+    # (CI 39157675883: AT-SPI bus) must not precede the self-test JSON.
+    smoke = runpy.run_path(str(ROOT / "scripts/smoke-package.py"))
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    fake_xvfb = bin_dir / "xvfb-run"
+    fake_xvfb.write_text('#!/bin/sh\n[ "$1" = "-a" ] && shift\n"$@" 2>&1\n')
+    app = tmp_path / "AppRun"
+    app.write_text('#!/bin/sh\necho "(paperwork-desktop:1): dbind-WARNING **: AT-SPI" >&2\necho \'{"ok":true}\'\n')
+    for path in (fake_xvfb, app):
+        path.chmod(0o755)
+    monkeypatch.setenv("PATH", str(bin_dir) + os.pathsep + os.environ.get("PATH", ""))
+    env = {"PATH": os.environ["PATH"]}
+    prefix = smoke["headless_display_prefix"](env, tmp_path)
+    assert prefix[0] == "xvfb-run"
+    completed = subprocess.run([*prefix, str(app)], env=env, capture_output=True, text=True, check=True)
+    assert completed.stdout == '{"ok":true}\n'
+    assert "dbind-WARNING" in (tmp_path / "native-app.stderr.log").read_text()
+    assert smoke["headless_display_prefix"]({"DISPLAY": ":0", "PATH": env["PATH"]}, tmp_path) == []

@@ -94,6 +94,15 @@ def test_worker(worker, logs, report, label="worker"):
     exercise_builtin_operations(worker, logs, report)
 
 
+def headless_display_prefix(env, logs):
+    """xvfb-run when no display exists. Debian's xvfb-run runs the command with
+    2>&1, so the app's stderr goes to its own log and stdout stays protocol JSON."""
+    if env.get("DISPLAY") or not shutil.which("xvfb-run"):
+        return []
+    env["PAPERWORK_APP_STDERR"] = str(logs / "native-app.stderr.log")
+    return ["xvfb-run", "-a", "sh", "-c", 'exec "$@" 2>>"$PAPERWORK_APP_STDERR"', "sh"]
+
+
 def test_native(app, worker, logs, report, env, prefix=None):
     stdout = run([*(prefix or []), str(app), "--worker-self-test"], "native-self-test", logs, report, env=env)
     # Native execute_worker returns the result, not the JSON-line envelope.
@@ -134,8 +143,7 @@ def smoke(kind, path, logs, report):
                 raise ValueError("Unexpected AppImage worker resource layout: " + repr(found))
             env = clean_environment()
             env["APPDIR"] = str(appdir)
-            prefix = ["xvfb-run", "-a"] if shutil.which("xvfb-run") and not env.get("DISPLAY") else []
-            test_native(appdir / "AppRun", worker, logs, report, env, prefix)
+            test_native(appdir / "AppRun", worker, logs, report, env, headless_display_prefix(env, logs))
 
 
 def main():
