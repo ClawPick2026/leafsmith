@@ -1,0 +1,1141 @@
+
+PKGVER RED 2026-10-18T21:17:15%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/tests/test_aur_package.py sha256=4102a8e0183798c9e2e704b55e95576ece964c5fd437820438746dd96b8a4c1d
+exit=2
+
+==================================== ERRORS ====================================
+______________ ERROR collecting scripts/tests/test_aur_package.py ______________
+scripts/tests/test_aur_package.py:8: in <module>
+    aur = runpy.run_path(str(ROOT / "scripts" / "aur_package.py"))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen runpy>:293: in run_path
+    ???
+<frozen runpy>:261: in _get_code_from_file
+    ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/home/defaultuser/Projects/paperwork/scripts/aur_package.py'
+=========================== short test summary info ============================
+ERROR scripts/tests/test_aur_package.py - FileNotFoundError: [Errno 2] No suc...
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.21s
+
+PKGVER RED 2026-10-18T21:17:22%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/aur_package.py sha256=27cc3705f56b8824146ba79d5501b296dbd0384dc63b369cb1a4696724f10681
+scripts/tests/test_aur_package.py sha256=4102a8e0183798c9e2e704b55e95576ece964c5fd437820438746dd96b8a4c1d
+exit=1
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_release_tags_map_to_pkgver_that_sorts_prereleases_before_final ______
+
+    def test_release_tags_map_to_pkgver_that_sorts_prereleases_before_final():
+>       assert aur["pkgver_from_tag"]("v0.1.0") == "0.1.0"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scripts/tests/test_aur_package.py:12: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tag = 'v0.1.0'
+
+    def pkgver_from_tag(tag: str) -> str:
+>       raise NotImplementedError
+E       NotImplementedError
+
+scripts/aur_package.py:7: NotImplementedError
+=========================== short test summary info ============================
+FAILED scripts/tests/test_aur_package.py::test_release_tags_map_to_pkgver_that_sorts_prereleases_before_final
+1 failed in 0.04s
+
+PKGVER GREEN 2026-10-18T21:17:30%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/aur_package.py sha256=e620b7b681573c8d9319259e50e1ba16f6bd23818e6f84e8fa87bb4fb14fe356
+scripts/tests/test_aur_package.py sha256=4102a8e0183798c9e2e704b55e95576ece964c5fd437820438746dd96b8a4c1d
+exit=0
+.                                                                        [100%]
+1 passed in 0.02s
+
+RELEASE ARTIFACT RED 2026-10-18T21:17:47%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/aur_package.py sha256=856bd02d8e0de0cec0243c367a6572a52ef31029f457bb719eec4d2693b24a1e
+scripts/tests/test_aur_package.py sha256=aeabe5de13701c88ef073a1cc3234341703fb09ec5331e7550106e348ee4b3bf
+exit=1
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+___ test_release_artifact_pins_the_appimage_only_when_checksum_sources_agree ___
+
+    def test_release_artifact_pins_the_appimage_only_when_checksum_sources_agree():
+>       assert aur["release_artifact"](github_release(), SUMS) == {
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            "tag": "v0.1.0-rc.2", "pkgver": "0.1.0rc2", "prerelease": True,
+            "release_url": "https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.2",
+            "appimage": "Paperwork_0.1.0_amd64.AppImage", "sha256": APPIMAGE_SHA, "size": 139901432}
+
+scripts/tests/test_aur_package.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+release = {'tag_name': 'v0.1.0-rc.2', 'draft': False, 'prerelease': True, 'html_url': 'https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.2', ...}
+sums_text = '16b0ebe4484820754224d1850a847990626e4c9e7a35cb7b5ac5b31c638761ca  Paperwork_0.1.0_amd64.AppImage\n1111111111111111111111111111111111111111111111111111111111111111  Paperwork-linux-corresponding-sources.zip\n'
+
+    def release_artifact(release: dict, sums_text: str) -> dict:
+>       raise NotImplementedError
+E       NotImplementedError
+
+scripts/aur_package.py:21: NotImplementedError
+=========================== short test summary info ============================
+FAILED scripts/tests/test_aur_package.py::test_release_artifact_pins_the_appimage_only_when_checksum_sources_agree
+1 failed, 1 passed in 0.04s
+
+RELEASE ARTIFACT GREEN 2026-10-18T21:18:08%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/aur_package.py sha256=5d0af322af5f1bae7deed2fb235a8a843245cbc0838d9cbe43ed2a76c44abcb1
+scripts/tests/test_aur_package.py sha256=aeabe5de13701c88ef073a1cc3234341703fb09ec5331e7550106e348ee4b3bf
+exit=0
+..                                                                       [100%]
+2 passed in 0.02s
+
+RENDER RED 2026-10-18T21:18:28%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/aur_package.py sha256=a71f334fc609ebc16b3d65b8b13f605a274f9d9d397d8be64f4a3edd726087b6
+scripts/tests/test_aur_package.py sha256=2205ec348fd10cec3cbd70a7410fc94f9310c22c0ccab2dd248bb0cd4e32cdd5
+exit=1
+..F                                                                      [100%]
+=================================== FAILURES ===================================
+_____________ test_render_pins_release_appimage_and_local_sources ______________
+
+tmp_path = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-109/test_render_pins_release_appim0')
+
+    def test_render_pins_release_appimage_and_local_sources(tmp_path):
+        artifact = aur["release_artifact"](github_release(), SUMS)
+>       files = aur["render"](artifact, MAINTAINER, 3, srcinfo=fake_srcinfo)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scripts/tests/test_aur_package.py:90: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+artifact = {'tag': 'v0.1.0-rc.2', 'pkgver': '0.1.0rc2', 'prerelease': True, 'release_url': 'https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.2', ...}
+maintainer = 'Jane Doe <jane at example dot org>', pkgrel = 3
+srcinfo = <function fake_srcinfo at 0x6fc0761f30>
+
+    def render(artifact: dict, maintainer: str, pkgrel: int, srcinfo=None) -> dict[str, bytes]:
+>       raise NotImplementedError
+E       NotImplementedError
+
+scripts/aur_package.py:59: NotImplementedError
+=========================== short test summary info ============================
+FAILED scripts/tests/test_aur_package.py::test_render_pins_release_appimage_and_local_sources
+1 failed, 2 passed in 0.09s
+
+RENDER GREEN 2026-10-18T21:19:12%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/aur_package.py sha256=964afbc663d41471589edd181c600e3f6fa255cad0f57e650d7b4c4d5bdbb46b
+scripts/tests/test_aur_package.py sha256=2205ec348fd10cec3cbd70a7410fc94f9310c22c0ccab2dd248bb0cd4e32cdd5
+packaging/aur/PKGBUILD.in sha256=0c5dcbf6b9391b0e55bbd895901faee675f71afa811dd0181bbbe0cee8a52269
+packaging/aur/paperwork-desktop.sh sha256=ed1f78384188bfc176cddf0e2296cb4dec3c1ceb91807384be85b60dfc2c8043
+packaging/aur/paperwork-desktop.desktop sha256=faabf9a6943da30c4cfc720bc58ede525100d8ea50f6791f61d07a5b920fa1d1
+exit=1
+..F                                                                      [100%]
+=================================== FAILURES ===================================
+_____________ test_render_pins_release_appimage_and_local_sources ______________
+
+tmp_path = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-110/test_render_pins_release_appim0')
+
+    def test_render_pins_release_appimage_and_local_sources(tmp_path):
+        artifact = aur["release_artifact"](github_release(), SUMS)
+        files = aur["render"](artifact, MAINTAINER, 3, srcinfo=fake_srcinfo)
+        assert set(files) == {"PKGBUILD", ".SRCINFO", "paperwork-desktop.sh", "paperwork-desktop.desktop"}
+        package = write(tmp_path / "package", files)
+        pkgbuild = files["PKGBUILD"].decode()
+        assert pkgbuild.startswith("# Maintainer: " + MAINTAINER + "\n")
+        assert "@" not in pkgbuild.replace(MAINTAINER, "")
+>       assert bash_values(package / "PKGBUILD", "$pkgname", "$pkgver", "$pkgrel", "${#source[@]}", "${source[0]}", "${sha256sums[*]}").splitlines() == [
+            "paperwork-desktop-bin", "0.1.0rc2", "3", "3",
+            "paperwork-desktop-0.1.0rc2.AppImage::" + DOWNLOADS + "v0.1.0-rc.2/Paperwork_0.1.0_amd64.AppImage",
+            " ".join([APPIMAGE_SHA, *(hashlib.sha256(files[n]).hexdigest() for n in ("paperwork-desktop.sh", "paperwork-desktop.desktop"))])]
+E       AssertionError: assert ['paperwork-d...a5b920fa1d1n'] == ['paperwork-d...7a5b920fa1d1']
+E         
+E         At index 0 diff: 'paperwork-desktop-binn0.1.0rc2n3n3npaperwork-desktop-0.1.0rc2.AppImage::https://github.com/ClawPick2026/paperwork-desktop/releases/download/v0.1.0-rc.2/Paperwork_0.1.0_amd64.AppImagen16b0ebe4484820754224d1850a847990626e4c9e7a35cb7b5ac5b31c638761ca ed1f78384188bfc176cddf0e2296cb4dec3c1ceb91807384be85b60dfc2c8043 faabf9a6943da30c4cfc720bc58ede525100d8ea50f6791f61d07a5b920fa1d1n' != 'paperwork-desktop-bin'
+E         Right contains 5 more items, first extra item: '0.1.0rc2'
+E         Use -v to get more diff
+
+scripts/tests/test_aur_package.py:96: AssertionError
+=========================== short test summary info ============================
+FAILED scripts/tests/test_aur_package.py::test_render_pins_release_appimage_and_local_sources
+1 failed, 2 passed in 0.08s
+
+RENDER GREEN (test helper printf escaping fixed) 2026-10-18T21:19:20%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/aur_package.py sha256=964afbc663d41471589edd181c600e3f6fa255cad0f57e650d7b4c4d5bdbb46b
+scripts/tests/test_aur_package.py sha256=2d53b2b233c207997b8c043c7df3e8a2224396779612f92de74bda1590447285
+packaging/aur/PKGBUILD.in sha256=0c5dcbf6b9391b0e55bbd895901faee675f71afa811dd0181bbbe0cee8a52269
+packaging/aur/paperwork-desktop.sh sha256=ed1f78384188bfc176cddf0e2296cb4dec3c1ceb91807384be85b60dfc2c8043
+packaging/aur/paperwork-desktop.desktop sha256=faabf9a6943da30c4cfc720bc58ede525100d8ea50f6791f61d07a5b920fa1d1
+exit=0
+...                                                                      [100%]
+3 passed in 0.10s
+
+PLAN RED 2026-10-18T21:19:53%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/aur_package.py sha256=37fa06ff729800b8d449dc874160b10b6ea6df6e5fbec393deefaf12794597a4
+scripts/tests/test_aur_package.py sha256=47f235942df108365046ea1d821813ef9b090c1c522a42af69a92a8d3c96eda3
+packaging/aur/PKGBUILD.in sha256=0c5dcbf6b9391b0e55bbd895901faee675f71afa811dd0181bbbe0cee8a52269
+packaging/aur/paperwork-desktop.sh sha256=ed1f78384188bfc176cddf0e2296cb4dec3c1ceb91807384be85b60dfc2c8043
+packaging/aur/paperwork-desktop.desktop sha256=faabf9a6943da30c4cfc720bc58ede525100d8ea50f6791f61d07a5b920fa1d1
+exit=1
+...FF                                                                    [100%]
+=================================== FAILURES ===================================
+_ test_plan_uploads_new_versions_bumps_pkgrel_for_recipe_changes_and_never_downgrades _
+
+tmp_path = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-112/test_plan_uploads_new_versions0')
+
+    def test_plan_uploads_new_versions_bumps_pkgrel_for_recipe_changes_and_never_downgrades(tmp_path):
+        rc2 = aur["release_artifact"](github_release(), SUMS)
+        remote = fake_aur(tmp_path)
+    
+>       first = plan(rc2, remote, tmp_path / "first")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scripts/tests/test_aur_package.py:151: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/tests/test_aur_package.py:144: in plan
+    return aur["plan"](artifact, maintainer, str(remote), out, vercmp=fake_vercmp, srcinfo=fake_srcinfo)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+artifact = {'tag': 'v0.1.0-rc.2', 'pkgver': '0.1.0rc2', 'prerelease': True, 'release_url': 'https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.2', ...}
+maintainer = 'Jane Doe <jane at example dot org>'
+remote = '/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-112/test_plan_uploads_new_versions0/aur.git'
+out = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-112/test_plan_uploads_new_versions0/first')
+vercmp = <function fake_vercmp at 0x774e5424b0>
+srcinfo = <function fake_srcinfo at 0x774e5421f0>
+
+    def plan(artifact: dict, maintainer: str, remote: str, out: Path, vercmp=None, srcinfo=makepkg_srcinfo) -> dict:
+>       raise NotImplementedError
+E       NotImplementedError
+
+scripts/aur_package.py:95: NotImplementedError
+___________ test_plan_refuses_an_aur_repository_for_another_package ____________
+
+tmp_path = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-112/test_plan_refuses_an_aur_repos0')
+
+    def test_plan_refuses_an_aur_repository_for_another_package(tmp_path):
+        remote = fake_aur(tmp_path)
+        push_to_aur(remote, tmp_path, {".SRCINFO": b"pkgbase = something-else\n\tpkgver = 1\n\tpkgrel = 1\n\npkgname = something-else\n",
+                                       "PKGBUILD": b"pkgname=something-else\n"})
+        with pytest.raises(ValueError, match="something-else"):
+>           plan(aur["release_artifact"](github_release(), SUMS), remote, tmp_path / "out")
+
+scripts/tests/test_aur_package.py:183: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/tests/test_aur_package.py:144: in plan
+    return aur["plan"](artifact, maintainer, str(remote), out, vercmp=fake_vercmp, srcinfo=fake_srcinfo)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+artifact = {'tag': 'v0.1.0-rc.2', 'pkgver': '0.1.0rc2', 'prerelease': True, 'release_url': 'https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.2', ...}
+maintainer = 'Jane Doe <jane at example dot org>'
+remote = '/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-112/test_plan_refuses_an_aur_repos0/aur.git'
+out = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-112/test_plan_refuses_an_aur_repos0/out')
+vercmp = <function fake_vercmp at 0x774e5424b0>
+srcinfo = <function fake_srcinfo at 0x774e5421f0>
+
+    def plan(artifact: dict, maintainer: str, remote: str, out: Path, vercmp=None, srcinfo=makepkg_srcinfo) -> dict:
+>       raise NotImplementedError
+E       NotImplementedError
+
+scripts/aur_package.py:95: NotImplementedError
+=========================== short test summary info ============================
+FAILED scripts/tests/test_aur_package.py::test_plan_uploads_new_versions_bumps_pkgrel_for_recipe_changes_and_never_downgrades
+FAILED scripts/tests/test_aur_package.py::test_plan_refuses_an_aur_repository_for_another_package
+2 failed, 3 passed in 0.46s
+
+PLAN GREEN 2026-10-18T21:20:13%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/aur_package.py sha256=56fa2346f713f4e1dcd9cf87245c19598f4d64a34f084c9587e6753b18880cfb
+scripts/tests/test_aur_package.py sha256=47f235942df108365046ea1d821813ef9b090c1c522a42af69a92a8d3c96eda3
+packaging/aur/PKGBUILD.in sha256=0c5dcbf6b9391b0e55bbd895901faee675f71afa811dd0181bbbe0cee8a52269
+packaging/aur/paperwork-desktop.sh sha256=ed1f78384188bfc176cddf0e2296cb4dec3c1ceb91807384be85b60dfc2c8043
+packaging/aur/paperwork-desktop.desktop sha256=faabf9a6943da30c4cfc720bc58ede525100d8ea50f6791f61d07a5b920fa1d1
+exit=0
+.....                                                                    [100%]
+5 passed in 1.21s
+
+NAMCAP GATE RED 2026-10-18T21:20:39%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/aur_package.py sha256=8facd8d9b8c657e34e657237c1329dd197d2b3f4946d0ab8ce76b6f0d985cf30
+scripts/tests/test_aur_package.py sha256=e251c2328475a3b13229e776b2ce8f33e5a57033bdcb4bddfc061046dfcaba8c
+packaging/aur/PKGBUILD.in sha256=0c5dcbf6b9391b0e55bbd895901faee675f71afa811dd0181bbbe0cee8a52269
+packaging/aur/paperwork-desktop.sh sha256=ed1f78384188bfc176cddf0e2296cb4dec3c1ceb91807384be85b60dfc2c8043
+packaging/aur/paperwork-desktop.desktop sha256=faabf9a6943da30c4cfc720bc58ede525100d8ea50f6791f61d07a5b920fa1d1
+exit=1
+.....F                                                                   [100%]
+=================================== FAILURES ===================================
+___ test_namcap_gate_fails_on_every_error_except_the_reviewed_worker_runpath ___
+
+    def test_namcap_gate_fails_on_every_error_except_the_reviewed_worker_runpath():
+        reviewed = [f"paperwork-desktop-bin E: insecure-runpath {HOSTED} {WORKER}libpython3.12.so.1.0",
+                    f"paperwork-desktop-bin E: insecure-runpath {HOSTED} {WORKER}python3.12/lib-dynload/_bz2.cpython-312-x86_64-linux-gnu.so"]
+        output = "\n".join(["paperwork-desktop-bin W: dependency-detected-not-included libx11 (libraries ['usr/lib/libX11.so.6'] needed in files ['x'])",
+                            *reviewed, "PKGBUILD (paperwork-desktop-bin) W: missing-contributor", ""])
+>       assert aur["namcap_errors"](output) == ([], reviewed)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scripts/tests/test_aur_package.py:195: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = "paperwork-desktop-bin W: dependency-detected-not-included libx11 (libraries ['usr/lib/libX11.so.6'] needed in files [...python3.12/lib-dynload/_bz2.cpython-312-x86_64-linux-gnu.so\nPKGBUILD (paperwork-desktop-bin) W: missing-contributor\n"
+
+    def namcap_errors(output: str) -> tuple[list[str], list[str]]:
+>       raise NotImplementedError
+E       NotImplementedError
+
+scripts/aur_package.py:189: NotImplementedError
+=========================== short test summary info ============================
+FAILED scripts/tests/test_aur_package.py::test_namcap_gate_fails_on_every_error_except_the_reviewed_worker_runpath
+1 failed, 5 passed in 1.27s
+
+NAMCAP GATE GREEN 2026-10-18T21:20:50%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/aur_package.py sha256=57d23c66708b91fae832cc2bc6cfdd9801d2725e51aca4e13e436a27c6817267
+scripts/tests/test_aur_package.py sha256=e251c2328475a3b13229e776b2ce8f33e5a57033bdcb4bddfc061046dfcaba8c
+packaging/aur/PKGBUILD.in sha256=0c5dcbf6b9391b0e55bbd895901faee675f71afa811dd0181bbbe0cee8a52269
+packaging/aur/paperwork-desktop.sh sha256=ed1f78384188bfc176cddf0e2296cb4dec3c1ceb91807384be85b60dfc2c8043
+packaging/aur/paperwork-desktop.desktop sha256=faabf9a6943da30c4cfc720bc58ede525100d8ea50f6791f61d07a5b920fa1d1
+exit=0
+......                                                                   [100%]
+6 passed in 1.33s
+
+PUBLISH RED 2026-10-18T21:21:28%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/aur_package.py sha256=1966c181e32d08ec0b85d450b841003f6e2abbc206c0f3e5394e6653275bb51f
+scripts/tests/test_aur_package.py sha256=f22f74bbccd774e9a9b549f41bcb59918864cd5b20fbbed7ec2e61fd35e8a229
+packaging/aur/PKGBUILD.in sha256=0c5dcbf6b9391b0e55bbd895901faee675f71afa811dd0181bbbe0cee8a52269
+packaging/aur/paperwork-desktop.sh sha256=ed1f78384188bfc176cddf0e2296cb4dec3c1ceb91807384be85b60dfc2c8043
+packaging/aur/paperwork-desktop.desktop sha256=faabf9a6943da30c4cfc720bc58ede525100d8ea50f6791f61d07a5b920fa1d1
+exit=1
+......FF                                                                 [100%]
+=================================== FAILURES ===================================
+_ test_publish_pushes_exactly_the_validated_plan_and_refuses_a_moved_aur_or_altered_files _
+
+tmp_path = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-116/test_publish_pushes_exactly_th0')
+
+    def test_publish_pushes_exactly_the_validated_plan_and_refuses_a_moved_aur_or_altered_files(tmp_path):
+        remote = fake_aur(tmp_path)
+        rc1 = aur["release_artifact"](github_release(tag="v0.1.0-rc.1"), SUMS)
+        base = push_to_aur(remote, tmp_path, {**aur["render"](rc1, MAINTAINER, 1, srcinfo=fake_srcinfo), "notes.txt": b"manual"})
+        rc2 = aur["release_artifact"](github_release(), SUMS)
+        planned = plan(rc2, remote, tmp_path / "rc2")
+    
+>       assert aur["publish"](tmp_path / "rc2", str(remote), MAINTAINER) is True
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scripts/tests/test_aur_package.py:216: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+out = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-116/test_publish_pushes_exactly_th0/rc2')
+remote = '/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-116/test_publish_pushes_exactly_th0/aur.git'
+maintainer = 'Jane Doe <jane at example dot org>'
+
+    def publish(out: Path, remote: str, maintainer: str) -> bool:
+>       raise NotImplementedError
+E       NotImplementedError
+
+scripts/aur_package.py:210: NotImplementedError
+_______________ test_first_publish_creates_the_aur_master_branch _______________
+
+tmp_path = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-116/test_first_publish_creates_the0')
+
+    def test_first_publish_creates_the_aur_master_branch(tmp_path):
+        remote = fake_aur(tmp_path)
+        plan(aur["release_artifact"](github_release(), SUMS), remote, tmp_path / "out")
+>       assert aur["publish"](tmp_path / "out", str(remote), MAINTAINER) is True
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scripts/tests/test_aur_package.py:235: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+out = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-116/test_first_publish_creates_the0/out')
+remote = '/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-116/test_first_publish_creates_the0/aur.git'
+maintainer = 'Jane Doe <jane at example dot org>'
+
+    def publish(out: Path, remote: str, maintainer: str) -> bool:
+>       raise NotImplementedError
+E       NotImplementedError
+
+scripts/aur_package.py:210: NotImplementedError
+----------------------------- Captured stderr call -----------------------------
+Warnung: Sie scheinen ein leeres Repository geklont zu haben.
+=========================== short test summary info ============================
+FAILED scripts/tests/test_aur_package.py::test_publish_pushes_exactly_the_validated_plan_and_refuses_a_moved_aur_or_altered_files
+FAILED scripts/tests/test_aur_package.py::test_first_publish_creates_the_aur_master_branch
+2 failed, 6 passed in 1.82s
+
+PUBLISH GREEN 2026-10-18T21:21:45%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/aur_package.py sha256=fcaad38e40cdd4bc3f309adf09450e0354f6a6fc245a05acbce6f2f24cc1a7e1
+scripts/tests/test_aur_package.py sha256=f22f74bbccd774e9a9b549f41bcb59918864cd5b20fbbed7ec2e61fd35e8a229
+packaging/aur/PKGBUILD.in sha256=0c5dcbf6b9391b0e55bbd895901faee675f71afa811dd0181bbbe0cee8a52269
+packaging/aur/paperwork-desktop.sh sha256=ed1f78384188bfc176cddf0e2296cb4dec3c1ceb91807384be85b60dfc2c8043
+packaging/aur/paperwork-desktop.desktop sha256=faabf9a6943da30c4cfc720bc58ede525100d8ea50f6791f61d07a5b920fa1d1
+exit=0
+........                                                                 [100%]
+8 passed in 2.77s
+
+PUSH ERROR + LATEST RELEASE RED 2026-10-18T21:22:06%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/aur_package.py sha256=46ed201ef0bb9262ac359e20ec7cfc1448c018bb4bb364a00757ff6eb922d328
+scripts/tests/test_aur_package.py sha256=4cdf098704d092b9381d9055773181c458833cd8e37561ff8e2a627513083777
+packaging/aur/PKGBUILD.in sha256=0c5dcbf6b9391b0e55bbd895901faee675f71afa811dd0181bbbe0cee8a52269
+packaging/aur/paperwork-desktop.sh sha256=ed1f78384188bfc176cddf0e2296cb4dec3c1ceb91807384be85b60dfc2c8043
+packaging/aur/paperwork-desktop.desktop sha256=faabf9a6943da30c4cfc720bc58ede525100d8ea50f6791f61d07a5b920fa1d1
+exit=1
+........FF                                                               [100%]
+=================================== FAILURES ===================================
+_____________ test_a_rejected_aur_push_reports_the_servers_reason ______________
+
+tmp_path = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-118/test_a_rejected_aur_push_repor0')
+
+    def test_a_rejected_aur_push_reports_the_servers_reason(tmp_path):
+        remote = fake_aur(tmp_path)
+        hook = remote / "hooks/pre-receive"
+        hook.write_text("#!/bin/sh\necho 'error: The package base is owned by someone else' >&2\nexit 1\n")
+        hook.chmod(0o755)
+        plan(aur["release_artifact"](github_release(), SUMS), remote, tmp_path / "out")
+        with pytest.raises(RuntimeError, match="owned by someone else"):
+>           aur["publish"](tmp_path / "out", str(remote), MAINTAINER)
+
+scripts/tests/test_aur_package.py:247: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/aur_package.py:243: in publish
+    git(checkout, "push", "--quiet", "origin", "HEAD:master")
+scripts/aur_package.py:102: in git
+    return subprocess.run(["git", "-C", str(directory), *args], check=True,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = 120, check = True
+popenargs = (['git', '-C', '/home/defaultuser/.hermes/cache/scratch/paperwork-aur-publish-4_kyelen/aur', 'push', '--quiet', 'origin', ...],)
+kwargs = {'text': True, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['git', '-C', '/home/defaultuser/.hermes/cache/scratch/paperwork-aur-publish-4_kyelen/aur', 'push', '--quiet', 'origin', 'HEAD:master']' returned non-zero exit status 1.
+
+../../.hermes/tools/python-3.14.7+20260901-linux-arm64/lib/python3.14/subprocess.py:578: CalledProcessError
+----------------------------- Captured stderr call -----------------------------
+Warnung: Sie scheinen ein leeres Repository geklont zu haben.
+Warnung: Sie scheinen ein leeres Repository geklont zu haben.
+_ test_without_a_tag_the_newest_published_release_with_an_appimage_is_packaged _
+
+    def test_without_a_tag_the_newest_published_release_with_an_appimage_is_packaged():
+        components = {"tag_name": "components-v0.1.0", "draft": False, "assets": [{"name": "tesseract.zip"}]}
+        releases = [github_release(tag="v0.2.0-rc.1", draft=True), components, github_release(), github_release(tag="v0.1.0-rc.1")]
+>       assert aur["latest_appimage_release"](releases)["tag_name"] == "v0.1.0-rc.2"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scripts/tests/test_aur_package.py:253: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+releases = [{'tag_name': 'v0.2.0-rc.1', 'draft': True, 'prerelease': True, 'html_url': 'https://github.com/ClawPick2026/paperwork...se, 'prerelease': True, 'html_url': 'https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.1', ...}]
+
+    def latest_appimage_release(releases: list[dict]) -> dict:
+>       raise NotImplementedError
+E       NotImplementedError
+
+scripts/aur_package.py:249: NotImplementedError
+=========================== short test summary info ============================
+FAILED scripts/tests/test_aur_package.py::test_a_rejected_aur_push_reports_the_servers_reason
+FAILED scripts/tests/test_aur_package.py::test_without_a_tag_the_newest_published_release_with_an_appimage_is_packaged
+2 failed, 8 passed in 3.17s
+
+PUSH ERROR + LATEST RELEASE GREEN 2026-10-18T21:22:26%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/aur_package.py sha256=700835d1465498c66bad6d9ba58b22b764bfcfbce53f318a512f083871eca6c5
+scripts/tests/test_aur_package.py sha256=4cdf098704d092b9381d9055773181c458833cd8e37561ff8e2a627513083777
+packaging/aur/PKGBUILD.in sha256=0c5dcbf6b9391b0e55bbd895901faee675f71afa811dd0181bbbe0cee8a52269
+packaging/aur/paperwork-desktop.sh sha256=ed1f78384188bfc176cddf0e2296cb4dec3c1ceb91807384be85b60dfc2c8043
+packaging/aur/paperwork-desktop.desktop sha256=faabf9a6943da30c4cfc720bc58ede525100d8ea50f6791f61d07a5b920fa1d1
+exit=0
+..........                                                               [100%]
+10 passed in 2.63s
+
+NAMCAP UNREADABLE INPUT RED 2026-10-18T21:23:21%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/aur_package.py sha256=700835d1465498c66bad6d9ba58b22b764bfcfbce53f318a512f083871eca6c5
+scripts/tests/test_aur_package.py sha256=ac8e35bd467e0b2ee0ae7cdacf2d4afb14eb962969514cf3659991816c5530d4
+packaging/aur/PKGBUILD.in sha256=0c5dcbf6b9391b0e55bbd895901faee675f71afa811dd0181bbbe0cee8a52269
+packaging/aur/paperwork-desktop.sh sha256=ed1f78384188bfc176cddf0e2296cb4dec3c1ceb91807384be85b60dfc2c8043
+packaging/aur/paperwork-desktop.desktop sha256=faabf9a6943da30c4cfc720bc58ede525100d8ea50f6791f61d07a5b920fa1d1
+exit=1
+..........F                                                              [100%]
+=================================== FAILURES ===================================
+_________ test_namcap_gate_fails_when_namcap_could_not_read_its_input __________
+
+    def test_namcap_gate_fails_when_namcap_could_not_read_its_input():
+        # namcap prints this and still exits 0.
+        line = "Error: build/aur/paperwork-desktop-bin.pkg.tar.zst not package or PKGBUILD"
+>       assert aur["namcap_errors"](line + "\n") == ([line], [])
+E       AssertionError: assert ([], []) == (['Error: bui...KGBUILD'], [])
+E         
+E         At index 0 diff: [] != ['Error: build/aur/paperwork-desktop-bin.pkg.tar.zst not package or PKGBUILD']
+E         Use -v to get more diff
+
+scripts/tests/test_aur_package.py:261: AssertionError
+=========================== short test summary info ============================
+FAILED scripts/tests/test_aur_package.py::test_namcap_gate_fails_when_namcap_could_not_read_its_input
+1 failed, 10 passed in 2.84s
+
+NAMCAP UNREADABLE INPUT GREEN 2026-10-18T21:23:29%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/aur_package.py sha256=6b25abc338871dc0a6b748b3579266c095249810121100719c8755cd2ef5afec
+scripts/tests/test_aur_package.py sha256=ac8e35bd467e0b2ee0ae7cdacf2d4afb14eb962969514cf3659991816c5530d4
+packaging/aur/PKGBUILD.in sha256=0c5dcbf6b9391b0e55bbd895901faee675f71afa811dd0181bbbe0cee8a52269
+packaging/aur/paperwork-desktop.sh sha256=ed1f78384188bfc176cddf0e2296cb4dec3c1ceb91807384be85b60dfc2c8043
+packaging/aur/paperwork-desktop.desktop sha256=faabf9a6943da30c4cfc720bc58ede525100d8ea50f6791f61d07a5b920fa1d1
+exit=0
+...........                                                              [100%]
+11 passed in 2.51s
+
+ARCH-ONLY TESTS (skipped on this non-Arch host; run in CI) 2026-10-18T21:23:43%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider -rs
+scripts/aur_package.py sha256=6b25abc338871dc0a6b748b3579266c095249810121100719c8755cd2ef5afec
+scripts/tests/test_aur_package.py sha256=d86f029d90fbadb79c9c1b0aa56db011ca3f4406cdbf99dcc18a9b1455081ab1
+packaging/aur/PKGBUILD.in sha256=0c5dcbf6b9391b0e55bbd895901faee675f71afa811dd0181bbbe0cee8a52269
+packaging/aur/paperwork-desktop.sh sha256=ed1f78384188bfc176cddf0e2296cb4dec3c1ceb91807384be85b60dfc2c8043
+packaging/aur/paperwork-desktop.desktop sha256=faabf9a6943da30c4cfc720bc58ede525100d8ea50f6791f61d07a5b920fa1d1
+exit=0
+...........ss                                                            [100%]
+=========================== short test summary info ============================
+SKIPPED [1] scripts/tests/test_aur_package.py:264: pacman's vercmp runs in CI's Arch container
+SKIPPED [1] scripts/tests/test_aur_package.py:272: makepkg runs in CI's Arch container
+11 passed, 2 skipped in 2.72s
+
+FULL SUITE GREEN (vercmp/makepkg tests skipped off Arch) 2026-10-18T21:34:05%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider -rs
+scripts/aur_package.py sha256=449241d54d25653d79160a5b3eb1d2bdbf8fdc5dbbd15ada26aeb3a95d3ada48
+scripts/tests/test_aur_package.py sha256=77a848e5ddb43bbbcaaf8b839269b90c8befcc109af1a85b801c21836e286a74
+packaging/aur/PKGBUILD.in sha256=0c5dcbf6b9391b0e55bbd895901faee675f71afa811dd0181bbbe0cee8a52269
+packaging/aur/paperwork-desktop.sh sha256=ed1f78384188bfc176cddf0e2296cb4dec3c1ceb91807384be85b60dfc2c8043
+packaging/aur/paperwork-desktop.desktop sha256=faabf9a6943da30c4cfc720bc58ede525100d8ea50f6791f61d07a5b920fa1d1
+exit=0
+...........ss                                                            [100%]
+=========================== short test summary info ============================
+SKIPPED [1] scripts/tests/test_aur_package.py:264: pacman's vercmp runs in CI's Arch container
+SKIPPED [1] scripts/tests/test_aur_package.py:272: makepkg runs in CI's Arch container
+11 passed, 2 skipped in 2.18s
+
+OLDER RELEASE STILL VALIDATED RED 2026-10-18T21:48:33%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider -k plan_uploads
+scripts/aur_package.py sha256=449241d54d25653d79160a5b3eb1d2bdbf8fdc5dbbd15ada26aeb3a95d3ada48
+scripts/tests/test_aur_package.py sha256=28c9070b36828d04cc5fb4a6aff3e8dd0cde4eca07d61d3d069e6d2bcc51ae07
+packaging/aur/PKGBUILD.in sha256=0c5dcbf6b9391b0e55bbd895901faee675f71afa811dd0181bbbe0cee8a52269
+packaging/aur/paperwork-desktop.sh sha256=ed1f78384188bfc176cddf0e2296cb4dec3c1ceb91807384be85b60dfc2c8043
+packaging/aur/paperwork-desktop.desktop sha256=faabf9a6943da30c4cfc720bc58ede525100d8ea50f6791f61d07a5b920fa1d1
+exit=1
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_plan_uploads_new_versions_bumps_pkgrel_for_recipe_changes_and_never_downgrades _
+
+tmp_path = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-126/test_plan_uploads_new_versions0')
+
+    def test_plan_uploads_new_versions_bumps_pkgrel_for_recipe_changes_and_never_downgrades(tmp_path):
+        rc2 = aur["release_artifact"](github_release(), SUMS)
+        remote = fake_aur(tmp_path)
+    
+        first = plan(rc2, remote, tmp_path / "first")
+        assert {k: first[k] for k in ("action", "pkgver", "pkgrel", "aur_head", "aur_version")} == {
+            "action": "publish", "pkgver": "0.1.0rc2", "pkgrel": 1, "aur_head": "", "aur_version": None}
+        package = {name: (tmp_path / "first/package" / name).read_bytes() for name in sorted(first["files"])}
+        assert sorted(package) == sorted(aur["PACKAGE_FILES"])
+        assert first["files"] == {name: hashlib.sha256(content).hexdigest() for name, content in package.items()}
+        assert json.loads((tmp_path / "first/plan.json").read_text()) == first
+        head = push_to_aur(remote, tmp_path, package)
+    
+        again = plan(rc2, remote, tmp_path / "again")
+        assert (again["action"], again["pkgrel"], again["aur_head"], again["aur_version"]) == ("unchanged", 1, head, "0.1.0rc2-1")
+    
+        # A recipe change for the same release is a new pkgrel of the same pkgver.
+        changed = plan(rc2, remote, tmp_path / "changed", maintainer="Other Person <other at example dot org>")
+        assert (changed["action"], changed["pkgver"], changed["pkgrel"]) == ("publish", "0.1.0rc2", 2)
+        assert "pkgrel=2\n" in (tmp_path / "changed/package/PKGBUILD").read_text()
+    
+        older = github_release(tag="v0.1.0-rc.1")
+        older = plan(aur["release_artifact"](older, SUMS), remote, tmp_path / "older")
+        assert (older["action"], older["pkgrel"], older["aur_version"]) == ("older", 1, "0.1.0rc2-1")
+        # Still rendered, so recipe changes are built and checked; publish refuses it.
+>       assert sorted(older["files"]) == sorted(aur["PACKAGE_FILES"])
+E       AssertionError: assert [] == ['.SRCINFO', ...k-desktop.sh']
+E         
+E         Right contains 4 more items, first extra item: '.SRCINFO'
+E         Use -v to get more diff
+
+scripts/tests/test_aur_package.py:172: AssertionError
+=========================== short test summary info ============================
+FAILED scripts/tests/test_aur_package.py::test_plan_uploads_new_versions_bumps_pkgrel_for_recipe_changes_and_never_downgrades
+1 failed, 12 deselected in 0.89s
+
+OLDER RELEASE STILL VALIDATED GREEN 2026-10-18T21:48:45%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/aur_package.py sha256=bf7df810c7e6dc8917f7cf3e3d86c15654f6682d2ff48be0f2c438669652d144
+scripts/tests/test_aur_package.py sha256=28c9070b36828d04cc5fb4a6aff3e8dd0cde4eca07d61d3d069e6d2bcc51ae07
+packaging/aur/PKGBUILD.in sha256=0c5dcbf6b9391b0e55bbd895901faee675f71afa811dd0181bbbe0cee8a52269
+packaging/aur/paperwork-desktop.sh sha256=ed1f78384188bfc176cddf0e2296cb4dec3c1ceb91807384be85b60dfc2c8043
+packaging/aur/paperwork-desktop.desktop sha256=faabf9a6943da30c4cfc720bc58ede525100d8ea50f6791f61d07a5b920fa1d1
+exit=0
+...........ss                                                            [100%]
+11 passed, 2 skipped in 2.72s
+
+DUPLICATE PUBLISH IS A NO-OP RED 2026-10-18T21:48:56%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider -k publish_pushes
+scripts/aur_package.py sha256=bf7df810c7e6dc8917f7cf3e3d86c15654f6682d2ff48be0f2c438669652d144
+scripts/tests/test_aur_package.py sha256=09b00be8d6a3dd1aa1e15262e25fd5e7585f2df25d7958606d1ee550732d14ea
+packaging/aur/PKGBUILD.in sha256=0c5dcbf6b9391b0e55bbd895901faee675f71afa811dd0181bbbe0cee8a52269
+packaging/aur/paperwork-desktop.sh sha256=ed1f78384188bfc176cddf0e2296cb4dec3c1ceb91807384be85b60dfc2c8043
+packaging/aur/paperwork-desktop.desktop sha256=faabf9a6943da30c4cfc720bc58ede525100d8ea50f6791f61d07a5b920fa1d1
+exit=1
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_publish_pushes_exactly_the_validated_plan_and_refuses_a_moved_aur_or_altered_files _
+
+tmp_path = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-128/test_publish_pushes_exactly_th0')
+
+    def test_publish_pushes_exactly_the_validated_plan_and_refuses_a_moved_aur_or_altered_files(tmp_path):
+        remote = fake_aur(tmp_path)
+        rc1 = aur["release_artifact"](github_release(tag="v0.1.0-rc.1"), SUMS)
+        base = push_to_aur(remote, tmp_path, {**aur["render"](rc1, MAINTAINER, 1, srcinfo=fake_srcinfo), "notes.txt": b"manual"})
+        rc2 = aur["release_artifact"](github_release(), SUMS)
+        planned = plan(rc2, remote, tmp_path / "rc2")
+    
+        assert aur["publish"](tmp_path / "rc2", str(remote), MAINTAINER) is True
+        assert aur_files(remote, tmp_path / "after") == {n: (tmp_path / "rc2/package" / n).read_bytes() for n in planned["files"]}
+        assert git(tmp_path / "after", "log", "-1", "--format=%an|%ae|%P|%s") == f"Jane Doe|jane at example dot org|{base}|Update to 0.1.0rc2-1"
+        assert git(tmp_path / "after", "log", "-1", "--format=%b") == "Release v0.1.0-rc.2: " + rc2["release_url"]
+    
+        # A second run for the same release finds its files already published.
+>       assert aur["publish"](tmp_path / "rc2", str(remote), MAINTAINER) is False
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scripts/tests/test_aur_package.py:225: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+out = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-128/test_publish_pushes_exactly_th0/rc2')
+remote = '/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-128/test_publish_pushes_exactly_th0/aur.git'
+maintainer = 'Jane Doe <jane at example dot org>'
+
+    def publish(out: Path, remote: str, maintainer: str) -> bool:
+        """Push the validated plan to AUR master. Never force-pushes: if AUR moved
+        after validation, stop so the next run plans against the new state."""
+        out = Path(out)
+        planned = json.loads((out / "plan.json").read_text(encoding="utf-8"))
+        if planned["action"] != "publish":
+            print(f"Nothing to publish: {planned['action']} (AUR has {planned['aur_version']})")
+            return False
+        if planned.get("pkgname") != PKGNAME or sorted(planned["files"]) != sorted(PACKAGE_FILES):
+            raise ValueError("plan.json does not describe this package's files")
+        files = {name: (out / "package" / name).read_bytes() for name in PACKAGE_FILES}
+        for name, content in files.items():
+            if hashlib.sha256(content).hexdigest() != planned["files"][name]:
+                raise ValueError(f"{name} does not match the validated plan")
+        if not MAINTAINER.fullmatch(maintainer):
+            raise ValueError("AUR maintainer must look like 'Name <email>' without shell characters")
+        name, email = maintainer[:-1].split(" <", 1)
+        version = f"{planned['pkgver']}-{planned['pkgrel']}"
+        with tempfile.TemporaryDirectory(prefix="paperwork-aur-publish-") as temporary:
+            checkout = Path(temporary) / "aur"
+            head = clone_aur(remote, checkout)
+            if head != planned["aur_head"]:
+>               raise ValueError("AUR changed after validation; re-run the workflow to plan against it")
+E               ValueError: AUR changed after validation; re-run the workflow to plan against it
+
+scripts/aur_package.py:295: ValueError
+----------------------------- Captured stdout call -----------------------------
+Published paperwork-desktop-bin 0.1.0rc2-1 to AUR
+=========================== short test summary info ============================
+FAILED scripts/tests/test_aur_package.py::test_publish_pushes_exactly_the_validated_plan_and_refuses_a_moved_aur_or_altered_files
+1 failed, 12 deselected in 0.73s
+
+DUPLICATE PUBLISH IS A NO-OP GREEN 2026-10-18T21:49:06%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/aur_package.py sha256=e040b7e758481fda2360d8246a630163008ac0fc4a3d2722009e718ec4c6e0f5
+scripts/tests/test_aur_package.py sha256=09b00be8d6a3dd1aa1e15262e25fd5e7585f2df25d7958606d1ee550732d14ea
+packaging/aur/PKGBUILD.in sha256=0c5dcbf6b9391b0e55bbd895901faee675f71afa811dd0181bbbe0cee8a52269
+packaging/aur/paperwork-desktop.sh sha256=ed1f78384188bfc176cddf0e2296cb4dec3c1ceb91807384be85b60dfc2c8043
+packaging/aur/paperwork-desktop.desktop sha256=faabf9a6943da30c4cfc720bc58ede525100d8ea50f6791f61d07a5b920fa1d1
+exit=1
+......F....ss                                                            [100%]
+=================================== FAILURES ===================================
+_ test_publish_pushes_exactly_the_validated_plan_and_refuses_a_moved_aur_or_altered_files _
+
+tmp_path = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-129/test_publish_pushes_exactly_th0')
+
+    def test_publish_pushes_exactly_the_validated_plan_and_refuses_a_moved_aur_or_altered_files(tmp_path):
+        remote = fake_aur(tmp_path)
+        rc1 = aur["release_artifact"](github_release(tag="v0.1.0-rc.1"), SUMS)
+        base = push_to_aur(remote, tmp_path, {**aur["render"](rc1, MAINTAINER, 1, srcinfo=fake_srcinfo), "notes.txt": b"manual"})
+        rc2 = aur["release_artifact"](github_release(), SUMS)
+        planned = plan(rc2, remote, tmp_path / "rc2")
+    
+        assert aur["publish"](tmp_path / "rc2", str(remote), MAINTAINER) is True
+        assert aur_files(remote, tmp_path / "after") == {n: (tmp_path / "rc2/package" / n).read_bytes() for n in planned["files"]}
+        assert git(tmp_path / "after", "log", "-1", "--format=%an|%ae|%P|%s") == f"Jane Doe|jane at example dot org|{base}|Update to 0.1.0rc2-1"
+        assert git(tmp_path / "after", "log", "-1", "--format=%b") == "Release v0.1.0-rc.2: " + rc2["release_url"]
+    
+        # A second run for the same release finds its files already published.
+        assert aur["publish"](tmp_path / "rc2", str(remote), MAINTAINER) is False
+        final = aur["release_artifact"](github_release(tag="v0.1.0"), SUMS)
+        plan(final, remote, tmp_path / "moved")
+        push_to_aur(remote, tmp_path, {**aur_files(remote, tmp_path / "manual"), "notes.txt": b"manual"}, "Manual edit")
+        with pytest.raises(ValueError, match="AUR changed"):
+            aur["publish"](tmp_path / "moved", str(remote), MAINTAINER)
+        plan(final, remote, tmp_path / "final")
+        (tmp_path / "final/package/PKGBUILD").write_text("pkgname=tampered\n")
+        with pytest.raises(ValueError, match="plan"):
+            aur["publish"](tmp_path / "final", str(remote), MAINTAINER)
+>       assert plan(rc2, remote, tmp_path / "same")["action"] == "unchanged"
+E       AssertionError: assert 'publish' == 'unchanged'
+E         
+E         - unchanged
+E         + publish
+
+scripts/tests/test_aur_package.py:235: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Published paperwork-desktop-bin 0.1.0rc2-1 to AUR
+AUR already has these files for 0.1.0rc2-1
+=========================== short test summary info ============================
+FAILED scripts/tests/test_aur_package.py::test_publish_pushes_exactly_the_validated_plan_and_refuses_a_moved_aur_or_altered_files
+1 failed, 10 passed, 2 skipped in 2.86s
+
+DUPLICATE PUBLISH IS A NO-OP GREEN (test scenario order fixed) 2026-10-18T21:49:19%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/aur_package.py sha256=e040b7e758481fda2360d8246a630163008ac0fc4a3d2722009e718ec4c6e0f5
+scripts/tests/test_aur_package.py sha256=d6837a7e7d1b27371aa086bd565304a9f5181da1e8a334cbb4c31eacce390abe
+packaging/aur/PKGBUILD.in sha256=0c5dcbf6b9391b0e55bbd895901faee675f71afa811dd0181bbbe0cee8a52269
+packaging/aur/paperwork-desktop.sh sha256=ed1f78384188bfc176cddf0e2296cb4dec3c1ceb91807384be85b60dfc2c8043
+packaging/aur/paperwork-desktop.desktop sha256=faabf9a6943da30c4cfc720bc58ede525100d8ea50f6791f61d07a5b920fa1d1
+exit=0
+...........ss                                                            [100%]
+11 passed, 2 skipped in 2.61s
+
+NAMCAP BUNDLE-AWARE GATE RED 2026-10-18T21:49:49%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider -k bundle_ships
+scripts/aur_package.py sha256=e040b7e758481fda2360d8246a630163008ac0fc4a3d2722009e718ec4c6e0f5
+scripts/tests/test_aur_package.py sha256=d026744c6c908bac348f4d4f7e0c40aa58dc8af29cb41f19844e5d415b99140c
+packaging/aur/PKGBUILD.in sha256=0c5dcbf6b9391b0e55bbd895901faee675f71afa811dd0181bbbe0cee8a52269
+packaging/aur/paperwork-desktop.sh sha256=ed1f78384188bfc176cddf0e2296cb4dec3c1ceb91807384be85b60dfc2c8043
+packaging/aur/paperwork-desktop.desktop sha256=faabf9a6943da30c4cfc720bc58ede525100d8ea50f6791f61d07a5b920fa1d1
+exit=1
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_namcap_gate_accepts_opt_and_dependency_reports_only_for_what_the_bundle_ships _
+
+    def test_namcap_gate_accepts_opt_and_dependency_reports_only_for_what_the_bundle_ships():
+        bundled = {"libz.so.1", "libpng16.so.16"}  # file names shipped under opt/paperwork-desktop/
+        lib = ("paperwork-desktop-bin E: dependency-detected-not-included zlib (libraries-needed ['usr/lib/libz.so.1'] "
+               "['opt/paperwork-desktop/usr/lib/libpng16.so.16', 'opt/paperwork-desktop/usr/lib/libfreetype.so.6'])")
+        python = ("paperwork-desktop-bin E: dependency-detected-not-included python (python-modules-needed ['json', 'ctypes'] "
+                  f"['{WORKER}pptx/util.py'], python-modules-needed ['zlib'] ['{WORKER}pypdfium2/raw.py'])")
+        opt = "paperwork-desktop-bin E: elffile-in-questionable-dirs opt/"
+>       assert aur["namcap_errors"]("\n".join([lib, python, opt]), bundled) == ([], [lib, python, opt])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: namcap_errors() takes 1 positional argument but 2 were given
+
+scripts/tests/test_aur_package.py:298: TypeError
+=========================== short test summary info ============================
+FAILED scripts/tests/test_aur_package.py::test_namcap_gate_accepts_opt_and_dependency_reports_only_for_what_the_bundle_ships
+1 failed, 13 deselected in 0.21s
+
+NAMCAP BUNDLE-AWARE GATE GREEN 2026-10-18T21:50:11%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/aur_package.py sha256=510d0b99e826613bca39665055dc2619b0459ef3e43768fb65f62c3ec83c469c
+scripts/tests/test_aur_package.py sha256=d026744c6c908bac348f4d4f7e0c40aa58dc8af29cb41f19844e5d415b99140c
+packaging/aur/PKGBUILD.in sha256=0c5dcbf6b9391b0e55bbd895901faee675f71afa811dd0181bbbe0cee8a52269
+packaging/aur/paperwork-desktop.sh sha256=ed1f78384188bfc176cddf0e2296cb4dec3c1ceb91807384be85b60dfc2c8043
+packaging/aur/paperwork-desktop.desktop sha256=faabf9a6943da30c4cfc720bc58ede525100d8ea50f6791f61d07a5b920fa1d1
+exit=0
+...........ss.                                                           [100%]
+12 passed, 2 skipped in 3.55s
+
+FULL SUITE GREEN AFTER REVIEW FIXES (vercmp/makepkg tests skipped off Arch) 2026-10-18T21:52:35%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider -rs
+scripts/aur_package.py sha256=78033de3f03905b12809fe9ec37eb59a2f3295679c4c45a1102d9b82c8356ccb
+scripts/tests/test_aur_package.py sha256=d026744c6c908bac348f4d4f7e0c40aa58dc8af29cb41f19844e5d415b99140c
+packaging/aur/PKGBUILD.in sha256=989ff608ca39f942156be232650176afe88609f1f131dc120f20465a5e457168
+packaging/aur/paperwork-desktop.sh sha256=ed1f78384188bfc176cddf0e2296cb4dec3c1ceb91807384be85b60dfc2c8043
+packaging/aur/paperwork-desktop.desktop sha256=faabf9a6943da30c4cfc720bc58ede525100d8ea50f6791f61d07a5b920fa1d1
+exit=0
+...........ss.                                                           [100%]
+=========================== short test summary info ============================
+SKIPPED [1] scripts/tests/test_aur_package.py:272: pacman's vercmp runs in CI's Arch container
+SKIPPED [1] scripts/tests/test_aur_package.py:280: makepkg runs in CI's Arch container
+12 passed, 2 skipped in 2.76s
+
+LEAFSMITH RENAME + NO-ELIGIBLE-RELEASE RED 2026-10-18T22:18:16%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider
+scripts/aur_package.py sha256=78033de3f03905b12809fe9ec37eb59a2f3295679c4c45a1102d9b82c8356ccb
+scripts/tests/test_aur_package.py sha256=ebb29da2da89148b641ee161147c53858ac8b07745ac81e63bb405b0aed033a1
+packaging/aur/PKGBUILD.in sha256=989ff608ca39f942156be232650176afe88609f1f131dc120f20465a5e457168
+packaging/aur/paperwork-desktop.sh sha256=ed1f78384188bfc176cddf0e2296cb4dec3c1ceb91807384be85b60dfc2c8043
+packaging/aur/paperwork-desktop.desktop sha256=faabf9a6943da30c4cfc720bc58ede525100d8ea50f6791f61d07a5b920fa1d1
+exit=1
+.FFFFFFFFFF.ssF                                                          [100%]
+=================================== FAILURES ===================================
+___ test_release_artifact_pins_the_appimage_only_when_checksum_sources_agree ___
+
+    def test_release_artifact_pins_the_appimage_only_when_checksum_sources_agree():
+>       assert aur["release_artifact"](github_release(), SUMS) == {
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            "tag": "v0.1.0-rc.2", "pkgver": "0.1.0rc2", "prerelease": True,
+            "release_url": "https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.2",
+            "appimage": "Leafsmith_0.1.0_amd64.AppImage", "sha256": APPIMAGE_SHA, "size": 139901432}
+
+scripts/tests/test_aur_package.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+release = {'tag_name': 'v0.1.0-rc.2', 'draft': False, 'prerelease': True, 'html_url': 'https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.2', ...}
+sums_text = '16b0ebe4484820754224d1850a847990626e4c9e7a35cb7b5ac5b31c638761ca  Leafsmith_0.1.0_amd64.AppImage\n1111111111111111111111111111111111111111111111111111111111111111  Leafsmith-linux-corresponding-sources.zip\n'
+
+    def release_artifact(release: dict, sums_text: str) -> dict:
+        """Pin the release's AppImage. The SHA256SUMS list was written by the job
+        that verified the AppImage; GitHub's recorded asset digest must agree."""
+        tag = release.get("tag_name", "")
+        pkgver = pkgver_from_tag(tag)
+        if release.get("draft") is not False:
+            raise ValueError(f"Release {tag} is a draft; only published releases are packaged")
+        appimages = [a for a in release.get("assets", []) if a.get("name", "").endswith(".AppImage")]
+        if len(appimages) != 1:
+            raise ValueError(f"Release {tag} must have exactly one .AppImage asset, found {len(appimages)}")
+        asset = appimages[0]
+        match = APPIMAGE.fullmatch(asset["name"])
+        if not match or match[1] != TAG.fullmatch(tag).expand(r"\1.\2.\3"):
+>           raise ValueError(f"AppImage {asset['name']!r} does not match release {tag}")
+E           ValueError: AppImage 'Leafsmith_0.1.0_amd64.AppImage' does not match release v0.1.0-rc.2
+
+scripts/aur_package.py:71: ValueError
+_____________ test_render_pins_release_appimage_and_local_sources ______________
+
+tmp_path = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-135/test_render_pins_release_appim0')
+
+    def test_render_pins_release_appimage_and_local_sources(tmp_path):
+>       artifact = aur["release_artifact"](github_release(), SUMS)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scripts/tests/test_aur_package.py:92: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+release = {'tag_name': 'v0.1.0-rc.2', 'draft': False, 'prerelease': True, 'html_url': 'https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.2', ...}
+sums_text = '16b0ebe4484820754224d1850a847990626e4c9e7a35cb7b5ac5b31c638761ca  Leafsmith_0.1.0_amd64.AppImage\n1111111111111111111111111111111111111111111111111111111111111111  Leafsmith-linux-corresponding-sources.zip\n'
+
+    def release_artifact(release: dict, sums_text: str) -> dict:
+        """Pin the release's AppImage. The SHA256SUMS list was written by the job
+        that verified the AppImage; GitHub's recorded asset digest must agree."""
+        tag = release.get("tag_name", "")
+        pkgver = pkgver_from_tag(tag)
+        if release.get("draft") is not False:
+            raise ValueError(f"Release {tag} is a draft; only published releases are packaged")
+        appimages = [a for a in release.get("assets", []) if a.get("name", "").endswith(".AppImage")]
+        if len(appimages) != 1:
+            raise ValueError(f"Release {tag} must have exactly one .AppImage asset, found {len(appimages)}")
+        asset = appimages[0]
+        match = APPIMAGE.fullmatch(asset["name"])
+        if not match or match[1] != TAG.fullmatch(tag).expand(r"\1.\2.\3"):
+>           raise ValueError(f"AppImage {asset['name']!r} does not match release {tag}")
+E           ValueError: AppImage 'Leafsmith_0.1.0_amd64.AppImage' does not match release v0.1.0-rc.2
+
+scripts/aur_package.py:71: ValueError
+_ test_plan_uploads_new_versions_bumps_pkgrel_for_recipe_changes_and_never_downgrades _
+
+tmp_path = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-135/test_plan_uploads_new_versions0')
+
+    def test_plan_uploads_new_versions_bumps_pkgrel_for_recipe_changes_and_never_downgrades(tmp_path):
+>       rc2 = aur["release_artifact"](github_release(), SUMS)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scripts/tests/test_aur_package.py:150: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+release = {'tag_name': 'v0.1.0-rc.2', 'draft': False, 'prerelease': True, 'html_url': 'https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.2', ...}
+sums_text = '16b0ebe4484820754224d1850a847990626e4c9e7a35cb7b5ac5b31c638761ca  Leafsmith_0.1.0_amd64.AppImage\n1111111111111111111111111111111111111111111111111111111111111111  Leafsmith-linux-corresponding-sources.zip\n'
+
+    def release_artifact(release: dict, sums_text: str) -> dict:
+        """Pin the release's AppImage. The SHA256SUMS list was written by the job
+        that verified the AppImage; GitHub's recorded asset digest must agree."""
+        tag = release.get("tag_name", "")
+        pkgver = pkgver_from_tag(tag)
+        if release.get("draft") is not False:
+            raise ValueError(f"Release {tag} is a draft; only published releases are packaged")
+        appimages = [a for a in release.get("assets", []) if a.get("name", "").endswith(".AppImage")]
+        if len(appimages) != 1:
+            raise ValueError(f"Release {tag} must have exactly one .AppImage asset, found {len(appimages)}")
+        asset = appimages[0]
+        match = APPIMAGE.fullmatch(asset["name"])
+        if not match or match[1] != TAG.fullmatch(tag).expand(r"\1.\2.\3"):
+>           raise ValueError(f"AppImage {asset['name']!r} does not match release {tag}")
+E           ValueError: AppImage 'Leafsmith_0.1.0_amd64.AppImage' does not match release v0.1.0-rc.2
+
+scripts/aur_package.py:71: ValueError
+___________ test_plan_refuses_an_aur_repository_for_another_package ____________
+
+tmp_path = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-135/test_plan_refuses_an_aur_repos0')
+
+    def test_plan_refuses_an_aur_repository_for_another_package(tmp_path):
+        remote = fake_aur(tmp_path)
+        push_to_aur(remote, tmp_path, {".SRCINFO": b"pkgbase = something-else\n\tpkgver = 1\n\tpkgrel = 1\n\npkgname = something-else\n",
+                                       "PKGBUILD": b"pkgname=something-else\n"})
+>       with pytest.raises(ValueError, match="something-else"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'something-else'
+E         Actual message: "AppImage 'Leafsmith_0.1.0_amd64.AppImage' does not match release v0.1.0-rc.2"
+
+scripts/tests/test_aur_package.py:187: AssertionError
+___ test_namcap_gate_fails_on_every_error_except_the_reviewed_worker_runpath ___
+
+    def test_namcap_gate_fails_on_every_error_except_the_reviewed_worker_runpath():
+        reviewed = [f"leafsmith-bin E: insecure-runpath {HOSTED} {WORKER}libpython3.12.so.1.0",
+                    f"leafsmith-bin E: insecure-runpath {HOSTED} {WORKER}python3.12/lib-dynload/_bz2.cpython-312-x86_64-linux-gnu.so"]
+        output = "\n".join(["leafsmith-bin W: dependency-detected-not-included libx11 (libraries ['usr/lib/libX11.so.6'] needed in files ['x'])",
+                            *reviewed, "PKGBUILD (leafsmith-bin) W: missing-contributor", ""])
+>       assert aur["namcap_errors"](output) == ([], reviewed)
+E       AssertionError: assert (['leafsmith-...-gnu.so'], []) == ([], ['leafsm...inux-gnu.so'])
+E         
+E         At index 0 diff: ['leafsmith-bin E: insecure-runpath /opt/hostedtoolcache/Python/3.12.15/x64/lib opt/leafsmith/usr/lib/Leafsmith/worker/_internal/libpython3.12.so.1.0', 'leafsmith-bin E: insecure-runpath /opt/hostedtoolcache/Python/3.12.15/x64/lib opt/leafsmith/usr/lib/Leafsmith/worker/_internal/python3.12/lib-dynload/_bz2.cpython-312-x86_64-linux-gnu.so'] != []
+E         Use -v to get more diff
+
+scripts/tests/test_aur_package.py:200: AssertionError
+_ test_publish_pushes_exactly_the_validated_plan_and_refuses_a_moved_aur_or_altered_files _
+
+tmp_path = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-135/test_publish_pushes_exactly_th0')
+
+    def test_publish_pushes_exactly_the_validated_plan_and_refuses_a_moved_aur_or_altered_files(tmp_path):
+        remote = fake_aur(tmp_path)
+>       rc1 = aur["release_artifact"](github_release(tag="v0.1.0-rc.1"), SUMS)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scripts/tests/test_aur_package.py:216: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+release = {'tag_name': 'v0.1.0-rc.1', 'draft': False, 'prerelease': True, 'html_url': 'https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.1', ...}
+sums_text = '16b0ebe4484820754224d1850a847990626e4c9e7a35cb7b5ac5b31c638761ca  Leafsmith_0.1.0_amd64.AppImage\n1111111111111111111111111111111111111111111111111111111111111111  Leafsmith-linux-corresponding-sources.zip\n'
+
+    def release_artifact(release: dict, sums_text: str) -> dict:
+        """Pin the release's AppImage. The SHA256SUMS list was written by the job
+        that verified the AppImage; GitHub's recorded asset digest must agree."""
+        tag = release.get("tag_name", "")
+        pkgver = pkgver_from_tag(tag)
+        if release.get("draft") is not False:
+            raise ValueError(f"Release {tag} is a draft; only published releases are packaged")
+        appimages = [a for a in release.get("assets", []) if a.get("name", "").endswith(".AppImage")]
+        if len(appimages) != 1:
+            raise ValueError(f"Release {tag} must have exactly one .AppImage asset, found {len(appimages)}")
+        asset = appimages[0]
+        match = APPIMAGE.fullmatch(asset["name"])
+        if not match or match[1] != TAG.fullmatch(tag).expand(r"\1.\2.\3"):
+>           raise ValueError(f"AppImage {asset['name']!r} does not match release {tag}")
+E           ValueError: AppImage 'Leafsmith_0.1.0_amd64.AppImage' does not match release v0.1.0-rc.1
+
+scripts/aur_package.py:71: ValueError
+_______________ test_first_publish_creates_the_aur_master_branch _______________
+
+tmp_path = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-135/test_first_publish_creates_the0')
+
+    def test_first_publish_creates_the_aur_master_branch(tmp_path):
+        remote = fake_aur(tmp_path)
+>       plan(aur["release_artifact"](github_release(), SUMS), remote, tmp_path / "out")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scripts/tests/test_aur_package.py:244: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+release = {'tag_name': 'v0.1.0-rc.2', 'draft': False, 'prerelease': True, 'html_url': 'https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.2', ...}
+sums_text = '16b0ebe4484820754224d1850a847990626e4c9e7a35cb7b5ac5b31c638761ca  Leafsmith_0.1.0_amd64.AppImage\n1111111111111111111111111111111111111111111111111111111111111111  Leafsmith-linux-corresponding-sources.zip\n'
+
+    def release_artifact(release: dict, sums_text: str) -> dict:
+        """Pin the release's AppImage. The SHA256SUMS list was written by the job
+        that verified the AppImage; GitHub's recorded asset digest must agree."""
+        tag = release.get("tag_name", "")
+        pkgver = pkgver_from_tag(tag)
+        if release.get("draft") is not False:
+            raise ValueError(f"Release {tag} is a draft; only published releases are packaged")
+        appimages = [a for a in release.get("assets", []) if a.get("name", "").endswith(".AppImage")]
+        if len(appimages) != 1:
+            raise ValueError(f"Release {tag} must have exactly one .AppImage asset, found {len(appimages)}")
+        asset = appimages[0]
+        match = APPIMAGE.fullmatch(asset["name"])
+        if not match or match[1] != TAG.fullmatch(tag).expand(r"\1.\2.\3"):
+>           raise ValueError(f"AppImage {asset['name']!r} does not match release {tag}")
+E           ValueError: AppImage 'Leafsmith_0.1.0_amd64.AppImage' does not match release v0.1.0-rc.2
+
+scripts/aur_package.py:71: ValueError
+_____________ test_a_rejected_aur_push_reports_the_servers_reason ______________
+
+tmp_path = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-135/test_a_rejected_aur_push_repor0')
+
+    def test_a_rejected_aur_push_reports_the_servers_reason(tmp_path):
+        remote = fake_aur(tmp_path)
+        hook = remote / "hooks/pre-receive"
+        hook.write_text("#!/bin/sh\necho 'error: The package base is owned by someone else' >&2\nexit 1\n")
+        hook.chmod(0o755)
+>       plan(aur["release_artifact"](github_release(), SUMS), remote, tmp_path / "out")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scripts/tests/test_aur_package.py:255: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+release = {'tag_name': 'v0.1.0-rc.2', 'draft': False, 'prerelease': True, 'html_url': 'https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.2', ...}
+sums_text = '16b0ebe4484820754224d1850a847990626e4c9e7a35cb7b5ac5b31c638761ca  Leafsmith_0.1.0_amd64.AppImage\n1111111111111111111111111111111111111111111111111111111111111111  Leafsmith-linux-corresponding-sources.zip\n'
+
+    def release_artifact(release: dict, sums_text: str) -> dict:
+        """Pin the release's AppImage. The SHA256SUMS list was written by the job
+        that verified the AppImage; GitHub's recorded asset digest must agree."""
+        tag = release.get("tag_name", "")
+        pkgver = pkgver_from_tag(tag)
+        if release.get("draft") is not False:
+            raise ValueError(f"Release {tag} is a draft; only published releases are packaged")
+        appimages = [a for a in release.get("assets", []) if a.get("name", "").endswith(".AppImage")]
+        if len(appimages) != 1:
+            raise ValueError(f"Release {tag} must have exactly one .AppImage asset, found {len(appimages)}")
+        asset = appimages[0]
+        match = APPIMAGE.fullmatch(asset["name"])
+        if not match or match[1] != TAG.fullmatch(tag).expand(r"\1.\2.\3"):
+>           raise ValueError(f"AppImage {asset['name']!r} does not match release {tag}")
+E           ValueError: AppImage 'Leafsmith_0.1.0_amd64.AppImage' does not match release v0.1.0-rc.2
+
+scripts/aur_package.py:71: ValueError
+_ test_without_a_tag_the_newest_published_release_with_a_leafsmith_appimage_is_packaged _
+
+    def test_without_a_tag_the_newest_published_release_with_a_leafsmith_appimage_is_packaged():
+        components = {"tag_name": "components-v0.1.0", "draft": False, "assets": [{"name": "tesseract.zip"}]}
+        paperwork = github_release(tag="v0.1.0-rc.3", name="Paperwork_0.1.0_amd64.AppImage")
+        releases = [github_release(tag="v0.2.0-rc.1", draft=True), components, paperwork, github_release(), github_release(tag="v0.1.0-rc.1")]
+>       assert aur["latest_appimage_release"](releases)["tag_name"] == "v0.1.0-rc.2"
+E       AssertionError: assert 'v0.1.0-rc.3' == 'v0.1.0-rc.2'
+E         
+E         - v0.1.0-rc.2
+E         ?           ^
+E         + v0.1.0-rc.3
+E         ?           ^
+
+scripts/tests/test_aur_package.py:264: AssertionError
+__ test_fetch_release_without_an_eligible_release_writes_nothing_and_succeeds __
+
+tmp_path = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-135/test_fetch_release_without_an_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f74bb63f0>
+capsys = <_pytest.capture.CaptureFixture object at 0x7f74adef90>
+
+    def test_fetch_release_without_an_eligible_release_writes_nothing_and_succeeds(tmp_path, monkeypatch, capsys):
+        paperwork = github_release(tag="v0.1.0-rc.2", name="Paperwork_0.1.0_amd64.AppImage")
+        monkeypatch.setitem(aur["main"].__globals__, "github_json", lambda url, token: [paperwork])
+        out = tmp_path / "release.json"
+        assert aur["main"](["fetch-release", "--out", str(out)]) == 0
+>       assert not out.exists()
+E       AssertionError: assert not True
+E        +  where True = exists()
+E        +    where exists = PosixPath('/home/defaultuser/.hermes/cache/scratch/pytest-of-defaultuser/pytest-135/test_fetch_release_without_an_0/release.json').exists
+
+scripts/tests/test_aur_package.py:274: AssertionError
+----------------------------- Captured stdout call -----------------------------
+v0.1.0-rc.2: Paperwork_0.1.0_amd64.AppImage sha256=16b0ebe4484820754224d1850a847990626e4c9e7a35cb7b5ac5b31c638761ca
+_ test_namcap_gate_accepts_opt_and_dependency_reports_only_for_what_the_bundle_ships _
+
+    def test_namcap_gate_accepts_opt_and_dependency_reports_only_for_what_the_bundle_ships():
+        bundled = {"libz.so.1", "libpng16.so.16"}  # file names shipped under opt/leafsmith/
+        lib = ("leafsmith-bin E: dependency-detected-not-included zlib (libraries-needed ['usr/lib/libz.so.1'] "
+               "['opt/leafsmith/usr/lib/libpng16.so.16', 'opt/leafsmith/usr/lib/libfreetype.so.6'])")
+        python = ("leafsmith-bin E: dependency-detected-not-included python (python-modules-needed ['json', 'ctypes'] "
+                  f"['{WORKER}pptx/util.py'], python-modules-needed ['zlib'] ['{WORKER}pypdfium2/raw.py'])")
+        opt = "leafsmith-bin E: elffile-in-questionable-dirs opt/"
+>       assert aur["namcap_errors"]("\n".join([lib, python, opt]), bundled) == ([], [lib, python, opt])
+E       assert (["leafsmith-...rs opt/'], []) == ([], ["leafsm...e-dirs opt/'])
+E         
+E         At index 0 diff: ["leafsmith-bin E: dependency-detected-not-included zlib (libraries-needed ['usr/lib/libz.so.1'] ['opt/leafsmith/usr/lib/libpng16.so.16', 'opt/leafsmith/usr/lib/libfreetype.so.6'])", "leafsmith-bin E: dependency-detected-not-included python (python-modules-needed ['json', 'ctypes'] ['opt/leafsmith/usr/lib/Leafsmith/worker/_internal/pptx/util.py'], python-modules-needed ['zlib'] ['opt/leafsmith/usr/lib/Leafsmith/worker/_internal/pypdfium2/raw.py'])", 'leafsmith-bin E: elffile-in-questionable-dirs opt/'] != []
+E         Use -v to get more diff
+
+scripts/tests/test_aur_package.py:310: AssertionError
+=========================== short test summary info ============================
+FAILED scripts/tests/test_aur_package.py::test_release_artifact_pins_the_appimage_only_when_checksum_sources_agree
+FAILED scripts/tests/test_aur_package.py::test_render_pins_release_appimage_and_local_sources
+FAILED scripts/tests/test_aur_package.py::test_plan_uploads_new_versions_bumps_pkgrel_for_recipe_changes_and_never_downgrades
+FAILED scripts/tests/test_aur_package.py::test_plan_refuses_an_aur_repository_for_another_package
+FAILED scripts/tests/test_aur_package.py::test_namcap_gate_fails_on_every_error_except_the_reviewed_worker_runpath
+FAILED scripts/tests/test_aur_package.py::test_publish_pushes_exactly_the_validated_plan_and_refuses_a_moved_aur_or_altered_files
+FAILED scripts/tests/test_aur_package.py::test_first_publish_creates_the_aur_master_branch
+FAILED scripts/tests/test_aur_package.py::test_a_rejected_aur_push_reports_the_servers_reason
+FAILED scripts/tests/test_aur_package.py::test_without_a_tag_the_newest_published_release_with_a_leafsmith_appimage_is_packaged
+FAILED scripts/tests/test_aur_package.py::test_fetch_release_without_an_eligible_release_writes_nothing_and_succeeds
+FAILED scripts/tests/test_aur_package.py::test_namcap_gate_accepts_opt_and_dependency_reports_only_for_what_the_bundle_ships
+11 failed, 2 passed, 2 skipped in 1.17s
+
+LEAFSMITH RENAME + NO-ELIGIBLE-RELEASE GREEN 2026-10-18T22:19:02%:z
+command=.venv-package/bin/python -m pytest scripts/tests/test_aur_package.py -q -p no:cacheprovider -rs
+scripts/aur_package.py sha256=e7e6492d260272cd821314436be1da360ef3e16328aa826f2e0ef866981359da
+scripts/tests/test_aur_package.py sha256=ebb29da2da89148b641ee161147c53858ac8b07745ac81e63bb405b0aed033a1
+packaging/aur/PKGBUILD.in sha256=6223f69ead30ee31ffcc211a7cfa271c419a6e4981595438a7d6ce60fa62cf68
+exit=0
+............ss.                                                          [100%]
+=========================== short test summary info ============================
+SKIPPED [1] scripts/tests/test_aur_package.py:284: pacman's vercmp runs in CI's Arch container
+SKIPPED [1] scripts/tests/test_aur_package.py:292: makepkg runs in CI's Arch container
+13 passed, 2 skipped in 3.12s

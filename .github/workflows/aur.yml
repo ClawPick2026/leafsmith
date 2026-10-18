@@ -1,0 +1,171 @@
+name: AUR package
+
+# Publishes leafsmith-bin to AUR for each published release with a Leafsmith
+# Linux AppImage; releases built before the Paperwork -> Leafsmith rename are
+# not packaged. AUR receives only the recipe; makepkg downloads the AppImage
+# from the GitHub release. Setup and checks: packaging/aur/README.md.
+on:
+  # Desktop packages publishes releases with GITHUB_TOKEN, which emits no
+  # release event, so its completed tag run is the trigger.
+  workflow_run:
+    workflows: [Desktop packages]
+    types: [completed]
+  # Recipe changes publish the next pkgrel of the newest release.
+  push:
+    branches: [main]
+    paths:
+      - packaging/aur/**
+      - scripts/aur_package.py
+      - scripts/tests/test_aur_package.py
+      - .github/workflows/aur.yml
+  # Pull requests validate only.
+  pull_request:
+    paths:
+      - packaging/aur/**
+      - scripts/aur_package.py
+      - scripts/tests/test_aur_package.py
+      - .github/workflows/aur.yml
+  # Run from main to publish a release by hand or retry; other refs validate only.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag; empty: the newest published release with a Leafsmith AppImage'
+        type: string
+        required: false
+      publish:
+        description: Push to AUR after validation
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+# No shared concurrency group: a newer pending run would cancel a queued
+# release. Racing publishes are safe; see `publish` in scripts/aur_package.py.
+
+jobs:
+  validate:
+    name: Plan, build and check in Arch Linux
+    # Desktop packages publishes a release only from a successful tag run,
+    # started by a tag push or dispatched on a tag.
+    if: >-
+      github.event_name != 'workflow_run' || (
+        github.event.workflow_run.conclusion == 'success' &&
+        contains(fromJSON('["push", "workflow_dispatch"]'), github.event.workflow_run.event) &&
+        startsWith(github.event.workflow_run.head_branch, 'v'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    outputs:
+      publish: ${{ steps.mode.outputs.publish }}
+      action: ${{ steps.plan.outputs.action }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Choose the release and whether to publish
+        id: mode
+        env:
+          EVENT: ${{ github.event_name }}
+          RUN_TAG: ${{ github.event.workflow_run.head_branch }}
+          INPUT_TAG: ${{ inputs.tag }}
+          INPUT_PUBLISH: ${{ inputs.publish }}
+          MAINTAINER: ${{ vars.AUR_MAINTAINER }}
+        run: |
+          case "$EVENT" in
+            workflow_run) tag=$RUN_TAG publish=true ;;
+            workflow_dispatch) tag=$INPUT_TAG publish=$INPUT_PUBLISH ;;
+            push) tag='' publish=true ;;
+            *) tag='' publish=false ;;
+          esac
+          if [[ "$GITHUB_REF" != refs/heads/main ]]; then publish=false; fi
+          if [[ "$publish" == true && -z "$MAINTAINER" ]]; then
+            echo "::error::Set the repository variable AUR_MAINTAINER to 'Name <email>' (packaging/aur/README.md, One-time setup)"
+            exit 1
+          fi
+          {
+            echo "tag=$tag"
+            echo "publish=$publish"
+            # Validation-only runs still render a complete recipe.
+            echo "maintainer=${MAINTAINER:-Leafsmith validation <validation@invalid>}"
+          } >> "$GITHUB_OUTPUT"
+      - name: Pin the release AppImage from its verified checksum list
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.mode.outputs.tag }}
+        run: |
+          python3 scripts/aur_package.py fetch-release ${TAG:+--tag "$TAG"} --out build/aur/release.json
+          # Without a tag, no release may have an eligible AppImage yet.
+          echo "found=$([[ -f build/aur/release.json ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+      - name: Test, render and compare with AUR in Arch Linux (no credentials)
+        if: steps.release.outputs.found == 'true'
+        env:
+          MAINTAINER: ${{ steps.mode.outputs.maintainer }}
+        run: |
+          docker run --rm --env MAINTAINER --env BUILDER_UID="$(id -u)" --volume "$PWD:/work" \
+            archlinux:base-devel bash /work/packaging/aur/ci-validate.sh plan
+      - name: Keep the plan out of the build container's reach
+        if: steps.release.outputs.found == 'true'
+        id: plan
+        run: |
+          cp -a build/aur/plan "$RUNNER_TEMP/aur-plan"
+          plan="$RUNNER_TEMP/aur-plan/plan.json"
+          echo "action=$(jq -r .action "$plan")" >> "$GITHUB_OUTPUT"
+          jq -r '"### AUR \(.pkgname)\n\n- Release: \(.tag)\n- AUR before this run: \(.aur_version // "no package yet")\n- Plan: \(.action) \(.pkgver)-\(.pkgrel)"' "$plan" >> "$GITHUB_STEP_SUMMARY"
+      - name: Build, install, namcap and headless smoke in Arch Linux (no credentials)
+        if: steps.release.outputs.found == 'true'
+        run: |
+          docker run --rm --shm-size=1g --env BUILDER_UID="$(id -u)" --volume "$PWD:/work" \
+            archlinux:base-devel bash /work/packaging/aur/ci-validate.sh build
+      - name: Save the validated package files
+        if: steps.plan.outputs.action == 'publish'
+        uses: actions/upload-artifact@v4
+        with:
+          name: aur-package
+          path: ${{ runner.temp }}/aur-plan/
+          include-hidden-files: true  # .SRCINFO
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload plan, makepkg, namcap and smoke logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aur-evidence
+          path: |
+            build/aur/release.json
+            build/aur/plan/
+            build/aur/logs/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 14
+
+  publish:
+    name: Push to AUR
+    needs: validate
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      needs.validate.outputs.publish == 'true' && needs.validate.outputs.action == 'publish'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    # Holds AUR_SSH_PRIVATE_KEY; only this job can read it. The environment
+    # must be limited to the main branch (README, One-time setup).
+    environment: aur
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: aur-package
+          path: build/aur/plan
+      - name: Push the validated files to AUR master
+        env:
+          AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          MAINTAINER: ${{ vars.AUR_MAINTAINER }}
+        run: |
+          test -n "$AUR_SSH_PRIVATE_KEY" || { echo "::error::Add the AUR_SSH_PRIVATE_KEY secret to the aur environment"; exit 1; }
+          key="$RUNNER_TEMP/aur-key"
+          trap 'rm -f "$key"' EXIT
+          (umask 077 && printf '%s\n' "$AUR_SSH_PRIVATE_KEY" > "$key")
+          export GIT_SSH_COMMAND="ssh -i $key -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$PWD/packaging/aur/known_hosts"
+          python3 scripts/aur_package.py publish --out build/aur/plan --maintainer "$MAINTAINER"
