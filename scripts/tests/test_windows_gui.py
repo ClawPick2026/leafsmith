@@ -146,6 +146,34 @@ class ArtifactHelperTests(unittest.TestCase):
 
 
 class NativeTraceTests(unittest.TestCase):
+    def test_file_dialog_selects_standard_idok_not_open_named_combobox_arrows(self):
+        # Portable replay of the real hosted-runner UIA identities, not GUI proof.
+        # Native dialog exposes two ComboBox arrow Buttons named Open, plus IDOK.
+        trace = object.__new__(smoke.NativeTrace)
+        clicks = []
+        state = {'path': ''}
+        edit = SimpleNamespace(
+            window_text=lambda: 'File name:',
+            set_edit_text=lambda value: state.update(path=value),
+            get_value=lambda: state['path'])
+        buttons = [SimpleNamespace(
+            window_text=lambda: 'Open',
+            element_info=SimpleNamespace(automation_id=identity),
+            is_enabled=lambda: True, is_visible=lambda: True,
+            click_input=lambda identity=identity: clicks.append(identity))
+            for identity in ('DropDown', 'DropDown', '1')]
+        dialog = SimpleNamespace(descendants=lambda control_type:
+                                 [edit] if control_type == 'Edit' else buttons)
+        trace.desktop = SimpleNamespace(windows=lambda **kwargs: [] if clicks else [dialog])
+        trace.pid = 123
+        trace.focus = lambda target: None
+        trace.capture = lambda *args: None
+        trace.step = lambda *args, **kwargs: None
+        trace.file_dialog('Select documents or media to process', Path('synthetic-input.pdf'),
+                          'Open', 'unit-only')
+        self.assertEqual(clicks, ['1'])
+        self.assertEqual(state['path'], 'synthetic-input.pdf')
+
     def test_drive_reads_inspection_from_nonclickable_overflowing_uia_text(self):
         # Simulated UIA provider only: exercise real drive/lookup/parser behavior,
         # not Windows rendering, processing, file dialogs, or GUI acceptance.

@@ -401,7 +401,10 @@ class NativeTrace:
         if edits[0].get_value() != str(path):
             raise RuntimeError('Native file name field did not retain the exact synthetic path.')
         self.capture(label + '-path', dialog)
-        buttons = self.named(action, scope=dialog)
+        # Common dialogs also expose ComboBox arrows named Open. IDOK (1)
+        # identifies the actual Open/Save action; never choose by name alone.
+        buttons = [button for button in self.named(action, scope=dialog)
+                   if button.element_info.automation_id == '1' and button.is_visible()]
         if len(buttons) != 1 or not buttons[0].is_enabled():
             raise RuntimeError('No unique enabled native dialog action: ' + action)
         buttons[0].click_input()
