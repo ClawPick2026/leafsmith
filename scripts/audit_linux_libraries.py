@@ -174,6 +174,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # another review even if the notice stays unchanged.
 LIBUUID_COPYRIGHT_SHA256 = "2c447817698777e3b2365a5afe2a58ececb85367dfdf0ea2c0df49add90e93eb"
 LIBUUID_SOURCE_VERSION = "2.37.2-4ubuntu3.6"
+# The matching source's libblkid/COPYING and libmount/COPYING explicitly grant
+# LGPL-2.1-or-later. Both share this exact package/version/complete notice.
+# Do not classify either library by the GPL utilities' default DEP5 stanza.
+UTIL_LINUX_REVIEWED_RUNTIMES = frozenset({"libuuid.so.1", "libblkid.so.1", "libmount.so.1"})
 
 
 def license_policy(text, source_package, basename, *, source_version=None):
@@ -182,31 +186,31 @@ def license_policy(text, source_package, basename, *, source_version=None):
     Debian copyright can cover GPL build utilities alongside LGPL libraries.
     Keep that complete text and exact sources; do not reject LGPL because its
     notice incorporates GPL text. Reviewed exceptions cover GCC runtime libs,
-    libffi's non-DEP5 MIT grant, and one exact libuuid mixed-package notice,
+    libffi's non-DEP5 MIT grant, and exact-version/hash-bound util-linux runtimes,
     never arbitrary mixed-license sources.
     This heuristic is a tripwire, not a binary-level legal determination.
     """
+    # Never let a selected DEP5 default grant hide prohibited later stanzas.
+    if re.search(r"\bAGPL(?:v?\d|[-\s]|\b)|Affero General Public", text, re.I):
+        raise ValueError("AGPL library is prohibited: " + basename)
     evidence = text
+    file_stanzas = []
+    default_stanza = None
     if re.search(r"(?mi)^Format:.*copyright-format", text):
-        # DEP5 distinguishes default code terms from per-file build-tool terms.
-        # Preserve every stanza in the notices/sources, but do not mislabel an
-        # Apache/LGPL library GPL-only because config.guess is GPL. Source-file
-        # exceptions still require human review; this is not linkage analysis.
-        for paragraph in re.split(r"\n\s*\n", text):
-            control = Parser().parsestr(paragraph)
+        # Read every Files stanza: the default grant cannot settle later
+        # source-file overrides. License-definition prose is not a file grant.
+        file_stanzas = [control for paragraph in re.split(r"\n\s*\n", text)
+                        if (control := Parser().parsestr(paragraph)).get("Files")]
+        for control in file_stanzas:
             if control.get("Files", "").strip() == "*" and control.get("License"):
                 evidence = control["License"].splitlines()[0]
+                default_stanza = control
                 break
-    if source_package == "util-linux" and basename == "libuuid.so.1":
-        # Inspect all stanzas for AGPL before the reviewed runtime classification.
-        evidence = text
-    if re.search(r"\bAGPL(?:v?\d|[-\s]|\b)|Affero General Public", evidence, re.I):
-        raise ValueError("AGPL library is prohibited: " + basename)
-    if source_package == "util-linux" and basename == "libuuid.so.1":
+    if source_package == "util-linux" and basename in UTIL_LINUX_REVIEWED_RUNTIMES:
         if source_version != LIBUUID_SOURCE_VERSION:
-            raise ValueError("Unrecognized libuuid runtime source version; explicit review required: " + basename)
+            raise ValueError("Unrecognized " + basename + " runtime source version; explicit review required")
         if hashlib.sha256(text.encode("utf-8")).hexdigest() != LIBUUID_COPYRIGHT_SHA256:
-            raise ValueError("Unrecognized libuuid runtime copyright; explicit review required: " + basename)
+            raise ValueError("Unrecognized " + basename + " runtime copyright; explicit review required")
         return "notice-and-exact-source-preserved"
     if source_package == "libffi" and re.fullmatch(r"libffi\.so(?:\.[0-9]+)*", basename):
         # Only this reviewed legacy layout is recognized. Require the entire
@@ -218,6 +222,17 @@ def license_policy(text, source_package, basename, *, source_version=None):
                 or runtime[1].split() != LIBFFI_RUNTIME_GRANT.split()):
             raise ValueError("Unrecognized libffi runtime copyright; explicit review required: " + basename)
         return "notice-and-exact-source-preserved"
+    for control in file_stanzas:
+        files = control["Files"].split()
+        if control is default_stanza:
+            continue  # The default grant is classified below (including GCC).
+        grant = control.get("License", "").splitlines()[0] if control.get("License") else ""
+        if (re.search(r"\bGPL(?:v?\d|[-\s]|\b)|GNU GENERAL PUBLIC LICENSE", grant, re.I)
+                and not re.search(r"\bLGPL(?:v?\d|[-\s]|\b)|GNU (?:LESSER|LIBRARY) GENERAL PUBLIC LICENSE", grant, re.I)):
+            # Only the named configure helper scripts are unambiguously build
+            # tools here. A directory, wildcard or mixed runtime list is not.
+            if not all(Path(name).name in {"config.guess", "config.sub"} for name in files):
+                raise ValueError("GPL-only file override requires explicit review; not permitted: " + basename)
     gpl = re.search(r"\bGPL(?:v?\d|[-\s]|\b)|GNU GENERAL PUBLIC LICENSE", evidence, re.I)
     lgpl = re.search(r"\bLGPL(?:v?\d|[-\s]|\b)|GNU (?:LESSER|LIBRARY) GENERAL PUBLIC LICENSE", evidence, re.I)
     gcc = (re.fullmatch(r"gcc-\d+", source_package or "")
@@ -246,7 +261,7 @@ def debian_notices(owner, output, filesystem=Path("/")):
     # Also preserve every available common license: this resolves indirect and
     # wrapped references (e.g. LGPL referring in turn to the GPL), without links.
     common = filesystem / "usr/share/common-licenses"
-    referenced = re.findall(r"/usr/share/common-licenses/([\w.+-]+)", source.read_text(errors="replace"))
+    referenced = re.findall(r"/usr/share/common-licenses/([\w.+-]+)", source.read_text(encoding="utf-8", errors="replace"))
     for name in referenced:
         if not (common / name.rstrip(".")).is_file():
             raise ValueError("Missing referenced common license: " + name)
@@ -400,8 +415,8 @@ def collect(worker, native, output, source_output, python_records, distributions
     linker = linker_paths()
     bootloader = next((r for r in python_records if canonical(r["name"]) == "pyinstaller"), {})
     bootloader_notices = bootloader.get("notices", [])
-    if not any("bootloader" in checked_file(output, p).read_text(errors="replace").lower()
-               and "exception" in checked_file(output, p).read_text(errors="replace").lower() for p in bootloader_notices):
+    if not any("bootloader" in checked_file(output, p).read_text(encoding="utf-8", errors="replace").lower()
+               and "exception" in checked_file(output, p).read_text(encoding="utf-8", errors="replace").lower() for p in bootloader_notices):
         raise ValueError("Missing actual PyInstaller bootloader exception notice")
     extras = [Path(p).resolve() for p in extra_libraries]
     # Native binary plus every worker extension: ldd includes transitive deps.
@@ -412,6 +427,20 @@ def collect(worker, native, output, source_output, python_records, distributions
     libraries = []
     debian_cache = {}
     sources_needed = set()
+    policy_issues = []
+
+    def classify(owner, text, basename):
+        try:
+            policy = license_policy(text, owner.get("source_package", owner["name"]), basename,
+                                    source_version=owner.get("source_version"))
+            if owner["kind"] == "wheel" and policy == "lgpl-source-required":
+                raise ValueError("Copyleft wheel requires a reviewed exact-source collector: " + owner["name"])
+            return policy
+        except ValueError as error:
+            policy_issues.append({"basename": basename, "package": owner["name"],
+                                  "source_version": owner.get("source_version"), "error": str(error)})
+            return "unapproved"
+
     for path, role in [(p, "shipped-worker") for p in shipped] + [(p, "dependency-superset") for p in superset]:
         collected_original = None
         if role == "shipped-worker":
@@ -423,10 +452,7 @@ def collect(worker, native, output, source_output, python_records, distributions
         if owner and owner["kind"] == "wheel":
             # Wheel declarations identify primary terms; full nested vendored
             # notices are preserved separately, not reinterpreted as app MIT.
-            policy = license_policy(owner.get("license") or "", owner["name"], path.name)
-            if policy == "lgpl-source-required":
-                raise ValueError("Copyleft wheel requires a reviewed exact-source collector: " + owner["name"])
-            owner["policy"] = policy
+            owner["policy"] = classify(owner, owner.get("license") or "", path.name)
         if owner is None:
             if role == "shipped-worker":
                 if freezer_toc is not None and collected_original is None:
@@ -440,13 +466,21 @@ def collect(worker, native, output, source_output, python_records, distributions
                 debian_cache[key] = debian_notices(owner, output)
             owner["notices"] = debian_cache[key]
             copyright_path = next(p for p in owner["notices"] if p.endswith("/copyright"))
-            copyright_text = checked_file(output, copyright_path).read_text(errors="replace")
-            owner["policy"] = license_policy(copyright_text, owner["source_package"], path.name,
-                                             source_version=owner.get("source_version"))
+            copyright_text = checked_file(output, copyright_path).read_text(encoding="utf-8", errors="replace")
+            owner["policy"] = classify(owner, copyright_text, path.name)
             owner["original_sha256"] = sha256(Path(owner["original"]))
-            sources_needed.add((owner["source_package"], owner["source_version"]))
+            if owner["policy"] != "unapproved":
+                sources_needed.add((owner["source_package"], owner["source_version"]))
         libraries.append({**owner, "path": path.relative_to(worker).as_posix() if role == "shipped-worker" else str(path),
                           "basename": path.name, "role": role, "sha256": sha256(path)})
+    if policy_issues:
+        # Finish the classification pass, but NEVER return an approved inventory
+        # or fetch sources/package binaries while any dependency is unresolved.
+        report = output / "linux/prebundle-license-review.json"
+        report.parent.mkdir(parents=True, exist_ok=True)
+        report.write_text(json.dumps({"approved": False, "issues": policy_issues,
+                                      "libraries": libraries}, indent=2), encoding="utf-8")
+        raise ValueError("Dependency license review failed: " + "; ".join(item["error"] for item in policy_issues))
     if source_output.exists() and any(source_output.iterdir()):
         raise ValueError("Corresponding source destination must be fresh; refusing stale sources: " + str(source_output))
     source_output.mkdir(parents=True, exist_ok=True)
@@ -510,13 +544,13 @@ def audit_payload(root, inventory, notices, source_output):
             raise ValueError("Missing dependency notices for " + path.name)
         for notice in record["notices"]:
             checked_file(notices, notice)
-        if record["kind"] == "debian" and record.get("source_package") == "util-linux" and path.name == "libuuid.so.1":
+        if record["kind"] == "debian" and record.get("source_package") == "util-linux" and path.name in UTIL_LINUX_REVIEWED_RUNTIMES:
             # Recheck this version-bound exception; a stored policy decision
             # does not establish that the packaged runtime was reviewed.
             copyright_path = next((p for p in record["notices"] if p.endswith("/copyright")), None)
             if copyright_path is None:
-                raise ValueError("Missing libuuid runtime copyright; explicit review required: " + path.name)
-            license_policy(checked_file(notices, copyright_path).read_text(errors="replace"),
+                raise ValueError("Missing reviewed util-linux runtime copyright; explicit review required: " + path.name)
+            license_policy(checked_file(notices, copyright_path).read_text(encoding="utf-8", errors="replace"),
                            record["source_package"], path.name, source_version=record.get("source_version"))
         if record["kind"] == "debian" and (record["source_package"], record["source_version"]) not in sources:
             raise ValueError("Missing exact corresponding source for " + path.name)

@@ -286,6 +286,26 @@ class SourceTests(unittest.TestCase):
                                              "util-linux", "libuuid.so.1", source_version="2.37.2-4ubuntu3.6"),
                          "notice-and-exact-source-preserved")
 
+    def test_reviewed_util_linux_lgpl_libraries_require_exact_source_and_notice(self):
+        # Same exact source package as libuuid. libblkid/COPYING and
+        # libmount/COPYING explicitly grant LGPL-2.1-or-later, not GPL-only.
+        text = (Path(__file__).with_name('fixtures') / 'libuuid-copyright.txt').read_text(encoding='utf-8')
+        module = api()
+        for basename in ('libblkid.so.1', 'libmount.so.1'):
+            with self.subTest(basename=basename):
+                self.assertEqual(module.license_policy(text, 'util-linux', basename,
+                                 source_version='2.37.2-4ubuntu3.6'),
+                                 'notice-and-exact-source-preserved')
+                for version in (None, '', '2.37.2-4ubuntu3.7'):
+                    with self.assertRaisesRegex(ValueError, 'explicit review'):
+                        module.license_policy(text, 'util-linux', basename, source_version=version)
+                with self.assertRaisesRegex(ValueError, 'explicit review'):
+                    module.license_policy(text + '\nChanged grant', 'util-linux', basename,
+                                          source_version='2.37.2-4ubuntu3.6')
+                with self.assertRaisesRegex(ValueError, 'AGPL'):
+                    module.license_policy(text + '\nLicense: AGPL-3.0', 'util-linux', basename,
+                                          source_version='2.37.2-4ubuntu3.6')
+
     def test_libuuid_unchanged_notice_requires_reviewed_source_version(self):
         text = (Path(__file__).with_name("fixtures") / "libuuid-copyright.txt").read_text(encoding="utf-8")
         module = api()
@@ -301,7 +321,7 @@ class SourceTests(unittest.TestCase):
         text = (Path(__file__).with_name("fixtures") / "libuuid-copyright.txt").read_text(encoding="utf-8")
         module = api()
         for source, basename in [("unknown", "libuuid.so.1"), ("util-linux-extra", "libuuid.so.1"),
-                                 ("util-linux", "libmount.so.1"), ("util-linux", "libblkid.so.1"),
+                                 ("util-linux", "libfdisk.so.1"), ("util-linux", "libsmartcols.so.1"),
                                  ("util-linux", "libuuid.so"), ("util-linux", "libuuid.so.1.3.0"),
                                  ("util-linux", "libuuid.so.1-extra"), ("util-linux", "other/libuuid.so.1")]:
             with self.subTest(source=source, basename=basename), self.assertRaisesRegex(ValueError, "GPL-only"):
@@ -329,6 +349,67 @@ class SourceTests(unittest.TestCase):
                 with self.subTest(term=term, notice=notice), self.assertRaisesRegex(ValueError, "AGPL library is prohibited"):
                     api().license_policy(notice, "util-linux", "libuuid.so.1", source_version="2.37.2-4ubuntu3.6")
 
+    def test_dep5_checks_complete_notice_for_agpl_before_default_runtime_grant(self):
+        module = api()
+        for default in ["MIT", "LGPL-2.1+"]:
+            for term in ["AGPL-3.0", "AGPLv3", "Affero General Public License"]:
+                for override in ["Files: src/runtime.c\nLicense: " + term,
+                                 "Files: build-aux/config.guess\nLicense: " + term,
+                                 "License: " + term,
+                                 "Comment: additional runtime terms: " + term]:
+                    text = ("Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/\n\n"
+                            "Files: *\nCopyright: fixture only\nLicense: " + default + "\n\n" + override + "\n")
+                    with self.subTest(default=default, term=term, override=override), \
+                            self.assertRaisesRegex(ValueError, "AGPL library is prohibited"):
+                        module.license_policy(text, "example", "libexample.so")
+
+    def test_dep5_gpl_only_runtime_overrides_require_explicit_review(self):
+        module = api()
+        for default in ["MIT", "LGPL-2.1+"]:
+            for files in ["src/runtime.c", "lib/*.c", "*.[ch]", "src/config.c",
+                          "build-aux/runtime.c", "build-aux/config.guess\n src/runtime.c",
+                          "config.guess config.sub src/runtime.c"]:
+                for term in ["GPL-3+", "GPLv2+", "GNU General Public License version 3"]:
+                    text = ("Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/\n\n"
+                            "Files: *\nCopyright: fixture only\nLicense: " + default + "\n\n"
+                            "Files: " + files + "\nCopyright: fixture only\nLicense: " + term + "\n")
+                    with self.subTest(default=default, files=files, term=term), \
+                            self.assertRaisesRegex(ValueError, "GPL-only.*explicit review"):
+                        module.license_policy(text, "example", "libexample.so")
+
+    def test_dep5_later_gpl_default_override_requires_explicit_review(self):
+        text = ("Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/\n\n"
+                "Files: *\nLicense: MIT\n\n"
+                "Files: *\nLicense: GPL-3+\n")
+        with self.assertRaisesRegex(ValueError, "GPL-only.*explicit review"):
+            api().license_policy(text, "example", "libexample.so")
+
+    def test_dep5_lgpl_and_permissive_grants_do_not_inherit_gpl_prose(self):
+        # Existing behavior: common-license definitions, documentation comments,
+        # and LGPL's incorporation of GPL text are not GPL-only file grants.
+        module = api()
+        for default, expected in [("MIT", "notice-and-exact-source-preserved"),
+                                  ("LGPL-2.1+", "lgpl-source-required")]:
+            text = ("Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/\n\n"
+                    "Files: *\nLicense: " + default + "\n"
+                    " The GNU GENERAL PUBLIC LICENSE is incorporated by the LGPL.\n\n"
+                    "Files: src/helper.c\nLicense: LGPL-2.1+\n"
+                    " See /usr/share/common-licenses/GPL-2.\n\n"
+                    "Files: doc/*\nLicense: MIT\nComment: This documentation discusses GPL-3.\n\n"
+                    "License: GPL-2\n GNU GENERAL PUBLIC LICENSE\n")
+            with self.subTest(default=default):
+                self.assertEqual(module.license_policy(text, "example", "libexample.so"), expected)
+
+    def test_dep5_named_gpl_configure_helpers_remain_build_only(self):
+        # Existing build-tool distinction, not a broad directory/package waiver.
+        for files in ["config.guess", "config.sub", "build-aux/config.sub",
+                      "build-aux/config.guess\n build-aux/config.sub"]:
+            text = ("Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/\n\n"
+                    "Files: *\nLicense: LGPL-2.1+\n\n"
+                    "Files: " + files + "\nLicense: GPL-3+\n")
+            with self.subTest(files=files):
+                self.assertEqual(api().license_policy(text, "example", "libexample.so"), "lgpl-source-required")
+
     def test_permissive_runtime_dep5_is_not_rejected_for_gpl_build_tools(self):
         text = ("Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/\n\n"
                 "Files: *\nCopyright: fixture only\nLicense: Apache-2.0\n\n"
@@ -353,6 +434,54 @@ class SourceTests(unittest.TestCase):
 
 
 class GateTests(unittest.TestCase):
+    def test_collect_reports_entire_dependency_license_failure_set_before_sources(self):
+        # Synthetic distribution, not release evidence: both failures must be
+        # reported in one audit, with no approved inventory or source fetching.
+        import json
+        from unittest.mock import patch
+        import tempfile
+        module = api()
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            worker = root / 'worker'
+            internal = worker / '_internal'
+            internal.mkdir(parents=True)
+            for name in ('libbadgpl.so.1', 'libbadagpl.so.1'):
+                (internal / name).write_bytes(b'synthetic native dependency')
+            (worker / 'paperwork-worker').write_bytes(b'synthetic bootloader')
+            native = root / 'native'
+            native.write_bytes(b'synthetic host')
+            output = worker / 'third-party-licenses'
+            boot = output / 'python/pyinstaller/COPYING.txt'
+            boot.parent.mkdir(parents=True)
+            boot.write_text('PyInstaller bootloader exception fixture')
+            def owner(path, linker):
+                return {'kind': 'debian', 'name': path.name, 'version': '1',
+                        'source_package': path.name, 'source_version': '1',
+                        'original': str(internal / path.name)}
+            def notices(record, destination):
+                path = destination / record['name'] / 'copyright'
+                path.parent.mkdir(parents=True, exist_ok=True)
+                grant = 'AGPL-3.0' if 'agpl' in record['name'] else 'GPL-3.0'
+                path.write_text('License: ' + grant, encoding='utf-8')
+                return [path.relative_to(destination).as_posix()]
+            with patch.object(module, 'linker_paths', return_value={}), \
+                    patch.object(module, 'linked_libraries', return_value=[]), \
+                    patch.object(module, 'python_runtime_owner', return_value=None), \
+                    patch.object(module, 'debian_owner', side_effect=owner), \
+                    patch.object(module, 'debian_notices', side_effect=notices), \
+                    patch.object(module, 'fetch_source') as fetch:
+                with self.assertRaises(ValueError):
+                    module.collect(worker, native, output, root/'sources',
+                                   [{'name': 'pyinstaller', 'notices': ['python/pyinstaller/COPYING.txt']}], [])
+                fetch.assert_not_called()
+            report = json.loads((output/'linux/prebundle-license-review.json').read_text(encoding='utf-8'))
+            self.assertFalse(report['approved'])
+            self.assertEqual({item['basename'] for item in report['issues']},
+                             {'libbadgpl.so.1', 'libbadagpl.so.1'})
+            self.assertEqual(len(report['libraries']), 2)
+            self.assertFalse((root/'sources/source-inventory.json').exists())
+
     def test_transitive_ldd_inventory_requires_no_unresolved_libraries(self):
         import tempfile
         import subprocess
@@ -530,6 +659,84 @@ class GateTests(unittest.TestCase):
                          "sha256": module.sha256(staged), "policy": "notice-and-exact-source-preserved"}], "sources": []}
             with self.assertRaisesRegex(ValueError, "Missing exact corresponding source"):
                 module.audit_payload(staged.parent, inventory, output, root / "sources")
+
+    def test_libuuid_utf8_notices_survive_cp1252_default_through_collection_and_postbundle(self):
+        # Portable locale simulation, NOT native Windows packaging evidence.
+        # Only omitted encodings use cp1252; all reads still consume real bytes.
+        import hashlib
+        import shutil
+        import tempfile
+        from unittest.mock import patch
+        module = api()
+        fixture = Path(__file__).with_name("fixtures") / "libuuid-copyright.txt"
+        expected_text = fixture.read_text(encoding="utf-8")
+        expected_hash = "2c447817698777e3b2365a5afe2a58ececb85367dfdf0ea2c0df49add90e93eb"
+        self.assertEqual(hashlib.sha256(fixture.read_bytes()).hexdigest(), expected_hash)
+        real_read_text = Path.read_text
+
+        def cp1252_read_text(path, encoding=None, errors=None, **kwargs):
+            return real_read_text(path, encoding=encoding or "cp1252", errors=errors, **kwargs)
+
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder).resolve()
+            worker = root / "worker"
+            staged = worker / "_internal/libuuid.so.1"
+            staged.parent.mkdir(parents=True)
+            staged.write_bytes(b"synthetic runtime library; not release evidence")
+            (worker / "paperwork-worker").write_bytes(b"synthetic bootloader")
+            native = root / "native"
+            native.write_bytes(b"synthetic executable")
+            output = worker / "third-party-licenses"
+            boot = output / "python/pyinstaller/COPYING.txt"
+            boot.parent.mkdir(parents=True)
+            boot.write_text("PyInstaller bootloader exception fixture", encoding="utf-8")
+            copyright = root / "usr/share/doc/libuuid1/copyright"
+            copyright.parent.mkdir(parents=True)
+            shutil.copyfile(fixture, copyright)
+            common = root / "usr/share/common-licenses"
+            common.mkdir(parents=True)
+            names = ["GPL-2", "GPL-3", "LGPL", "LGPL-2", "LGPL-2.1", "LGPL-3"]
+            for name in names:
+                (common / name).write_text("synthetic common-license fixture: " + name, encoding="utf-8")
+            version = "2.37.2-4ubuntu3.6"
+            owner = {"kind": "debian", "name": "libuuid1:amd64", "version": version,
+                     "source_package": "util-linux", "source_version": version, "original": str(staged)}
+            records = [{"name": "pyinstaller", "notices": ["python/pyinstaller/COPYING.txt"]}]
+            copy_notices = module.debian_notices
+
+            def synthetic_source(package, version, destination):
+                directory = destination / (package + "-" + version)
+                directory.mkdir()
+                _, dsc = SourceTests().source_fixture(directory, version)
+                dsc.write_text(dsc.read_text(encoding="utf-8").replace("Source: example\n", "Source: " + package + "\n"),
+                               encoding="utf-8")
+                files = module.verify_source_directory(directory, package, version)
+                return {"source_package": package, "source_version": version,
+                        "files": {directory.name + "/" + name: digest for name, digest in files.items()}}
+
+            with patch.object(Path, "read_text", cp1252_read_text), \
+                    patch.object(module, "linker_paths", return_value={}), \
+                    patch.object(module, "linked_libraries", return_value=[]), \
+                    patch.object(module, "python_runtime_owner", return_value=None), \
+                    patch.object(module, "debian_owner", return_value=owner), \
+                    patch.object(module, "debian_notices", side_effect=lambda owner, out: copy_notices(owner, out, root)), \
+                    patch.object(module, "fetch_source", side_effect=synthetic_source) as fetch, \
+                    patch.object(module, "license_policy", wraps=module.license_policy) as policy:
+                collected = module.collect(worker, native, output, root / "sources", records, [])
+                report = module.audit_payload(staged.parent, collected, output, root / "sources")
+            fetch.assert_called_once_with("util-linux", version, root / "sources")
+            self.assertTrue(report["success"])
+            self.assertEqual(report["shared_library_count"], 1)
+            self.assertEqual(report["source_package_count"], 1)
+            self.assertEqual(policy.call_count, 2)  # Collection and postbundle each re-read the notice.
+            for call in policy.call_args_list:
+                self.assertEqual(call.args, (expected_text, "util-linux", "libuuid.so.1"))
+                self.assertEqual(call.kwargs, {"source_version": version})
+                self.assertEqual(hashlib.sha256(call.args[0].encode("utf-8")).hexdigest(), expected_hash)
+            copied = output / "linux/debian/libuuid1_amd64-2.37.2-4ubuntu3.6/copyright"
+            self.assertEqual(copied.read_bytes(), fixture.read_bytes())
+            for name in names:
+                self.assertEqual((output / "linux/common-licenses" / name).read_bytes(), (common / name).read_bytes())
 
     def test_libuuid_postbundle_rechecks_reviewed_source_version(self):
         import tempfile
