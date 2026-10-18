@@ -1,0 +1,33 @@
+## RED 2026-10-18T21:38:39Z: signature stacking test before implementation
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (383.947156ms)
+✖ signatures are painted above every existing page element, including form fields and earlier annotations (38.225973ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 717.318443
+
+✖ failing tests:
+
+test at tests/engine.test.ts:154:1
+✖ signatures are painted above every existing page element, including form fields and earlier annotations (38.225973ms)
+  Error: Unsupported overlay type.
+      at Module.overlayPdf (file:///home/defaultuser/Projects/paperwork/web/client/engine-core.ts:151:82)
+      at async TestContext.<anonymous> (file:///home/defaultuser/Projects/paperwork/web/tests/engine.test.ts:160:16)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7)
+
+## GREEN 2026-10-18T21:39:15Z: after adding the top-most signature stamp
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (355.850262ms)
+✔ signatures are painted above every existing page element, including form fields and earlier annotations (56.846012ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 648.978313

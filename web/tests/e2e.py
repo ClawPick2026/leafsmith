@@ -145,9 +145,18 @@ with sync_playwright() as p:
         page.mouse.move(box['x']+20,box['y']+50);page.mouse.down()
         for dx,dy in [(40,30),(60,70),(90,25),(130,55)]:page.mouse.move(box['x']+dx,box['y']+dy)
         page.mouse.up();page.wait_for_timeout(300)
-        result=PdfReader(run('signed.pdf'));resources=result.pages[0]['/Resources']
-        assert '/XObject' in resources
-    record('drawn electronic signature adds an image to PDF',signature)
+        # Place the signature over the filled name field (x 50, y 600, 200 x 25) so it must be painted above the widget.
+        for label,value in [('X · from left (pt)','55'),('Y · from bottom (pt)','588'),('Width (pt)','180'),('Height (pt)','40')]:page.get_by_label(label).fill(value)
+        result=PdfReader(run('signed.pdf'));annots=[a.get_object() for a in result.pages[0]['/Annots']]
+        stamp=annots[-1]
+        assert stamp['/Subtype']=='/Stamp' and [float(n) for n in stamp['/Rect']]==[55,588,235,628],stamp
+        assert any(a.get('/T')=='name' for a in annots[:-1]),'the form field stays below the signature'
+        xobjects=stamp['/AP']['/N'].get_object()['/Resources']['/XObject']
+        assert any(x.get_object()['/Subtype']=='/Image' for x in xobjects.values())
+        # The result preview is rendered from the download; signature ink (#25382f) must show inside the field.
+        ink=page.get_by_role('img',name='Result preview page 1').evaluate("""c=>{const s=c.width/600;const d=c.getContext('2d').getImageData(Math.round(50*s),Math.round(175*s),Math.round(200*s),Math.round(25*s)).data;let n=0;for(let i=0;i<d.length;i+=4)if(d[i+1]-d[i]>=10&&d[i+1]<140)n++;return n}""")
+        assert ink>20,f'signature ink pixels inside the field: {ink}'
+    record('drawn electronic signature is added above existing form fields',signature)
     def invalid():
         load(['source.pdf'],'organize');page.get_by_test_id('page-range').fill('99');page.get_by_test_id('run-tool').click()
         expect(page.get_by_role('alert')).to_be_visible();assert page.get_by_test_id('download-result').count()==0

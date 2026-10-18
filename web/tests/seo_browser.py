@@ -4,6 +4,7 @@ Evidence lives in ignored tests/artifacts/seo-* files.
 """
 import json
 import os
+import re
 import sys
 from pathlib import Path
 from playwright.sync_api import sync_playwright, expect
@@ -11,6 +12,9 @@ from playwright.sync_api import sync_playwright, expect
 ROOT = Path(__file__).resolve().parents[1]
 BASE = sys.argv[1].rstrip('/')
 MODE = sys.argv[2] if len(sys.argv) > 2 else 'all'
+PUBLIC = 'https://paperwork.lakebed.app'
+SHARED = (ROOT / 'shared/discovery.ts').read_text()
+HOME_DESCRIPTION = re.search(r"export const homeDescription = '([^']+)';", SHARED).group(1)
 settings = json.loads((ROOT / 'tests/browser-env.json').read_text())
 env = os.environ.copy()
 if settings.get('library_path'):
@@ -28,10 +32,11 @@ with sync_playwright() as p:
     page.goto(BASE, wait_until='networkidle')
     if MODE in ('metadata', 'all'):
         expect(page).to_have_title('Paperwork — Free PDF & Image Tools, No Uploads')
-        expect(page.locator('meta[name="description"]')).to_have_attribute('content', 'Merge, split, annotate and sign PDFs in your browser. Convert images and generate QR codes. No account required; documents stay on your device.')
-        expect(page.locator('link[rel="canonical"]')).to_have_attribute('href', 'https://paperwork.lakebed.app/')
+        expect(page.locator('meta[name="description"]')).to_have_attribute('content', HOME_DESCRIPTION)
+        expect(page.locator('link[rel="canonical"]')).to_have_attribute('href', PUBLIC + '/')
         expect(page.locator('meta[property="og:title"]')).to_have_attribute('content', page.title())
         expect(page.locator('meta[name="twitter:card"]')).to_have_attribute('content', 'summary')
+        expect(page.locator('script[type="application/ld+json"]')).to_have_count(0)
         print('PASS rendered homepage title, description, canonical and sharing metadata')
     if MODE in ('links', 'all'):
         nav = page.get_by_role('navigation', name='PDF guides')
@@ -41,8 +46,15 @@ with sync_playwright() as p:
         page.locator('a[href="/merge-pdf"]').click()
         expect(page.get_by_role('heading', level=1)).to_contain_text('Merge')
         expect(page.locator('a[href="/?tool=merge"]')).to_be_visible()
-        print('PASS crawlable homepage links lead to a server-rendered guide')
+        print('PASS homepage links lead to a guide')
     if MODE in ('deeplink', 'all'):
+        # The homepage visit above started a guest session, as for a returning visitor.
+        page.goto(BASE + '/tools', wait_until='networkidle')
+        expect(page.get_by_role('heading', level=1)).to_have_text('PDF and image tool guides')
+        expect(page).to_have_title('PDF & Image Tool Guides — Paperwork')
+        expect(page.locator('link[rel="canonical"]')).to_have_attribute('href', PUBLIC + '/tools')
+        for path in ['/merge-pdf', '/split-pdf', '/images-to-pdf', '/sign-pdf']:
+            expect(page.get_by_role('main').locator(f'a[href="{path}"]')).to_have_count(1)
         for slug, tool, heading in [
             ('merge-pdf', 'merge', 'Merge PDFs'),
             ('split-pdf', 'split', 'Split PDF'),
@@ -50,12 +62,27 @@ with sync_playwright() as p:
             ('sign-pdf', 'sign', 'Sign PDF'),
         ]:
             page.goto(BASE + '/' + slug, wait_until='networkidle')
+            expect(page.get_by_role('heading', level=1)).to_have_count(1)
+            expect(page.locator('link[rel="canonical"]')).to_have_attribute('href', f'{PUBLIC}/{slug}')
+            expect(page.locator('meta[property="og:url"]')).to_have_attribute('content', f'{PUBLIC}/{slug}')
+            assert page.title().endswith(' — Paperwork') and page.title() != 'Paperwork — Free PDF & Image Tools, No Uploads', page.title()
+            description = page.locator('meta[name="description"]').get_attribute('content')
+            assert description and description != HOME_DESCRIPTION, description
+            data = json.loads(page.locator('script[type="application/ld+json"]').text_content())
+            crumbs = next(node for node in data['@graph'] if node['@type'] == 'BreadcrumbList')['itemListElement']
+            assert crumbs[2]['item'] == f'{PUBLIC}/{slug}', crumbs
+            main = page.get_by_role('main')
+            assert main.locator('ol > li').count() >= 4
+            assert main.locator('h3').count() >= 2
+            for text in ['no document uploads', '25 MiB per file', 'not redaction']:
+                expect(main).to_contain_text(text)
             page.locator(f'a[href="/?tool={tool}"]').click()
             expect(page.get_by_role('heading', level=1)).to_have_text(heading)
-            expect(page.locator('link[rel="canonical"]')).to_have_attribute('href', 'https://paperwork.lakebed.app/')
+            expect(page.locator('link[rel="canonical"]')).to_have_attribute('href', PUBLIC + '/')
+            expect(page.locator('script[type="application/ld+json"]')).to_have_count(0)
         page.goto(BASE + '/?tool=not-a-tool', wait_until='networkidle')
         expect(page.get_by_role('heading', name='Your documents. Your device.')).to_be_visible()
-        print('PASS every guide opens its actual tool; invalid tool falls back safely')
+        print('PASS returning visitors open every guide directly; guides open their actual tool; invalid tool falls back safely')
     if MODE == 'all':
         for width in [1440, 390]:
             page.set_viewport_size({'width': width, 'height': 1000})

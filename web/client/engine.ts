@@ -1,5 +1,5 @@
 import { createEngine } from './engine-core.ts';
-export type { PdfField, TransformOptions, Overlay, ImageOptions } from './engine-core.ts';
+export type { PdfField, PageSize, TransformOptions, Overlay, ImageOptions } from './engine-core.ts';
 const globals = globalThis as typeof globalThis & { PDFLib?: any; pdfjsLib?: any; qrcode?: any };
 const scripts = new Map<string, Promise<any>>();
 const PDF_LIB_URL = 'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js';
@@ -35,4 +35,4 @@ export async function loadPdfJs(): Promise<any> {
 }
 function loadQr(): Promise<any> { return loadScript('https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js', 'qrcode'); }
 
-export const { openPdf, pdfInfo, makeDemoPdf, transformPdf, mergePdfs, overlayPdf, fillPdf, imagesToPdf, optimizePdf, qrSvg, renderPdfPage, extractPdfText, processImage, mergeImages, validateFileSize } = createEngine({ loadPdfLib, loadPdfJs, loadQr });
+export const { openPdf, pdfInfo, makeDemoPdf, transformPdf, mergePdfs, overlayPdf, fillPdf, imagesToPdf, optimizePdf, qrSvg, renderPdfPage, renderPdfPages, extractPdfText, processImage, mergeImages, validateFileSize } = createEngine({ loadPdfLib, loadPdfJs, loadQr });

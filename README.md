@@ -21,8 +21,9 @@ The built-in workspace provides:
 - Merge, split, reorder, rotate, crop, extract and delete PDF pages.
 - Add text, images, shapes and flattened highlights; draw electronic signatures.
 - Fill supported PDF forms and extract embedded text.
-- Convert images to PDF and PDF pages to images.
-- Resize, combine and compress images, and generate QR codes.
+- Convert images to PDF and PDF pages, or cropped areas of them, to images.
+- Crop, resize, combine and compress images, and generate QR codes.
+- Drag on the page or image preview to set crop areas and annotation or signature boxes. Results shows a preview rendered from each generated PDF, image or text file.
 
 The separate **Native tools** workspace adds existing-text editing and standard-font replacement, genuine PDF comments/highlights, Office export/import, OCR, form templates, password protection and known-password unlocking, selected text-watermark removal, PDF/image/video processing, transcription, summaries and text translation. Some operations require a separately installed processing engine or AI model. Native platform and real-engine validation is still in progress; see the release status above.
 

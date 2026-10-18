@@ -16,11 +16,11 @@ Sort, annotate, sign and transform documents without uploading them from your br
 
 - **Manage pages:** merge, split, reorder, rotate, crop, extract and omit pages.
 - **Annotate:** add new text in three standard fonts, PNG/JPEG images, rectangle outlines and flattened translucent highlights.
-- **Sign:** draw and place an electronic signature. This is not certificate-backed digital signing or identity verification.
+- **Sign:** draw and place an electronic signature. It is added as a locked stamp annotation, so it appears above page content, form fields and earlier annotations. This is not certificate-backed digital signing or identity verification.
 - **Fill forms:** existing AcroForm text fields, checkboxes and single-choice dropdown/option-list fields; optional flattening.
-- **Convert:** PNG/JPEG images to PDF, selected PDF pages to PNG, and existing embedded PDF text to a plain-text file.
+- **Convert:** PNG/JPEG images to PDF, selected PDF pages (or a cropped area of them) to PNG, and existing embedded PDF text to a plain-text file.
 - **Optimize:** try structural PDF optimization without downsampling images. The original bytes are returned if the result would be larger; savings are not guaranteed.
-- **Work with images:** resize, export JPEG/PNG/WebP, adjust brightness and contrast, or combine images vertically/horizontally. This is not AI enhancement.
+- **Work with images:** crop, resize, export JPEG/PNG/WebP, adjust brightness and contrast, or combine images vertically/horizontally. This is not AI enhancement.
 - **Generate QR codes:** locally generated, downloadable SVGs for links or text.
 
 ## First use
@@ -31,14 +31,14 @@ Sort, annotate, sign and transform documents without uploading them from your br
 4. Adjust the settings and run the operation.
 5. Download each result. **Use result** replaces the in-tab workspace with that PDF to continue editing; files on disk are never overwritten.
 
-The preview shows the **source document**, not a live representation of pending edits. To inspect a PDF result, choose **Use result**.
+The source preview shows the **original document**. For crop, annotation and signature tools it also marks the area or box you set; drag on the preview to change it. Other pending edits are not drawn on the source preview. After a run, **Results** shows a preview rendered from each generated PDF, image or text file.
 
 ## Page workflows
 
 ![Reorder/extract pages, rotate and crop controls beside the original PDF preview](docs/screenshots/pages.png)
 
 - **Reorder and extract:** enter `3,1` to produce page 3 followed by page 1. Omitted pages are deleted from the output; blank means all pages.
-- **Rotate and crop:** rotate output pages and trim visible margins in PDF points. Cropping is not redaction: hidden content remains in the PDF.
+- **Rotate and crop:** rotate output pages and trim visible margins by dragging on the preview or entering margins in PDF points, measured on the page as displayed. Cropping is not redaction: hidden content remains in the PDF.
 
 ## Not included
 

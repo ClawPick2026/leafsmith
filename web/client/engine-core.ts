@@ -1,17 +1,27 @@
 /** Shared processing operations; platform adapters own all library loading. */
+import { viewMarginsToPdf } from '../shared/crop.ts';
+import type { Margins, Rect } from '../shared/crop.ts';
 export type EngineDependencies = {
   loadPdfLib: () => Promise<any>;
   loadPdfJs: () => Promise<any>;
   loadQr: () => Promise<any>;
 };
 export type PdfField = { name: string; type: string; value: string | boolean; options?: string[] };
-export type TransformOptions = { pages: number[]; rotate?: number; crop?: { left: number; bottom: number; right: number; top: number } };
-export type Overlay = { page: number; kind: 'text' | 'rectangle' | 'highlight' | 'image'; x: number; y: number; width: number; height: number; text?: string; fontSize?: number; fontFamily?: 'Helvetica' | 'TimesRoman' | 'Courier'; color?: string; imageBytes?: Uint8Array; imageMime?: string };
-export type ImageOptions = { format: 'image/jpeg' | 'image/png' | 'image/webp'; quality: number; maxWidth: number; brightness: number; contrast: number };
+/** Crop margins are measured on each page as displayed, after its existing /Rotate value. */
+export type TransformOptions = { pages: number[]; rotate?: number; crop?: Margins };
+export type PageSize = { width: number; height: number; rotation: number; box: Rect };
+export type Overlay = { page: number; kind: 'text' | 'rectangle' | 'highlight' | 'image' | 'signature'; x: number; y: number; width: number; height: number; text?: string; fontSize?: number; fontFamily?: 'Helvetica' | 'TimesRoman' | 'Courier'; color?: string; imageBytes?: Uint8Array; imageMime?: string };
+export type ImageOptions = { format: 'image/jpeg' | 'image/png' | 'image/webp'; quality: number; maxWidth: number; brightness: number; contrast: number; crop?: Margins };
 
 const MAX_BYTES = 25 * 1024 * 1024;
 
 export function createEngine({ loadPdfLib, loadPdfJs, loadQr }: EngineDependencies) {
+// One PDF.js worker serves every document of this engine; otherwise each document starts and terminates a worker.
+let pdfWorker: { lib: any; worker: any } | null = null;
+function openPdfJs(lib: any, bytes: Uint8Array): any {
+  if (lib.PDFWorker && (!pdfWorker || pdfWorker.lib !== lib || pdfWorker.worker.destroyed)) pdfWorker = { lib, worker: new lib.PDFWorker() };
+  return lib.getDocument({ data: bytes.slice(), isEvalSupported: false, useSystemFonts: true, ...(lib.PDFWorker ? { worker: pdfWorker!.worker } : {}) });
+}
 async function openPdf(bytes: Uint8Array): Promise<any> {
   validateFileSize(bytes.byteLength);
   const lib = await loadPdfLib();
@@ -27,7 +37,18 @@ async function openPdf(bytes: Uint8Array): Promise<any> {
   return doc;
 }
 
-async function pdfInfo(bytes: Uint8Array): Promise<{ pageCount: number; sizes: { width: number; height: number; rotation: number }[]; fields: PdfField[] }> {
+/** The crop box clipped to the media box: the area PDF viewers display. */
+function visibleBox(page: any): Rect {
+  const media = page.getMediaBox();
+  const crop = page.getCropBox();
+  const x = Math.max(media.x, crop.x);
+  const y = Math.max(media.y, crop.y);
+  const width = Math.min(media.x + media.width, crop.x + crop.width) - x;
+  const height = Math.min(media.y + media.height, crop.y + crop.height) - y;
+  return width > 0 && height > 0 ? { x, y, width, height } : media;
+}
+
+async function pdfInfo(bytes: Uint8Array): Promise<{ pageCount: number; sizes: PageSize[]; fields: PdfField[] }> {
   const doc = await openPdf(bytes);
   const lib = await loadPdfLib();
   const fields: PdfField[] = doc.getForm().getFields().map((field: any) => {
@@ -38,7 +59,7 @@ async function pdfInfo(bytes: Uint8Array): Promise<{ pageCount: number; sizes: {
     if (field instanceof lib.PDFOptionList) return { name, type: 'optionlist', value: field.getSelected().join(', '), options: field.getOptions() };
     return { name, type: 'unsupported', value: '' };
   });
-  return { pageCount: doc.getPageCount(), sizes: doc.getPages().map((page: any) => ({ ...page.getSize(), rotation: page.getRotation().angle })), fields };
+  return { pageCount: doc.getPageCount(), sizes: doc.getPages().map((page: any) => ({ ...page.getSize(), rotation: page.getRotation().angle, box: visibleBox(page) })), fields };
 }
 
 async function makeDemoPdf(): Promise<Uint8Array> {
@@ -69,20 +90,28 @@ function pageSelection(pages: number[], count: number): number[] {
 function finite(value: number, label: string, min = 0): void {
   if (!Number.isFinite(value) || value < min) throw new Error(`${label} must be a finite number of at least ${min}.`);
 }
+function cropMargins(crop: Margins, whole = false): Margins {
+  for (const key of ['left', 'bottom', 'right', 'top'] as const) {
+    finite(crop[key], `Crop ${key}`);
+    if (whole && !Number.isInteger(crop[key])) throw new Error(`Crop ${key} must be a whole number of pixels.`);
+  }
+  return crop;
+}
 async function transformPdf(bytes: Uint8Array, options: TransformOptions): Promise<Uint8Array> {
   const source = await openPdf(bytes);
   const indices = pageSelection(options.pages, source.getPageCount());
   const rotation = options.rotate ?? 0;
   if (!Number.isInteger(rotation) || rotation % 90 !== 0) throw new Error('Rotation must be an integer multiple of 90 degrees.');
-  if (options.crop) for (const key of ['left', 'bottom', 'right', 'top'] as const) finite(options.crop[key], `Crop ${key}`);
+  if (options.crop) cropMargins(options.crop);
   const lib = await loadPdfLib();
   const out = await lib.PDFDocument.create();
   const pages = await out.copyPages(source, indices);
   for (const page of pages) {
-    page.setRotation(lib.degrees(((page.getRotation().angle + rotation) % 360 + 360) % 360));
+    const sourceRotation = page.getRotation().angle;
+    page.setRotation(lib.degrees(((sourceRotation + rotation) % 360 + 360) % 360));
     if (options.crop) {
-      const box = page.getCropBox();
-      const { left, bottom, right, top } = options.crop;
+      const box = visibleBox(page);
+      const { left, bottom, right, top } = viewMarginsToPdf(options.crop, sourceRotation);
       const width = box.width - left - right;
       const height = box.height - bottom - top;
       if (width <= 0 || height <= 0) throw new Error('Crop margins must leave a positive page width and height.');
@@ -109,12 +138,17 @@ async function overlayPdf(bytes: Uint8Array, overlay: Overlay): Promise<Uint8Arr
   const doc = await openPdf(bytes);
   const lib = await loadPdfLib();
   const index = pageSelection([overlay.page], doc.getPageCount())[0];
-  for (const key of ['x', 'y', 'width', 'height'] as const) finite(overlay[key], key);
+  for (const key of ['x', 'y', 'width', 'height'] as const) if (!Number.isFinite(overlay[key])) throw new Error(`Overlay ${key} must be a finite number.`);
   if (overlay.width <= 0 || overlay.height <= 0) throw new Error('Overlay width and height must be positive.');
   const page = doc.getPage(index);
-  const size = page.getSize();
-  if (overlay.x + overlay.width > size.width || overlay.y + overlay.height > size.height) throw new Error('Overlay must fit inside the page. Coordinates use PDF points from the bottom-left.');
-  if (!['text', 'rectangle', 'highlight', 'image'].includes(overlay.kind)) throw new Error('Unsupported overlay type.');
+  // Check against the area viewers display; 0.01 pt absorbs rounding of placements drawn on the preview.
+  const box = visibleBox(page);
+  const slack = 0.01;
+  const span = (start: number, length: number) => `${Math.round(start * 100) / 100}–${Math.round((start + length) * 100) / 100}`;
+  if (overlay.x < box.x - slack || overlay.y < box.y - slack || overlay.x + overlay.width > box.x + box.width + slack || overlay.y + overlay.height > box.y + box.height + slack) {
+    throw new Error(`Overlay must fit inside the visible page: x ${span(box.x, box.width)}, y ${span(box.y, box.height)} in PDF points.`);
+  }
+  if (!['text', 'rectangle', 'highlight', 'image', 'signature'].includes(overlay.kind)) throw new Error('Unsupported overlay type.');
   const hex = overlay.color ?? (overlay.kind === 'highlight' ? '#ffdf33' : '#222222');
   if (!/^#[0-9a-f]{6}$/i.test(hex)) throw new Error('Use a six-digit hex color, such as #336699.');
   const color = lib.rgb(parseInt(hex.slice(1, 3), 16) / 255, parseInt(hex.slice(3, 5), 16) / 255, parseInt(hex.slice(5, 7), 16) / 255);
@@ -130,12 +164,28 @@ async function overlayPdf(bytes: Uint8Array, overlay: Overlay): Promise<Uint8Arr
     try {
       // WinAnsi standard fonts intentionally reject unsupported characters instead of silently corrupting them.
       font.encodeText(overlay.text);
-      page.drawText(overlay.text, { x: overlay.x, y: overlay.y, size: fontSize, font, color, maxWidth: overlay.width, lineHeight: fontSize * 1.2 });
+      // The first line starts at the top of the box and later lines wrap downwards, matching the placement box.
+      const baseline = overlay.y + overlay.height - font.heightAtSize(fontSize, { descender: false });
+      page.drawText(overlay.text, { x: overlay.x, y: baseline, size: fontSize, font, color, maxWidth: overlay.width, lineHeight: fontSize * 1.2 });
     } catch { throw new Error('This text cannot be drawn with a standard PDF font. Use supported Latin characters.'); }
   } else if (overlay.kind === 'image') {
     if (!overlay.imageBytes) throw new Error('Choose a PNG or JPEG image.');
     const image = await embedImage(doc, overlay.imageBytes, overlay.imageMime ?? '');
     page.drawImage(image, geometry);
+  } else if (overlay.kind === 'signature') {
+    if (!overlay.imageBytes) throw new Error('Draw a signature or choose a PNG or JPEG image.');
+    const image = await embedImage(doc, overlay.imageBytes, overlay.imageMime ?? '');
+    // Viewers paint page content first and then annotations in /Annots order, so a stamp appended
+    // last stays above form fields, comments and earlier signatures instead of being covered by them.
+    const appearance = doc.context.formXObject(
+      [lib.pushGraphicsState(), lib.scale(overlay.width, overlay.height), lib.drawObject('Signature'), lib.popGraphicsState()],
+      { BBox: [0, 0, overlay.width, overlay.height], Resources: { XObject: { Signature: image.ref } } },
+    );
+    const printable = 4, locked = 128;
+    page.node.addAnnot(doc.context.register(doc.context.obj({
+      Type: 'Annot', Subtype: 'Stamp', P: page.ref, F: printable | locked, Contents: lib.PDFString.of('Signature'),
+      Rect: [overlay.x, overlay.y, overlay.x + overlay.width, overlay.y + overlay.height], AP: { N: doc.context.register(appearance) },
+    })));
   } else if (overlay.kind === 'highlight') {
     page.drawRectangle({ ...geometry, color, opacity: 0.3 });
   } else {
@@ -226,33 +276,49 @@ function pixelBudget(width: number, height: number): void {
     throw new Error('Image canvas exceeds the 16 million pixel limit. Reduce the size or scale.');
   }
 }
-async function renderPdfPage(bytes: Uint8Array, page: number, scale = 1): Promise<HTMLCanvasElement> {
+/** Renders pages as displayed. Optional crop margins are PDF points on the displayed page. */
+async function renderPdfPages(bytes: Uint8Array, pages: number[], scale = 1, crop?: Margins): Promise<HTMLCanvasElement[]> {
   finite(scale, 'Render scale', Number.MIN_VALUE);
+  if (crop) cropMargins(crop);
   const doc = await openPdf(bytes);
-  pageSelection([page], doc.getPageCount());
+  pageSelection(pages, doc.getPageCount());
   const lib = await loadPdfJs();
-  const task = lib.getDocument({ data: bytes.slice(), isEvalSupported: false, useSystemFonts: true });
+  const task = openPdfJs(lib, bytes);
+  const canvases: HTMLCanvasElement[] = [];
   try {
     const pdf = await task.promise;
-    const pdfPage = await pdf.getPage(page);
-    const viewport = pdfPage.getViewport({ scale });
-    pixelBudget(viewport.width, viewport.height);
-    const canvas = document.createElement('canvas');
-    canvas.width = Math.ceil(viewport.width);
-    canvas.height = Math.ceil(viewport.height);
-    const context = canvas.getContext('2d');
-    if (!context) throw new Error('Your browser could not create a canvas. Try a current browser.');
-    await pdfPage.render({ canvasContext: context, viewport, background: 'white' }).promise;
-    pdfPage.cleanup();
-    return canvas;
+    for (const page of pages) {
+      const pdfPage = await pdf.getPage(page);
+      const viewport = pdfPage.getViewport({ scale });
+      const [left, top, right, bottom] = crop ? [crop.left, crop.top, crop.right, crop.bottom].map(value => value * scale) : [0, 0, 0, 0];
+      const width = viewport.width - left - right;
+      const height = viewport.height - top - bottom;
+      if (width < 1 || height < 1) throw new Error('Crop margins must leave at least one pixel of the page.');
+      pixelBudget(width, height);
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.ceil(width);
+      canvas.height = Math.ceil(height);
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('Your browser could not create a canvas. Try a current browser.');
+      await pdfPage.render({ canvasContext: context, viewport, background: 'white', ...(crop ? { transform: [1, 0, 0, 1, -left, -top] } : {}) }).promise;
+      pdfPage.cleanup();
+      canvases.push(canvas);
+    }
+    return canvases;
+  } catch (error) {
+    for (const canvas of canvases) { canvas.width = 0; canvas.height = 0; }
+    throw error;
   } finally { await task.destroy(); }
+}
+async function renderPdfPage(bytes: Uint8Array, page: number, scale = 1, crop?: Margins): Promise<HTMLCanvasElement> {
+  return (await renderPdfPages(bytes, [page], scale, crop))[0];
 }
 
 async function extractPdfText(bytes: Uint8Array, pages: number[]): Promise<string> {
   const doc = await openPdf(bytes);
   pageSelection(pages, doc.getPageCount());
   const lib = await loadPdfJs();
-  const task = lib.getDocument({ data: bytes.slice(), isEvalSupported: false, useSystemFonts: true });
+  const task = openPdfJs(lib, bytes);
   try {
     const pdf = await task.promise;
     const output: string[] = [];
@@ -321,15 +387,19 @@ async function processImage(bytes: Uint8Array, mime: string, options: ImageOptio
   const maxWidth = Math.floor(clamp(options.maxWidth, 1, 4096));
   const brightness = clamp(options.brightness, 0.5, 1.5);
   const contrast = clamp(options.contrast, 0.5, 1.5);
+  const crop = cropMargins(options.crop ?? { left: 0, bottom: 0, right: 0, top: 0 }, true);
   const image = await decodeImage(bytes, mime);
   try {
-    const scale = Math.min(1, maxWidth / image.width, 4096 / image.height, Math.sqrt(MAX_PIXELS / (image.width * image.height)));
-    const width = Math.max(1, Math.floor(image.width * scale));
-    const height = Math.max(1, Math.floor(image.height * scale));
+    const sourceWidth = image.width - crop.left - crop.right;
+    const sourceHeight = image.height - crop.top - crop.bottom;
+    if (sourceWidth < 1 || sourceHeight < 1) throw new Error(`Crop margins must leave at least one pixel of the ${image.width} × ${image.height} image.`);
+    const scale = Math.min(1, maxWidth / sourceWidth, 4096 / sourceHeight, Math.sqrt(MAX_PIXELS / (sourceWidth * sourceHeight)));
+    const width = Math.max(1, Math.floor(sourceWidth * scale));
+    const height = Math.max(1, Math.floor(sourceHeight * scale));
     const { canvas, context } = canvas2d(width, height);
     if (options.format === 'image/jpeg') { context.fillStyle = '#ffffff'; context.fillRect(0, 0, width, height); }
     context.filter = `brightness(${brightness}) contrast(${contrast})`;
-    context.drawImage(image, 0, 0, width, height);
+    context.drawImage(image, crop.left, crop.top, sourceWidth, sourceHeight, 0, 0, width, height);
     return { ...await encodeCanvas(canvas, options.format, quality), width, height };
   } finally { image.close?.(); }
 }
@@ -363,7 +433,7 @@ function validateFileSize(bytes: number): void {
 }
 
 
-  return { loadPdfLib, loadPdfJs, openPdf, pdfInfo, makeDemoPdf, transformPdf, mergePdfs, overlayPdf, fillPdf, imagesToPdf, optimizePdf, qrSvg, renderPdfPage, extractPdfText, processImage, mergeImages, validateFileSize };
+  return { loadPdfLib, loadPdfJs, openPdf, pdfInfo, makeDemoPdf, transformPdf, mergePdfs, overlayPdf, fillPdf, imagesToPdf, optimizePdf, qrSvg, renderPdfPage, renderPdfPages, extractPdfText, processImage, mergeImages, validateFileSize };
 }
 
 export type Engine = ReturnType<typeof createEngine>;

@@ -13,6 +13,43 @@ export const siteUrl = 'https://paperwork.lakebed.app';
 export const homeTitle = 'Paperwork — Free PDF & Image Tools, No Uploads';
 export const homeDescription = 'Free browser tools to merge, split and sign PDFs or convert PNG and JPEG images to PDF. No account or uploads; files are processed in tab memory.';
 
+export const guideIndex = {
+  path: '/tools',
+  title: 'PDF & Image Tool Guides — Paperwork',
+  description: 'Instructions for merging and splitting PDFs, converting images to PDF and drawing electronic signatures. Free browser tools with no account or document uploads.',
+  heading: 'PDF and image tool guides',
+  intro: 'Choose a guide for steps, input limits and output checks.',
+};
+
+export const scopeHeading = 'Privacy and browser edition limits';
+export const scopeParagraphs = [
+  'Free to use, with no account and no document uploads. Files are processed in tab memory, not on our server. Download your results before closing or reloading the tab; there is no saved workspace.',
+  'The host and CDN receive request metadata such as your IP address when you load the app or libraries. Third-party scripts run in the page and must be trusted. You need internet access to load processing libraries; offline operation is not guaranteed.',
+  'Limits: 8 files, 25 MiB per file, 50 MiB combined and 200 pages per PDF. Device memory may impose lower practical limits. Password-protected PDFs are rejected.',
+  'This browser edition has no OCR, Office conversion or original text editing. Crop changes the visible page box, not underlying content; it is not redaction.',
+];
+
+/** schema.org graph for discovery pages: the free web app, plus a breadcrumb on guides. */
+export function structuredData(guide?: Guide) {
+  const graph: Record<string, unknown>[] = [{
+    '@type': 'WebApplication', name: 'Paperwork', url: siteUrl + '/',
+    description: homeDescription, applicationCategory: 'UtilitiesApplication',
+    operatingSystem: 'Any (web browser)',
+    browserRequirements: 'JavaScript required; internet access needed to load processing libraries.',
+    isAccessibleForFree: true,
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  }];
+  if (guide) graph.push({
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Paperwork', item: siteUrl + '/' },
+      { '@type': 'ListItem', position: 2, name: 'Tool guides', item: siteUrl + guideIndex.path },
+      { '@type': 'ListItem', position: 3, name: guide.heading, item: siteUrl + guide.path },
+    ],
+  });
+  return { '@context': 'https://schema.org', '@graph': graph };
+}
+
 export const guides: Guide[] = [
   {
     path: '/merge-pdf', toolId: 'merge',
@@ -87,8 +124,8 @@ export const guides: Guide[] = [
     steps: [
       'Open Sign PDF, choose an unencrypted PDF and select its filename to make it active.',
       'Set Page to the page you want to sign, then draw in the signature box. Use Clear if you need to draw it again.',
-      'Set X from the left, Y from the bottom, Width and Height in PDF points. There are 72 points per inch; placement uses the unrotated page coordinates.',
-      'Select Add signature, then Download signed.pdf in Results. Open the download to check placement: the source preview is not a live edit preview.',
+      'Drag on the page preview to draw the signature box, or set X from the left, Y from the bottom, Width and Height in PDF points. There are 72 points per inch; typed coordinates use the unrotated page.',
+      'Select Add signature. Results shows the signed page rendered from signed.pdf; check the placement there, then select Download to save the file.',
     ],
     limitations: [
       'A drawn electronic signature is not certificate-backed and is not identity verified. Ask the recipient whether this form of signature is acceptable.',
@@ -97,7 +134,7 @@ export const guides: Guide[] = [
     ],
     faq: [
       { question: 'Does this verify who signed the document?', answer: 'No. The tool places the drawing you provide on the PDF. It does not verify identity, issue a certificate or provide a signing audit trail.' },
-      { question: 'Why is my signature missing from the source preview?', answer: 'The preview shows the original PDF, not your generated result. Download signed.pdf after selecting Add signature, inspect it, and adjust the coordinates if needed.' },
+      { question: 'Why is my signature missing from the source preview?', answer: 'The source preview shows the original PDF with a box marking where the signature will go. After you select Add signature, the Results preview is rendered from signed.pdf. Move the box and run again if the placement needs adjusting.' },
     ],
   },
 ];

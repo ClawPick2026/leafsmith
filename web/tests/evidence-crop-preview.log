@@ -1,0 +1,192 @@
+COMMAND: node --experimental-strip-types --test web/tests/crop.test.ts  # RED: shared crop geometry before implementation
+✖ display-relative margins map to unrotated PDF margins for each page rotation (3.525452ms)
+✖ displayed page size swaps width and height for quarter turns (1.309458ms)
+✖ a fractional selection converts to rounded margins and back (1.153305ms)
+✖ placement selections convert to PDF rectangles relative to the visible page box (1.29815ms)
+✖ selection clamping keeps rectangles inside the page with a minimum size (1.244612ms)
+ℹ tests 5
+ℹ pass 0
+ℹ fail 5
+✖ failing tests:
+✖ display-relative margins map to unrotated PDF margins for each page rotation (3.525452ms)
+  Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/home/defaultuser/Projects/paperwork/web/shared/crop.ts' imported from /home/defaultuser/Projects/paperwork/web/tests/crop.test.ts
+    code: 'ERR_MODULE_NOT_FOUND',
+✖ displayed page size swaps width and height for quarter turns (1.309458ms)
+  Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/home/defaultuser/Projects/paperwork/web/shared/crop.ts' imported from /home/defaultuser/Projects/paperwork/web/tests/crop.test.ts
+    code: 'ERR_MODULE_NOT_FOUND',
+✖ a fractional selection converts to rounded margins and back (1.153305ms)
+  Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/home/defaultuser/Projects/paperwork/web/shared/crop.ts' imported from /home/defaultuser/Projects/paperwork/web/tests/crop.test.ts
+    code: 'ERR_MODULE_NOT_FOUND',
+✖ placement selections convert to PDF rectangles relative to the visible page box (1.29815ms)
+  Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/home/defaultuser/Projects/paperwork/web/shared/crop.ts' imported from /home/defaultuser/Projects/paperwork/web/tests/crop.test.ts
+
+COMMAND: node --experimental-strip-types --test web/tests/crop.test.ts  # GREEN: web/shared/crop.ts
+✔ display-relative margins map to unrotated PDF margins for each page rotation (14.28004ms)
+✔ displayed page size swaps width and height for quarter turns (0.821767ms)
+✔ a fractional selection converts to rounded margins and back (1.217843ms)
+✔ placement selections convert to PDF rectangles relative to the visible page box (1.29715ms)
+✔ selection clamping keeps rectangles inside the page with a minimum size (0.837228ms)
+ℹ tests 5
+ℹ pass 5
+ℹ fail 0
+
+COMMAND: node --experimental-strip-types --test web/tests/engine.test.ts  # RED: visible box, display-relative crop, cropped rendering, image crop
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (20.89534ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (270.925577ms)
+✔ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (33.736544ms)
+✖ PDF info reports each visible page box, clipped to the media box (10.260286ms)
+✖ crop margins follow the page as displayed, including pages with a /Rotate value (7.481215ms)
+✔ merge concatenates PDF pages and enforces the combined 200-page limit (180.481386ms)
+✔ overlays draw text, rectangles and flattened highlights without discarding interactive fields (37.329767ms)
+✔ form filling updates text, checkboxes and choices, preserves fields unless flattened, and rejects unknown fields (48.59182ms)
+✔ images become natural-sized PDF pages and image overlays validate decoded PNG data (14.142739ms)
+✔ optimization returns a valid PDF with fields and never increases file size (5.230143ms)
+✔ QR output is safe SVG, UTF-8 encodes non-Latin text and limits payload to 1000 bytes (74.864764ms)
+✔ PDF.js rendering uses pinned worker, copies bytes, limits canvas pixels and destroys documents (5.880603ms)
+✖ page rendering opens a document once, crops the displayed page and budgets only the cropped pixels (1.42992ms)
+✔ text extraction preserves selected page order, line breaks, original bytes and releases PDF.js resources (3.466454ms)
+✔ image processing decodes input, clamps resize/filter/quality settings, and returns actual canvas MIME (2.618456ms)
+✖ image crop removes pixels outside the margins before resizing (1.461843ms)
+✔ image merging places decoded images in order, produces PNG, caps pixels and closes resources (2.310149ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (0.945229ms)
+ℹ tests 18
+ℹ pass 14
+ℹ fail 4
+✖ failing tests:
+✖ PDF info reports each visible page box, clipped to the media box (10.260286ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+✖ crop margins follow the page as displayed, including pages with a /Rotate value (7.481215ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+✖ page rendering opens a document once, crops the displayed page and budgets only the cropped pixels (1.42992ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+✖ image crop removes pixels outside the margins before resizing (1.461843ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+COMMAND: node --experimental-strip-types --test web/tests/engine.test.ts  # GREEN: engine-core crop/render/box changes (images-to-PDF size assertion extended with the new box field)
+✔ browser library loading fails actionably offline, retries failures, and deduplicates concurrent loads (23.706727ms)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (230.698281ms)
+✔ page transforms preserve requested page order, add rotations, crop by margins, and reject invalid geometry (42.719693ms)
+✔ PDF info reports each visible page box, clipped to the media box (12.024902ms)
+✔ crop margins follow the page as displayed, including pages with a /Rotate value (6.148989ms)
+✔ merge concatenates PDF pages and enforces the combined 200-page limit (193.959733ms)
+✔ overlays draw text, rectangles and flattened highlights without discarding interactive fields (36.467243ms)
+✔ form filling updates text, checkboxes and choices, preserves fields unless flattened, and rejects unknown fields (46.782763ms)
+✔ images become natural-sized PDF pages and image overlays validate decoded PNG data (13.385515ms)
+✔ optimization returns a valid PDF with fields and never increases file size (5.661297ms)
+✔ QR output is safe SVG, UTF-8 encodes non-Latin text and limits payload to 1000 bytes (76.860171ms)
+✔ PDF.js rendering uses pinned worker, copies bytes, limits canvas pixels and destroys documents (6.846757ms)
+✔ page rendering opens a document once, crops the displayed page and budgets only the cropped pixels (8.995676ms)
+✔ text extraction preserves selected page order, line breaks, original bytes and releases PDF.js resources (3.489148ms)
+✔ image processing decodes input, clamps resize/filter/quality settings, and returns actual canvas MIME (2.905764ms)
+✔ image crop removes pixels outside the margins before resizing (2.138765ms)
+✔ image merging places decoded images in order, produces PNG, caps pixels and closes resources (2.247073ms)
+✔ file size validation accepts 1..25 MiB and rejects empty, fractional or oversized input (0.867383ms)
+ℹ tests 18
+ℹ pass 18
+ℹ fail 0
+
+COMMAND: ../.test-venv/bin/python tests/crop_preview.py http://127.0.0.1:1431  # RED: desktop Vite preview before workspace integration
+  File "/home/defaultuser/Projects/paperwork/.test-venv/lib/python3.14/site-packages/playwright/_impl/_frame.py", line 395, in wait_for_selector
+    await self._channel.send(
+        "waitForSelector", self._timeout, locals_to_params(locals())
+    )
+  File "/home/defaultuser/Projects/paperwork/.test-venv/lib/python3.14/site-packages/playwright/_impl/_connection.py", line 78, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/home/defaultuser/Projects/paperwork/.test-venv/lib/python3.14/site-packages/playwright/_impl/_connection.py", line 636, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Locator.bounding_box: Timeout 30000ms exceeded.
+Call log:
+
+
+COMMAND: node --experimental-strip-types --test --test-name-pattern='top of its box' web/tests/engine.test.ts  # RED: overlay text baseline sits at the box bottom
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (575.622752ms)
+✖ overlay text starts at the top of its box so it matches the placement shown on the preview (56.077514ms)
+ℹ tests 2
+ℹ pass 1
+ℹ fail 1
+✖ failing tests:
+✖ overlay text starts at the top of its box so it matches the placement shown on the preview (56.077514ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+(test corrected: the first Tm belonged to the sample's own heading; the overlay's is the last one)
+✔ demo PDF round-trips three pages, labeled content and editable name/approved fields (241.537748ms)
+✖ overlay text starts at the top of its box so it matches the placement shown on the preview (25.800989ms)
+ℹ tests 2
+ℹ pass 1
+ℹ fail 1
+✖ failing tests:
+✖ overlay text starts at the top of its box so it matches the placement shown on the preview (25.800989ms)
+  AssertionError [ERR_ASSERTION]: first baseline 300 sits one ascent below the box top
+
+COMMAND: node --experimental-strip-types --test web/tests/engine.test.ts  # GREEN: text starts one ascent below the box top
+ℹ tests 19
+ℹ pass 19
+ℹ fail 0
+
+COMMAND: ../.test-venv/bin/python tests/crop_preview.py http://127.0.0.1:1431  # GREEN: desktop Vite preview after workspace integration (test now waits for the tool's smooth scroll before measuring)
+PASS drag a crop area on the preview, adjust it by keyboard, and preview the cropped result
+PASS crop margins follow a rotated page as displayed
+PASS export a cropped area of a PDF page as PNG and preview it
+PASS crop image pixels by dragging on the source image
+PASS draw an annotation box on the preview and preview the annotated page
+PASS preview extracted text
+PASS pointer cursors, no uploads and no uncaught page errors
+passed: 7
+
+COMMAND: node --experimental-strip-types --test web/tests/catalog.test.ts  # RED: catalog does not mention crop for PDF to images / Image studio
+✖ tool discovery filters active browser tools by category and search (10.608558ms)
+✖ tool descriptions state supported operations without promotional language (1.753209ms)
+ℹ tests 2
+ℹ pass 0
+ℹ fail 2
+✖ failing tests:
+✖ tool discovery filters active browser tools by category and search (10.608558ms)
+✖ tool descriptions state supported operations without promotional language (1.753209ms)
+
+COMMAND: node --experimental-strip-types --test web/tests/catalog.test.ts  # GREEN
+✔ tool discovery filters active browser tools by category and search (11.350015ms)
+✔ tool descriptions state supported operations without promotional language (1.115371ms)
+ℹ tests 2
+ℹ pass 2
+ℹ fail 0
+
+COMMAND: node --experimental-strip-types --test web/tests/engine.test.ts  # RED: each PDF.js document starts its own worker (the result preview refetched the worker script offline in tests/browser_e2e.py)
+✖ PDF.js documents share one worker per engine instead of starting a worker per document (6.515347ms)
+ℹ tests 20
+ℹ pass 19
+ℹ fail 1
+✖ failing tests:
+✖ PDF.js documents share one worker per engine instead of starting a worker per document (6.515347ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+COMMAND: npm test  # GREEN: shared PDF.js worker (all frontend suites)
+ℹ tests 83
+ℹ pass 83
+ℹ fail 0
+
+COMMAND: node --experimental-strip-types --test web/tests/engine.test.ts  # RED: overlay bounds use MediaBox size from 0,0 (reported by the parallel feature-gap session)
+✖ overlays must fit inside the visible page box, including offset media boxes and cropped pages (6.781736ms)
+ℹ tests 21
+ℹ pass 20
+ℹ fail 1
+✖ failing tests:
+✖ overlays must fit inside the visible page box, including offset media boxes and cropped pages (6.781736ms)
+  AssertionError [ERR_ASSERTION]: Got unwanted rejection.
+
+COMMAND: npm test  # GREEN: overlays validated against the visible page box
+ℹ tests 84
+ℹ pass 84
+ℹ fail 0
+
+FULL ACCEPTANCE (fresh builds; desktop dist frozen at /tmp copy and served by vite preview :4174; website = fresh copy of web/ on lakebed@0.0.40 dev :3141)
+desktop  tests/browser_e2e.py      passed 29, failed 0, skipped 4 (native IPC/installers, by design)
+desktop  web/tests/crop_preview.py passed 7
+website  web/tests/crop_preview.py passed 7
+website  web/tests/e2e.py          passed 16
+website  web/tests/review_regressions.py passed 6
+website  web/tests/ui_polish.py    OK (2 tests)
+website  web/tests/test_shell.py   OK
+unit     npm test                  84 pass, 0 fail

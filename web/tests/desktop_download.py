@@ -10,8 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 BASE = os.environ.get('PAPERWORK_URL', 'https://paperwork.lakebed.app')
 RELEASE = 'https://github.com/ClawPick2026/paperwork-desktop/releases/tag/v0.1.0-rc.2'
 PACKAGES = [
-    ('Download Windows preview', 'Paperwork_0.1.0_x64-setup.exe', 'fbcaa8473a2d7d51848edc3623aad45999eff12891eaac67fcba4deb5ec3e502'),
-    ('Download Linux preview', 'Paperwork_0.1.0_amd64.AppImage', '16b0ebe4484820754224d1850a847990626e4c9e7a35cb7b5ac5b31c638761ca'),
+    ('Download Windows preview', 'windows', 'Windows', 'Paperwork_0.1.0_x64-setup.exe', 'fbcaa8473a2d7d51848edc3623aad45999eff12891eaac67fcba4deb5ec3e502'),
+    ('Download Linux preview', 'linux', 'Linux', 'Paperwork_0.1.0_amd64.AppImage', '16b0ebe4484820754224d1850a847990626e4c9e7a35cb7b5ac5b31c638761ca'),
 ]
 
 class DesktopDownloadTests(unittest.TestCase):
@@ -38,8 +38,11 @@ class DesktopDownloadTests(unittest.TestCase):
             for phrase in ['0.1.0-rc.2', 'Unsigned', 'Interactive use has not been tested', 'glibc 2.35', 'unrecognized-publisher']:
                 self.assertIn(phrase, text)
             self.assertNotIn('rc.1', text)
-            for name, filename, sha256 in PACKAGES:
+            for name, icon, label, filename, sha256 in PACKAGES:
                 link = section.get_by_role('link', name=name, exact=True)
+                expect(link.locator('svg')).to_have_count(1)
+                expect(link.locator(f'svg[data-icon="{icon}"]')).to_be_visible()
+                expect(link).to_have_text(label)
                 expect(link).to_have_attribute('href', f'https://github.com/ClawPick2026/paperwork-desktop/releases/download/v0.1.0-rc.2/{filename}')
                 link.hover()
                 self.assertEqual(link.evaluate('element=>getComputedStyle(element).cursor'), 'pointer')

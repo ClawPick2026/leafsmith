@@ -1,7 +1,7 @@
 import * as PDFLib from 'pdf-lib';
 import qrFactory from 'qrcode-generator';
 import { createEngine } from '../web/client/engine-core.ts';
-export type { PdfField, TransformOptions, Overlay, ImageOptions } from '../web/client/engine-core.ts';
+export type { PdfField, PageSize, TransformOptions, Overlay, ImageOptions } from '../web/client/engine-core.ts';
 
 export function loadPdfLib(): Promise<any> { return Promise.resolve(PDFLib); }
 export async function loadPdfJs(): Promise<any> {
@@ -14,4 +14,4 @@ export async function loadPdfJs(): Promise<any> {
 }
 function loadQr(): Promise<any> { return Promise.resolve(qrFactory); }
 
-export const { openPdf, pdfInfo, makeDemoPdf, transformPdf, mergePdfs, overlayPdf, fillPdf, imagesToPdf, optimizePdf, qrSvg, renderPdfPage, extractPdfText, processImage, mergeImages, validateFileSize } = createEngine({ loadPdfLib, loadPdfJs, loadQr });
+export const { openPdf, pdfInfo, makeDemoPdf, transformPdf, mergePdfs, overlayPdf, fillPdf, imagesToPdf, optimizePdf, qrSvg, renderPdfPage, renderPdfPages, extractPdfText, processImage, mergeImages, validateFileSize } = createEngine({ loadPdfLib, loadPdfJs, loadQr });

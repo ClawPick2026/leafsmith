@@ -8,6 +8,7 @@ test('tool discovery filters active browser tools by category and search', async
   assert.equal(tools.length, 1);
   assert.equal(tools[0].id, 'organize');
   assert.equal(catalog.findTools('All tools', 'images').some((t:any)=>t.id==='images-pdf'), true);
+  assert.deepEqual(catalog.findTools('All tools', 'crop').map((t:any)=>t.id), ['organize','pdf-images','image-tools']);
 });
 
 test('tool descriptions state supported operations without promotional language', async () => {
@@ -20,10 +21,10 @@ test('tool descriptions state supported operations without promotional language'
     sign:'Draw your signature and place it on a document.',
     forms:'Fill existing text fields, checkboxes and supported dropdowns.',
     'images-pdf':'Convert PNG and JPEG images into one PDF.',
-    'pdf-images':'Export selected PDF pages as PNG images.',
+    'pdf-images':'Export selected PDF pages, or a cropped area of them, as PNG images.',
     text:'Save text already embedded in a PDF as a .txt file.',
     optimize:'Optimize PDF structure without changing image quality.',
-    'image-tools':'Resize, compress, adjust brightness and contrast, or combine images.',
+    'image-tools':'Crop, resize, compress, adjust brightness and contrast, or combine images.',
     qr:'Generate a QR code from a link or text.'
   };
   assert.deepEqual(Object.fromEntries(tools.map(t=>[t.id,t.description])),expected);
