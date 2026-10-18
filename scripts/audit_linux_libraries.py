@@ -180,6 +180,95 @@ LIBUUID_SOURCE_VERSION = "2.37.2-4ubuntu3.6"
 UTIL_LINUX_REVIEWED_RUNTIMES = frozenset({"libuuid.so.1", "libblkid.so.1", "libmount.so.1"})
 
 
+GPL_TERMS = re.compile(r"\bGPL(?:v?\d|[-\s]|\b)|GNU GENERAL PUBLIC LICENSE", re.I)
+LGPL_TERMS = re.compile(r"\bLGPL(?:v?\d|[-\s]|\b)|GNU (?:LESSER|LIBRARY) GENERAL PUBLIC LICENSE", re.I)
+# Standard exceptions that permit use of the covered file outside GPL works.
+GPL_EXCEPTIONS = re.compile(r"\bwith\s+(?:bison|autoconf|distribution|libtool|linux-syscall-note)\s+exception\b", re.I)
+
+# DEP5 override paths that are packaging, build system, documentation, tests,
+# examples, programs or scripts rather than shared-library code. A tripwire
+# heuristic: anything else with a GPL-only grant still needs review.
+NONRUNTIME_DIRS = frozenset({"debian", "doc", "docs", "man", "po", "test", "tests", "testsuite",
+                             "examples", "example", "contrib", "programs", "tools", "scripts", "perl", "coverage"})
+# Build-system directories can hold compiled snippets: exempt only non-source
+# files there (a "build-aux/runtime.c" still needs review).
+BUILD_SYSTEM_DIRS = frozenset({"build-aux", "m4"})
+SOURCE_SUFFIXES = (".c", ".h", ".cc", ".cpp", ".cxx", ".hh", ".hpp", ".m", ".mm", ".s", ".S", ".asm", ".inc")
+NONRUNTIME_NAMES = frozenset({"aclocal.m4", "ar-lib", "autogen.sh", "compile", "config.guess", "config.sub",
+                              "configure", "depcomp", "GNUmakefile", "install-sh", "ltmain.sh", "maint.mk",
+                              "mdate-sh", "missing", "test-driver", "texinfo.tex", "ylwrap"})
+NONRUNTIME_SUFFIXES = (".m4", ".pl", ".pm", ".py", ".sh", ".xsl", ".html", ".texi")
+NONRUNTIME_PREFIXES = ("Makefile", "Doxyfile", "test-", "test_")
+# Copies of Linux kernel UAPI headers: userspace use is the kernel's
+# syscall-note boundary, whether or not Debian repeats the note.
+UAPI_HEADER_DIRS = frozenset({"linux", "drm-uapi"})
+
+# Reviewed GPL-only overrides that are not built into the shipped libraries,
+# by Debian source package. A trailing "/" covers that directory. Any other
+# GPL-only override in these sources still requires review.
+REVIEWED_NONRUNTIME_OVERRIDES = {
+    "xz-utils": {"lib/*": "getopt_long replacement for the xz command-line tools; liblzma is src/liblzma (public domain)",
+                 "extra/scanlzma/scanlzma.c": "standalone scanlzma utility"},
+    "nettle": {"getopt*": "getopt replacement for the nettle command-line tools, not libnettle/libhogweed"},
+    "systemd": {"src/udev/": "udevd, udevadm and udev helper programs; libudev and libsystemd are src/libudev and src/libsystemd",
+                "src/basic/ioprio.h": "Linux I/O-priority syscall ABI definitions (constants, macros and inline syscall "
+                                      "wrappers copied from the kernel header); reviewed as an interface definition"},
+    "lcms2": {"plugins/fast_float/*": "separately built fast-float plugin, not part of liblcms2"},
+    "gstreamer1.0": {"gst/parse/grammar.tab.h": "Bison-generated parser header covered by Bison's skeleton exception"},
+    "enchant-2": {"providers/applespell_checker.mm": "macOS AppleSpell provider, not built for Linux",
+                  "build-aux/snippet/": "gnulib snippet headers (macro definitions only); gnulib's module metadata "
+                                        "licenses them LGPLv2+ for library use"},
+    "libunistring": {"woe32dll/*": "Windows DLL support, not built for Linux"},
+    "gdk-pixbuf": {"thumbnailer/*": "gdk-pixbuf-thumbnailer program, not the library or its loaders"},
+}
+
+# Reviewed whole-notice classifications (Ubuntu jammy, CI 39154597775), bound
+# to the exact notice SHA-256 and library basenames. Changed text, another
+# library or a missing source needs another review.
+REVIEWED_LIBRARY_NOTICES = {
+    # Non-DEP5 MIT Kerberos notice; its GPL text is an alternative a recipient
+    # may choose ("either the BSD or the GPL"), not a requirement.
+    "krb5": ("4a2d321ab57260e8de4b67bde8cff76c07d28be69c2d8b22dfc2bfa42f5c41b9",
+             frozenset({"libgssapi_krb5.so.2", "libk5crypto.so.3", "libkrb5.so.3", "libkrb5support.so.0"}),
+             "notice-and-exact-source-preserved"),
+    # The GPL-2+ default covers the keyctl tools; libkeyutils is built from
+    # keyutils.c/keyutils.h, which the "keyutils.*" stanza grants LGPL-2+.
+    "keyutils": ("6ab5c541723d8211cab7ebc1643d53aa51c4863c1c838e4625d797ece9472ee8",
+                 frozenset({"libkeyutils.so.1"}), "lgpl-source-required"),
+    # Library sources (*.c *.h) are "LGPL-3+ or GPL-2+". The GPL-3+ stanzas
+    # cover the idn2 tool, docs and FSF build/gnulib files of an older layout.
+    "libidn2": ("41702469f28e8ff406345e3d1dd0c741f11bdfca319264f67036efd6aaa79e4b",
+                frozenset({"libidn2.so.0"}), "lgpl-source-required"),
+    # Debian writes "BSD-3-clause and GPL-2"; the upstream source headers say
+    # "You may select, at your option, one of the above-listed licenses."
+    "libzstd": ("8cf66791fbe72801cb1d701c832b7e395dad0000bb9699dc42df94b49d699e91",
+                frozenset({"libzstd.so.1"}), "notice-and-exact-source-preserved"),
+}
+
+
+def requires_gpl(grant):
+    """True when every choice in a DEP5 license expression needs plain GPL.
+
+    DEP5 precedence: ", and" / ", or" bind loosest, then "or", then "and".
+    """
+    for separator, combine in ((r",\s*and\s+", any), (r",\s*or\s+", all), (r"\s+or\s+", all), (r"\s+and\s+", any)):
+        parts = re.split(separator, grant.strip(), flags=re.I)
+        if len(parts) > 1:
+            return combine(requires_gpl(part) for part in parts)
+    return bool(GPL_TERMS.search(grant) and not LGPL_TERMS.search(grant) and not GPL_EXCEPTIONS.search(grant))
+
+
+def nonruntime_file(pattern, reviewed=()):
+    pattern = pattern.removeprefix("./")
+    if pattern in reviewed or any(entry.endswith("/") and pattern.startswith(entry) for entry in reviewed):
+        return True
+    *dirs, name = pattern.split("/")
+    return (any(part in NONRUNTIME_DIRS for part in dirs) or name in NONRUNTIME_NAMES
+            or (any(part in BUILD_SYSTEM_DIRS for part in dirs) and not name.endswith(SOURCE_SUFFIXES))
+            or name.endswith(NONRUNTIME_SUFFIXES) or name.startswith(NONRUNTIME_PREFIXES)
+            or (name.endswith(".h") and bool(dirs) and dirs[-1] in UAPI_HEADER_DIRS))
+
+
 def license_policy(text, source_package, basename, *, source_version=None):
     """Reject GPL-only/AGPL libraries, not LGPL runtime libraries.
 
@@ -206,6 +295,11 @@ def license_policy(text, source_package, basename, *, source_version=None):
                 evidence = control["License"].splitlines()[0]
                 default_stanza = control
                 break
+    if source_package in REVIEWED_LIBRARY_NOTICES:
+        digest, basenames, policy = REVIEWED_LIBRARY_NOTICES[source_package]
+        if basename not in basenames or hashlib.sha256(text.encode("utf-8")).hexdigest() != digest:
+            raise ValueError("Unrecognized " + basename + " notice for reviewed " + source_package + "; explicit review required")
+        return policy
     if source_package == "util-linux" and basename in UTIL_LINUX_REVIEWED_RUNTIMES:
         if source_version != LIBUUID_SOURCE_VERSION:
             raise ValueError("Unrecognized " + basename + " runtime source version; explicit review required")
@@ -222,19 +316,20 @@ def license_policy(text, source_package, basename, *, source_version=None):
                 or runtime[1].split() != LIBFFI_RUNTIME_GRANT.split()):
             raise ValueError("Unrecognized libffi runtime copyright; explicit review required: " + basename)
         return "notice-and-exact-source-preserved"
+    reviewed = REVIEWED_NONRUNTIME_OVERRIDES.get(source_package, {})
     for control in file_stanzas:
-        files = control["Files"].split()
         if control is default_stanza:
             continue  # The default grant is classified below (including GCC).
         grant = control.get("License", "").splitlines()[0] if control.get("License") else ""
-        if (re.search(r"\bGPL(?:v?\d|[-\s]|\b)|GNU GENERAL PUBLIC LICENSE", grant, re.I)
-                and not re.search(r"\bLGPL(?:v?\d|[-\s]|\b)|GNU (?:LESSER|LIBRARY) GENERAL PUBLIC LICENSE", grant, re.I)):
-            # Only the named configure helper scripts are unambiguously build
-            # tools here. A directory, wildcard or mixed runtime list is not.
-            if not all(Path(name).name in {"config.guess", "config.sub"} for name in files):
-                raise ValueError("GPL-only file override requires explicit review; not permitted: " + basename)
-    gpl = re.search(r"\bGPL(?:v?\d|[-\s]|\b)|GNU GENERAL PUBLIC LICENSE", evidence, re.I)
-    lgpl = re.search(r"\bLGPL(?:v?\d|[-\s]|\b)|GNU (?:LESSER|LIBRARY) GENERAL PUBLIC LICENSE", evidence, re.I)
+        # A non-GPL alternative or standard exception is not GPL-only. Otherwise
+        # only build/tool/doc/test files or reviewed paths are permitted.
+        if GPL_TERMS.search(grant) and not LGPL_TERMS.search(grant) and requires_gpl(grant):
+            unexcused = [name for name in control["Files"].split() if not nonruntime_file(name, reviewed)]
+            if unexcused:
+                raise ValueError("GPL-only file override requires explicit review; not permitted: "
+                                 + basename + " (" + ", ".join(unexcused) + ")")
+    gpl = GPL_TERMS.search(evidence)
+    lgpl = LGPL_TERMS.search(evidence)
     gcc = (re.fullmatch(r"gcc-\d+", source_package or "")
            and re.match(r"lib(?:gcc_s|stdc\+\+)\.so(?:\.|$)", basename)
            and re.search(r"GCC (?:RUNTIME LIBRARY |runtime )?EXCEPTION", text, re.I))
@@ -242,7 +337,8 @@ def license_policy(text, source_package, basename, *, source_version=None):
         return "gcc-runtime-exception-source-required"
     if lgpl:
         return "lgpl-source-required"
-    if gpl:
+    # Expression parsing applies only to a DEP5 grant line, never to prose.
+    if gpl and (default_stanza is None or requires_gpl(evidence)):
         raise ValueError("GPL-only library requires explicit review; not permitted: " + basename)
     return "notice-and-exact-source-preserved"
 

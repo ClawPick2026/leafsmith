@@ -79,6 +79,20 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends build-essential binutils curl wget file patchelf libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev libxdo-dev libssl-dev librsvg2-dev xvfb xauth
+      - name: Drop the GPL-only TIFF image loader (disposable hosted Ubuntu only)
+        if: runner.os == 'Linux'
+        run: |
+          # gdk-pixbuf's TIFF loader links libtiff -> libjbig (JBIG-KIT, GPL-2+).
+          # The app never loads TIFF through GTK (the worker uses Pillow's own
+          # libtiff), so the loader is neither inventoried nor bundled. The
+          # postbundle audit rejects libjbig if anything still ships it.
+          test "$GITHUB_ACTIONS" = true && test "$RUNNER_ENVIRONMENT" = github-hosted
+          pixbuf=/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0
+          sudo rm -f "$pixbuf"/2.10.0/loaders/libpixbufloader-tiff.so
+          sudo "$pixbuf"/gdk-pixbuf-query-loaders --update-cache
+          if grep -q -i tiff "$pixbuf"/2.10.0/loaders.cache; then
+            echo "::error::TIFF pixbuf loader is still registered"; exit 1
+          fi
       - name: Install locked frontend dependencies
         run: npm ci
       - name: Frontend tests and build

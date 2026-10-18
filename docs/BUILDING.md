@@ -178,8 +178,20 @@ python scripts/audit_linux_libraries.py \
   Runtime Library Exception present. Debian copyright often covers GPL build
   tools alongside LGPL/permissive libraries; DEP5's default `Files: *` license is
   used where available rather than treating a GPL `config.guess` stanza as runtime
-  terms. This tripwire is **not** a determination of file-specific licensing.
-  Review source-file exceptions and mixed/dual-license notices before release.
+  terms. A GPL-only `Files:` override is accepted only when its grant offers a
+  non-GPL alternative (`BSD-3-clause or GPL-2`) or a standard exception (Bison,
+  Autoconf, libtool distribution, Linux-syscall-note), or when every listed file is
+  packaging, documentation, tests, examples, programs, scripts, a Linux UAPI
+  header copy, a non-source build-system file, or a reviewed path in
+  `REVIEWED_NONRUNTIME_OVERRIDES` (each with its reason). Krb5, keyutils, libidn2
+  and libzstd are classified from their exact reviewed notices (SHA-256 and
+  library names pinned in `REVIEWED_LIBRARY_NOTICES`); a changed notice fails.
+  The error lists every unexcused file. This tripwire is **not** a determination
+  of file-specific licensing. Review source-file exceptions and mixed/dual-license
+  notices before release.
+* CI deletes gdk-pixbuf's TIFF loader on the disposable runner before inventory
+  and bundling: it links libtiff to JBIG-KIT (`libjbig`, GPL-2+), and the app
+  never decodes TIFF through GTK (the worker uses Pillow's bundled libtiff).
   Copyleft wheel declarations require an explicit exact-source collector rather
   than silently borrowing unrelated Debian sources. Other wheel terms and nested
   vendored-library notices still require review.

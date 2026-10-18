@@ -8,3 +8,7 @@
 # Preserve the exact upstream copyright fixture, including its whitespace.
 scripts/tests/fixtures/libffi-copyright.txt text eol=lf -whitespace
 scripts/tests/fixtures/libuuid-copyright.txt text eol=lf -whitespace
+scripts/tests/fixtures/krb5-copyright.txt text eol=lf -whitespace
+scripts/tests/fixtures/keyutils-copyright.txt text eol=lf -whitespace
+scripts/tests/fixtures/libidn2-copyright.txt text eol=lf -whitespace
+scripts/tests/fixtures/libzstd-copyright.txt text eol=lf -whitespace

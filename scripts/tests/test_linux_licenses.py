@@ -1,6 +1,7 @@
 """Linux redistribution contracts; synthetic data is never release evidence."""
 import importlib.util
 from pathlib import Path
+import re
 import unittest
 
 SCRIPT = Path(__file__).resolve().parents[1] / "audit_linux_libraries.py"
@@ -415,6 +416,106 @@ class SourceTests(unittest.TestCase):
                 "Files: *\nCopyright: fixture only\nLicense: Apache-2.0\n\n"
                 "Files: build-aux/config.guess\nCopyright: fixture only\nLicense: GPL-3+\n")
         self.assertEqual(api().license_policy(text, "example", "libexample.so"), "notice-and-exact-source-preserved")
+
+    def dep5(self, default, override_files, override_grant):
+        return ("Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/\n\n"
+                "Files: *\nCopyright: fixture only\nLicense: " + default + "\n\n"
+                "Files: " + override_files + "\nCopyright: fixture only\nLicense: " + override_grant + "\n")
+
+    def test_dep5_gpl_alternatives_and_standard_exceptions_are_not_gpl_only(self):
+        # Grants seen in Ubuntu jammy WebKitGTK dependencies (CI 39154597775).
+        module = api()
+        for grant in ["BSD-3-clause or GPL-2", "AFL-2.1 or GPL-2+", "Artistic or GPL-1+",
+                      "GPL-2 or MIT", "GPL-2+ or AFL-2.1, and Tcl-BSDish",
+                      "GPL-2+ with Bison exception", "GPL-3+ with Autoconf exception",
+                      "GPL-3+ with autoconf exception", "GPL-2 with Linux-syscall-note exception",
+                      "GPL-2+ with distribution exception"]:
+            with self.subTest(grant=grant):
+                self.assertEqual(module.license_policy(self.dep5("LGPL-2.1+", "src/core.c", grant), "example", "libexample.so"),
+                                 "lgpl-source-required")
+
+    def test_dep5_gpl_only_overrides_outside_library_sources_are_build_or_tool_files(self):
+        module = api()
+        for files in ["debian/*", "m4/ax_pthread.m4", "builds/unix/pkg.m4", "build-aux/*", "ltmain.sh", "texinfo.tex",
+                      "Doxyfile.in", "lib/Makefile.gnulib lib/Makefile.in", "doc/yat2m.c", "src/util/uthash/doc/userguide.html",
+                      "tests/* gdk-pixbuf/test-gdk-pixbuf.c", "./examples/printVersion.c", "programs/lz4io.c",
+                      "tools/dbus-monitor.c tools/dbus-print-message.?", "src/scripts/*", "contrib/perl/*",
+                      "external/perl/Text-Template-1.56/*", "common/coverage/coverage-report.pl", "libsecret/mock/hkdf.py",
+                      "Source/ThirdParty/ANGLE/tools/flex-bison/third_party/skeletons/*",
+                      "include/linux/input.h include/drm-uapi/etnaviv_drm.h"]:
+            with self.subTest(files=files):
+                self.assertEqual(module.license_policy(self.dep5("LGPL-2.1+", files, "GPL-2+"), "example", "libexample.so"),
+                                 "lgpl-source-required")
+
+    def test_dep5_gpl_only_runtime_looking_overrides_still_require_review(self):
+        # Still a tripwire: the error names every unexcused file.
+        module = api()
+        for files, grant in [("src/core.c", "GPL-2+"), ("lib/*", "GPL-3+"), ("src/basic/ioprio.h", "GPL-2"),
+                             ("libexample/linux.c", "GPL-2"), ("src/core.c", "BSD-3-clause and GPL-2"),
+                             ("debian/* src/core.c", "GPL-2+"), ("thumbnailer/*", "GPL-2+"),
+                             ("build-aux/snippet/arg-nonnull.h", "GPL-3.0+"), ("m4/inline.h", "GPL-2+")]:
+            with self.subTest(files=files, grant=grant):
+                with self.assertRaisesRegex(ValueError, "GPL-only file override requires explicit review.*" + re.escape(files.split()[-1])):
+                    module.license_policy(self.dep5("LGPL-2.1+", files, grant), "example", "libexample.so")
+
+    def test_reviewed_non_runtime_overrides_apply_only_to_their_source_package(self):
+        module = api()
+        for source, files in [("xz-utils", "src/scripts/* lib/* extra/scanlzma/scanlzma.c"), ("nettle", "getopt*"),
+                              ("systemd", "src/basic/ioprio.h src/udev/ata_id/ata_id.c src/udev/udevadm.c"),
+                              ("lcms2", "plugins/fast_float/*"), ("gstreamer1.0", "gst/parse/grammar.tab.h"),
+                              ("enchant-2", "./providers/applespell_checker.mm build-aux/snippet/arg-nonnull.h"),
+                              ("libunistring", "woe32dll/*"),
+                              ("gdk-pixbuf", "thumbnailer/*")]:
+            text = self.dep5("LGPL-2.1+", files, "GPL-2+")
+            with self.subTest(source=source):
+                self.assertEqual(module.license_policy(text, source, "libexample.so"), "lgpl-source-required")
+                with self.assertRaisesRegex(ValueError, "GPL-only file override requires explicit review"):
+                    module.license_policy(text, "example", "libexample.so")
+        with self.assertRaisesRegex(ValueError, "src/core.c"):
+            module.license_policy(self.dep5("LGPL-2.1+", "lib/* src/core.c", "GPL-2+"), "xz-utils", "liblzma.so.5")
+
+    def test_dep5_default_grant_with_permissive_alternative_is_not_gpl_only(self):
+        # dbus: "Files: * / License: GPL-2+ or AFL-2.1".
+        module = api()
+        text = ("Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/\n\n"
+                "Files: *\nCopyright: fixture only\nLicense: GPL-2+ or AFL-2.1\n")
+        self.assertEqual(module.license_policy(text, "dbus", "libdbus-1.so.3"), "notice-and-exact-source-preserved")
+        with self.assertRaisesRegex(ValueError, "GPL-only library"):
+            module.license_policy(text.replace(" or AFL-2.1", ""), "dbus", "libdbus-1.so.3")
+
+    def test_actual_reviewed_library_notices_are_bound_to_exact_text_and_libraries(self):
+        # Unmodified notices from CI 39154597775 (Ubuntu jammy): krb5
+        # 1.19.2-2ubuntu0.10 (MIT notice; GPL is only an offered alternative),
+        # keyutils 1.6.1-2ubuntu3 (library sources keyutils.* are LGPL-2+) and
+        # libidn2 2.3.2-2build1 (library sources are LGPL-3+ or GPL-2+) and
+        # libzstd 1.4.8+dfsg-3build1 (BSD-3-clause or GPL-2 at the recipient's option).
+        import hashlib
+        module = api()
+        cases = [("krb5-copyright.txt", "krb5", "4a2d321ab57260e8de4b67bde8cff76c07d28be69c2d8b22dfc2bfa42f5c41b9",
+                  ["libgssapi_krb5.so.2", "libk5crypto.so.3", "libkrb5.so.3", "libkrb5support.so.0"],
+                  "notice-and-exact-source-preserved"),
+                 ("keyutils-copyright.txt", "keyutils", "6ab5c541723d8211cab7ebc1643d53aa51c4863c1c838e4625d797ece9472ee8",
+                  ["libkeyutils.so.1"], "lgpl-source-required"),
+                 ("libidn2-copyright.txt", "libidn2", "41702469f28e8ff406345e3d1dd0c741f11bdfca319264f67036efd6aaa79e4b",
+                  ["libidn2.so.0"], "lgpl-source-required"),
+                 ("libzstd-copyright.txt", "libzstd", "8cf66791fbe72801cb1d701c832b7e395dad0000bb9699dc42df94b49d699e91",
+                  ["libzstd.so.1"], "notice-and-exact-source-preserved")]
+        for fixture, source, digest, basenames, policy in cases:
+            path = Path(__file__).with_name("fixtures") / fixture
+            self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), digest)
+            text = path.read_text(encoding="utf-8")
+            for basename in basenames:
+                with self.subTest(source=source, basename=basename):
+                    self.assertEqual(module.license_policy(text, source, basename), policy)
+            with self.subTest(source=source, change="notice"), self.assertRaisesRegex(ValueError, "explicit review"):
+                module.license_policy(text + "\n", source, basenames[0])
+            with self.subTest(source=source, change="library"), self.assertRaisesRegex(ValueError, "explicit review"):
+                module.license_policy(text, source, "libother.so.1")
+            with self.subTest(source=source, change="package"), self.assertRaisesRegex(ValueError, "GPL"):
+                module.license_policy(text, "example", basenames[0])
+            for term in ["AGPL-3.0", "Affero General Public License"]:
+                with self.subTest(source=source, term=term), self.assertRaisesRegex(ValueError, "AGPL"):
+                    module.license_policy(text + "\n" + term, source, basenames[0])
 
     def test_copyright_and_referenced_common_license_are_copied_not_linked(self):
         import tempfile
